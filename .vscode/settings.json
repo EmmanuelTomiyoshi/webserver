@@ -1,0 +1,9 @@
+{
+	"makefile.launchConfigurations": [
+		{
+			"cwd": "/home/etomiyos/42projetos/webserver",
+			"binaryPath": "/home/etomiyos/42projetos/webserver/webserver",
+			"binaryArgs": []
+		}
+	]
+}

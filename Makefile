@@ -1,6 +1,8 @@
 NAME 		=	webserver
 
-SRC 		=	main.cpp test.cpp ./parsing/Request.cpp
+SRC 		=	main.cpp test.cpp Request.cpp
+
+VPATH		=	./parsing
 
 CXX 		=	c++
 CXXFLAGS 	=	-Wall -Wextra -Werror -std=c++98 -g

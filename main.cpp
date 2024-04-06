@@ -14,5 +14,8 @@ int main (void)
 	std::cout << "\n--------- PRINTINGS ---------\n\n";
 
 	std::cout << "request-line: " << req.get_request_line() << std::endl;
+
+	std::cout << std::endl;
+	req.info();
 	return (0);
 }

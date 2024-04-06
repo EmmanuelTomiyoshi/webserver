@@ -47,6 +47,9 @@ re: fclean all
 rr: re
 	@./webserver
 
+push:
+	git push origin tomatte
+
 leaks: $(NAME)
 	$(VALGRIND) ./$(NAME)
 

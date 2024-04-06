@@ -3,9 +3,8 @@
 
 int main (void)
 {
-	Request req;
+	Request req("eu sou a lei");
 
-	req.hello();
-	webtest();
+	std::cout << req.get_message() << std::endl;
 	return (0);
 }

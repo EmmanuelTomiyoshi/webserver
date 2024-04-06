@@ -44,6 +44,9 @@ fclean: clean
 
 re: fclean all
 
+rr: re
+	@./webserver
+
 leaks: $(NAME)
 	$(VALGRIND) ./$(NAME)
 

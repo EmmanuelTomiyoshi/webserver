@@ -1,6 +1,7 @@
 #ifndef REQUEST_H
 # define REQUEST_H
 # include <string>
+# include <sstream>
 
 /*	 MESSAGE FORMAT 
 
@@ -13,7 +14,11 @@ class Request
 
 	private:
 		std::string _message;
-		std::string extract_request_line();
+		std::string _request_line;
+		std::string _method;
+		std::string _target;
+		std::string _version;
+		void extract_request_line(void);
 
 	public:
 		Request(void);
@@ -22,6 +27,7 @@ class Request
 		~Request(void);
 
 		std::string get_message(void) const;
+		std::string get_request_line(void) const;
 		void hello(void);
 };
 

@@ -6,7 +6,7 @@ Request::Request(void) {}
 
 Request::Request(std::string message) {
 	this->_message = message;
-	this->extract_request_line();
+	this->_request_line = extract_request_line(message);
 }
 
 std::string Request::get_message(void) const {
@@ -19,11 +19,11 @@ std::string Request::get_request_line(void) const {
 //LF = 10 = Line Feed
 //CR = 13 = Carriage Return
 
-void Request::extract_request_line(void) {
-	std::stringstream	ss(this->_message);
+std::string Request::extract_request_line(std::string & message) {
+	std::stringstream	ss(message);
 	char	buffer[200];
 	ss.getline(buffer, 199);
-	this->_request_line = std::string(buffer);
+	return std::string(buffer);
 }
 
 Request::~Request(void) {}

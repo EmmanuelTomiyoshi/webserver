@@ -18,7 +18,7 @@ class Request
 		std::string _method;
 		std::string _target;
 		std::string _version;
-		void extract_request_line(void);
+		static std::string extract_request_line(std::string & message);
 
 	public:
 		Request(void);

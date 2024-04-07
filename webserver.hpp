@@ -8,11 +8,15 @@
 #include <netdb.h>				// for network-related functions like getaddrinfo()
 #include <arpa/inet.h>			// for manipulating IP addresses
 #include <cstring>				// for c string manipulation functions
+#include <errno.h>				// for error macros
+#include <unistd.h>				// close()
 
 #include <sstream>
 
 #include "colors.hpp"
 #include "IPResolver.hpp"
+
+#define SOCKET_ERROR -1
 
 void webtest();
 

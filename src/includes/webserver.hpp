@@ -14,7 +14,7 @@
 #include <sstream>
 
 #include "colors.hpp"
-#include "IPResolver.hpp"
+#include "../socket/IPResolver.hpp"
 
 #define SOCKET_ERROR -1
 

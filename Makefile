@@ -1,12 +1,15 @@
 NAME 		=	webserver
 
-SRC 		=	main.cpp test.cpp IPResolver.cpp Request.cpp
+SRC 		=	main.cpp IPResolver.cpp Request.cpp
 
-VPATH		=	./parsing
+VPATH		=	./src \
+				./src/parsing \
+				./src/utils \
+				./src/socket
 
 CXX 		=	c++
 # CXXFLAGS 	=	-Wall -Wextra -Werror -std=c++98 -g
-CPPFLAGS 	=	-MMD -MP
+CPPFLAGS 	=	-MMD -MP -I ./src/includes
 BUILD_DIR 	=	build
 
 OBJ 		=	$(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
@@ -55,7 +58,7 @@ leaks: $(NAME)
 	$(VALGRIND) ./$(NAME) a
 
 client:
-	g++ client.cpp -o client
+	g++ ./src/client.cpp -o client
 
 -include $(DEP)
 

@@ -27,21 +27,6 @@ addrinfo get_hints(void) {
 	return hints;
 }
 
-void	addr_print(addrinfo *addr) {
-	std::cout << "----- ADDR INFO -----" << std::endl;
-	if (addr == NULL) {
-		std::cout << "addr is empty" << std::endl;
-		perror ("getaddrinfo");
-	}
-	else {
-		std::cout << "SocketLen: " << addr->ai_addrlen << std::endl;
-		std::cout << "Family: " << addr->ai_family << std::endl;
-		std::cout << "Protocol: " << addr->ai_protocol << std::endl;
-		std::cout << "SockType: " << addr->ai_socktype << std::endl;
-		std::cout << "Flags: " << addr->ai_flags << std::endl;
-	}
-}
-
 int main (void)
 {
 	addrinfo	hints = get_hints();
@@ -56,14 +41,9 @@ int main (void)
 		char buffer[100];
 		if (read(fd, buffer, 100) > 0) {
 			std::cout << "Response: " << buffer << std::endl;
+			return 0;
 		}
 
 	}
-	// socklen_t socklen;
-	// int nfd = accept(fd, addr->ai_addr, &socklen);
-	// std::cout << "nfd: " << nfd << std::endl;
-	perror("listen");
-	addr_print(addr);
-	(void)fd;
 	return (0);
 }

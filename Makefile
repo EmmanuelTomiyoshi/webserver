@@ -1,6 +1,6 @@
 NAME 		=	webserver
 
-SRC 		=	main.cpp test.cpp IPResolver.cpp Request.cpp
+SRC 		=	main.cpp IPResolver.cpp Request.cpp
 
 VPATH		=	./src \
 				./src/parsing \

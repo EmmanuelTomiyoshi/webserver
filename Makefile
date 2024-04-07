@@ -1,9 +1,9 @@
 NAME 		=	webserver
 
-SRC 		=	main.cpp test.cpp
+SRC 		=	main.cpp test.cpp IPResolver.cpp
 
 CXX 		=	c++
-CXXFLAGS 	=	-Wall -Wextra -Werror -std=c++98 -g
+# CXXFLAGS 	=	-Wall -Wextra -Werror -std=c++98 -g
 CPPFLAGS 	=	-MMD -MP
 BUILD_DIR 	=	build
 
@@ -43,7 +43,7 @@ fclean: clean
 re: fclean all
 
 leaks: $(NAME)
-	$(VALGRIND) ./$(NAME)
+	$(VALGRIND) ./$(NAME) a
 
 -include $(DEP)
 

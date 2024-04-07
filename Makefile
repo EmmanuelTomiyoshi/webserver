@@ -1,6 +1,8 @@
 NAME 		=	webserver
 
-SRC 		=	main.cpp test.cpp IPResolver.cpp
+SRC 		=	main.cpp test.cpp IPResolver.cpp Request.cpp
+
+VPATH		=	./parsing
 
 CXX 		=	c++
 # CXXFLAGS 	=	-Wall -Wextra -Werror -std=c++98 -g
@@ -39,11 +41,21 @@ fclean: clean
 	@echo "$(COLOR_BLUE)Removing $(NAME)$(COLOR_WHITE)"
 	$(RM) *.out $(NAME)
 	$(RM) -rf $(BUILD_DIR)
+	$(RM) -rf client
 
 re: fclean all
 
+rr: re
+	@./webserver
+
+push:
+	git push origin tomatte
+
 leaks: $(NAME)
 	$(VALGRIND) ./$(NAME) a
+
+client:
+	g++ client.cpp -o client
 
 -include $(DEP)
 

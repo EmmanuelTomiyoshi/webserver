@@ -1,5 +1,3 @@
-#include "webserver.hpp"
-#include "./parsing/Request.hpp"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -7,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <iostream>
+#include <unistd.h>
 
 std::string http_messagqe(void) {
 	return std::string(
@@ -42,41 +42,22 @@ void	addr_print(addrinfo *addr) {
 	}
 }
 
-int main(int argc, char *argv[])
+int main (void)
 {
-	if (argc != 2)
-	{
-		std::cerr << "Wrong arguments number" << std::endl;
-		return (1);
-	}
-
-	std::string str = std::string(argv[1]);
-	if (str.empty())
-	{
-		std::cerr << "Argument must not be empty" << std::endl;
-		return (1);
-	}
-
-	IPResolver ip;
-
-	std::string hostname = "google.com";
-	IPResolver resolver;
-	resolver.printIPAdresses(hostname);
-
 	addrinfo	hints = get_hints();
 	addrinfo	*addr = NULL;
 	// addrinfo	*rp = NULL;
 
 	int fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	getaddrinfo("localhost", "3005", &hints, &addr);
-	bind(fd, addr->ai_addr, addr->ai_addrlen);
-	listen(fd, 4);
+	connect(fd, addr->ai_addr, addr->ai_addrlen);
+	
 	while (1) {
-		int connFd = accept(fd, NULL, NULL);
-		if (connFd != -1) {
-			std::cout << "connected? " << std::endl;
+		char buffer[100];
+		if (read(fd, buffer, 100) > 0) {
+			std::cout << "Response: " << buffer << std::endl;
 		}
-		send(connFd, "sera q vai?", 12, MSG_DONTWAIT);
+
 	}
 	// socklen_t socklen;
 	// int nfd = accept(fd, addr->ai_addr, &socklen);
@@ -85,5 +66,4 @@ int main(int argc, char *argv[])
 	addr_print(addr);
 	(void)fd;
 	return (0);
-
 }

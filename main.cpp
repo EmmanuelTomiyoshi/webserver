@@ -57,7 +57,7 @@ int main (void)
 		if (connFd != -1) {
 			std::cout << "connected? " << std::endl;
 		}
-		send(connFd, "sera q vai?", 12, MSG_CONFIRM);
+		send(connFd, "sera q vai?", 12, MSG_DONTWAIT);
 	}
 	// socklen_t socklen;
 	// int nfd = accept(fd, addr->ai_addr, &socklen);

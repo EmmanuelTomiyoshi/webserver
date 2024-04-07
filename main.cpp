@@ -100,12 +100,9 @@ int main(int argc, char *argv[])
 
 	while (1) {
 		int connFd = accept(fd, NULL, NULL);
-		if (connFd == -1)
-		{
-			perror("accept");
-			continue; //continue listening for other connections
+		if (connFd != -1) {
+			std::cout << "connected? " << std::endl;
 		}
-		std::cout << "connected? " << std::endl;
 		send(connFd, "sera q vai?", 12, MSG_DONTWAIT);
 		close(connFd);
 	}

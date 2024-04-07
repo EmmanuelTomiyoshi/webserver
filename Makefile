@@ -41,6 +41,7 @@ fclean: clean
 	@echo "$(COLOR_BLUE)Removing $(NAME)$(COLOR_WHITE)"
 	$(RM) *.out $(NAME)
 	$(RM) -rf $(BUILD_DIR)
+	$(RM) -rf client
 
 re: fclean all
 
@@ -52,6 +53,9 @@ push:
 
 leaks: $(NAME)
 	$(VALGRIND) ./$(NAME)
+
+client:
+	g++ client.cpp -o client
 
 -include $(DEP)
 

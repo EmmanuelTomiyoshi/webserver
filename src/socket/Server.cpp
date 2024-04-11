@@ -33,16 +33,33 @@ Server::Server(void) : _addr_res(NULL)
 	_port = "3005";
 	_domain_name = "localhost";
 	_addr_hints = get_hints();
+	_epfd = epoll_create1(EPOLL_CLOEXEC);
 }
 
 Server::~Server(void)
 {
+	close(_epfd);
+	if (_addr_res != NULL)
+		freeaddrinfo(_addr_res);
 }
 
-void Server::new_connection(void)
+void	Server::new_epoll(int conn_fd)
 {
+	epoll_event event;
+	event.events = EPOLLIN | EPOLLOUT;
+	event.data.fd = conn_fd;
+	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, &event);
+}
 
-
+void	Server::send_message(int conn_fd, int event_count)
+{
+	for (int i = 0; i < event_count; i++)
+	{
+		char msg[] = "yeaaaaaaaaaaah!!!!!!!";
+		send(conn_fd, msg, strlen(msg), MSG_DONTWAIT);
+		std::cout << "message sent" << std::endl;
+		close(conn_fd);
+	}
 }
 
 void	Server::run(void)
@@ -50,26 +67,9 @@ void	Server::run(void)
 	while (1) {
 		int conn_fd = accept(_socket_fd, NULL, NULL);
 		if (conn_fd != -1) {
-			int epfd = epoll_create1(EPOLL_CLOEXEC);
-			epoll_event event;
-			event.events = EPOLLIN | EPOLLOUT;
-			event.data.fd = conn_fd;
-			epoll_ctl(epfd, EPOLL_CTL_ADD, conn_fd, &event);
-			int event_count = epoll_wait(epfd, _events, 5, 30000);
-			for (int i = 0; i < event_count; i++)
-			{
-				char msg[] = "yeaaaaaaaaaaah!!!!!!!";
-				send(conn_fd, msg, strlen(msg), MSG_DONTWAIT);
-				char buff[200];
-				int rsize = recv(_events[i].data.fd, buff, 200, MSG_DONTWAIT);
-				if (rsize > 0)
-				{
-					buff[rsize] = '\0';
-					std::cout << "Event " << i << ": " << buff << std::endl;
-				}
-				close(epfd);
-			}
-			close(conn_fd);
+			new_epoll(conn_fd);
+			int event_count = epoll_wait(_epfd, _events, 5, 30000);
+			send_message(conn_fd, event_count);
 		}
 	}
 }

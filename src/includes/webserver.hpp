@@ -15,6 +15,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sstream>
+#include <sys/epoll.h> 
 
 #include "../parsing/Request.hpp"
 #include "../socket/IPResolver.hpp"

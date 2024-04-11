@@ -34,6 +34,16 @@ void	addr_print(addrinfo *addr) {
 	}
 }
 
+int new_epoll(int conn_fd)
+{
+	int epfd = epoll_create1(EPOLL_CLOEXEC);
+	epoll_event event;
+	event.events = EPOLLIN | EPOLLOUT;
+	event.data.fd = conn_fd;
+	epoll_ctl(epfd, EPOLL_CTL_ADD, conn_fd, &event);
+	return epfd;
+}
+
 int server_start(void)
 {
 	addrinfo	hints = get_hints();
@@ -71,16 +81,30 @@ int server_start(void)
 		return (EXIT_FAILURE);
 	}
 
-	server_start();
 	std::cout << "server started!" << std::endl;
+	epoll_event events[5];
 	while (1) {
-		int connFd = accept(fd, NULL, NULL);
-		if (connFd != -1) {
+		int conn_fd = accept(fd, NULL, NULL);
+		if (conn_fd != -1) {
 			std::cout << "connected!!! " << std::endl;
-			char buffer[] = "yeaaaaaaaaaaah!!!!!!!";
-			send(connFd, buffer, strlen(buffer), MSG_DONTWAIT);
-			close(connFd);
-			break ;
+			int epfd = new_epoll(conn_fd);
+			int event_count = epoll_wait(epfd, events, 5, 30000);
+			std::cout << "epfd: " << epfd << std::endl;
+			std::cout << "event_count: " << event_count << std::endl;
+			for (int i = 0; i < event_count; i++)
+			{
+				char msg[] = "yeaaaaaaaaaaah!!!!!!!";
+				send(conn_fd, msg, strlen(msg), MSG_DONTWAIT);
+				char buff[200];
+				int rsize = recv(events[i].data.fd, buff, 200, MSG_DONTWAIT);
+				if (rsize > 0)
+				{
+					buff[rsize] = '\0';
+					std::cout << "Event " << i << ": " << buff << std::endl;
+				}
+				close(epfd);
+			}
+			close(conn_fd);
 		}
 	}
 	// socklen_t socklen;

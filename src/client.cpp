@@ -39,9 +39,15 @@ int main (void)
 	
 	while (1) {
 		char buffer[100];
-		if (read(fd, buffer, 100) > 0) {
+		int rsize = recv(fd, buffer, 100, MSG_DONTWAIT);
+		if (rsize > 0) {
+			buffer[rsize] = '\0';
 			std::cout << "Response: " << buffer << std::endl;
-			return 0;
+			char msg[] = "hi from client ^^";
+			send(fd, msg, strlen(msg), MSG_DONTWAIT);
+			close(fd);
+			freeaddrinfo(addr);
+			break ;
 		}
 
 	}

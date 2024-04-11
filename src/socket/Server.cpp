@@ -51,8 +51,10 @@ void	Server::new_epoll(int conn_fd)
 	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, &event);
 }
 
-void	Server::send_message(int conn_fd, int event_count)
+void	Server::send_message(int conn_fd)
 {
+	new_epoll(conn_fd);
+	int event_count = epoll_wait(_epfd, _events, 5, 30000);
 	for (int i = 0; i < event_count; i++)
 	{
 		char msg[] = "yeaaaaaaaaaaah!!!!!!!";
@@ -61,8 +63,10 @@ void	Server::send_message(int conn_fd, int event_count)
 	}
 }
 
-void Server::recv_message(int conn_fd, int event_count)
+void Server::recv_message(int conn_fd)
 {
+	new_epoll(conn_fd);
+	int event_count = epoll_wait(_epfd, _events, 5, 30000);
 	for (int i = 0; i < event_count; i++)
 	{
 		char buff[100];
@@ -78,12 +82,9 @@ void	Server::run(void)
 	while (1) {
 		int conn_fd = accept(_socket_fd, NULL, NULL);
 		if (conn_fd != -1) {
-		new_epoll(conn_fd);
-		new_epoll(conn_fd);
-		int event_count = epoll_wait(_epfd, _events, 5, 30000);
-		send_message(conn_fd, event_count);
-		recv_message(conn_fd, event_count);
-		close(conn_fd);
+			send_message(conn_fd);
+			recv_message(conn_fd);
+			close(conn_fd);
 		}
 	}
 }

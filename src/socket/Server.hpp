@@ -17,8 +17,8 @@ class Server
 		void start_addrinfo(void);
 		void socket_bind(void);
 		void run(void);
-		void send_message(int conn_fd, int event_count);
-		void recv_message(int conn_fd, int event_count);
+		void send_message(int conn_fd);
+		void recv_message(int conn_fd);
 		void new_epoll(int conn_fd);
 		static addrinfo get_hints(void);
 

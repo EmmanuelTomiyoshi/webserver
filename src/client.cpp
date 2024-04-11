@@ -8,7 +8,7 @@
 #include <iostream>
 #include <unistd.h>
 
-std::string http_messagqe(void) {
+std::string http_messaqe(void) {
 	return std::string(
 		"GET /hello.txt HTTP/1.1\nUser-Agent: curl/7.64.1\r\nHost: www.example.com\nAccept-Language: en, mi"
 	);
@@ -18,13 +18,20 @@ addrinfo get_hints(void) {
 	addrinfo hints;
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_INET;
-	// hints.ai_socktype = SOCK_STREAM;
-	// hints.ai_flags |= AI_CANONNAME;
-	// hints.ai_protocol = 0;
-	// hints.ai_next = NULL;
-	// hints.ai_addr = NULL;
-	// hints.ai_canonname = NULL;
 	return hints;
+}
+
+void recv_message(int fd)
+{
+	char buffer[100];
+	int rsize = recv(fd, buffer, 100, MSG_WAITALL);
+	if (rsize > 0)
+	{
+		buffer[rsize] = '\0';
+		std::cout << "MESSAGE RECEIVED: " << buffer << std::endl;	
+	}
+	else
+		std::cout << "message not received!!!" << std::endl;	
 }
 
 int main (void)
@@ -35,21 +42,21 @@ int main (void)
 
 	int fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	getaddrinfo("localhost", "3005", &hints, &addr);
-	connect(fd, addr->ai_addr, addr->ai_addrlen);
+	if (connect(fd, addr->ai_addr, addr->ai_addrlen) == 0)
+		std::cout << "CONNECTED TO SERVER" << std::endl;
+	std::string http;
+	http = http_messaqe();
+	int bsent = send(fd, http.c_str(), http.size(), MSG_DONTWAIT);
+	if (bsent > 0)
+		std::cout << "MESSAGE SENT SUCCESSFULLY" << std::endl;
 	
-	while (1) {
-		char buffer[100];
-		int rsize = recv(fd, buffer, 100, MSG_DONTWAIT);
-		if (rsize > 0) {
-			buffer[rsize] = '\0';
-			std::cout << "Response: " << buffer << std::endl;
-			char msg[] = "hi from client ^^";
-			send(fd, msg, strlen(msg), MSG_DONTWAIT);
-			close(fd);
-			freeaddrinfo(addr);
-			break ;
-		}
-
+	while (1)
+	{
+		sleep(1);
+		recv_message(fd);
+		break ;
 	}
+	close(fd);
+	freeaddrinfo(addr);
 	return (0);
 }

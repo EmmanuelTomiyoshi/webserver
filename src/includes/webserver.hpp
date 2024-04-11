@@ -10,15 +10,20 @@
 #include <cstring>				// for c string manipulation functions
 #include <errno.h>				// for error macros
 #include <unistd.h>				// close()
-
+#include <error.h>
+#include <stdio.h> 
+#include <string.h>
+#include <stdlib.h>
 #include <sstream>
 
-#include "colors.hpp"
+#include "../parsing/Request.hpp"
 #include "../socket/IPResolver.hpp"
+
+#include "colors.hpp"
 
 #define SOCKET_ERROR -1
 
-void webtest();
-
+void webtest(void);
+int server_start(void);
 
 #endif // WEBSERVER_HPP

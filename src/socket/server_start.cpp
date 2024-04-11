@@ -46,73 +46,15 @@ int new_epoll(int conn_fd)
 
 int server_start(void)
 {
-	addrinfo	hints = get_hints();
-	addrinfo	*addr = NULL;
-	// addrinfo	*rp = NULL;
+	Server server;
 
-	int fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
-	if (fd == SOCKET_ERROR)
-	{
-		perror("socket");
-		exit(EXIT_FAILURE);
-	}
-
-	int status = getaddrinfo("localhost", "3005", &hints, &addr);
-	if (status != 0)
-	{
-		std::cerr << "getaddrinfo: " << gai_strerror(status) << std::endl;
-		close(fd);
-		return (EXIT_FAILURE);
-	}
-
-	if (bind(fd, addr->ai_addr, addr->ai_addrlen) == -1)
-	{
-		perror("bind");
-		freeaddrinfo(addr);
-		close(fd);
-		return (EXIT_FAILURE);
-	}
-
-	if (listen(fd, 4) == -1)
-	{
-		perror("listen");
-		freeaddrinfo(addr);
-		close(fd);
-		return (EXIT_FAILURE);
-	}
-
-	std::cout << "server started!" << std::endl;
-	epoll_event events[5];
-	while (1) {
-		int conn_fd = accept(fd, NULL, NULL);
-		if (conn_fd != -1) {
-			std::cout << "connected!!! " << std::endl;
-			int epfd = new_epoll(conn_fd);
-			int event_count = epoll_wait(epfd, events, 5, 30000);
-			std::cout << "epfd: " << epfd << std::endl;
-			std::cout << "event_count: " << event_count << std::endl;
-			for (int i = 0; i < event_count; i++)
-			{
-				char msg[] = "yeaaaaaaaaaaah!!!!!!!";
-				send(conn_fd, msg, strlen(msg), MSG_DONTWAIT);
-				char buff[200];
-				int rsize = recv(events[i].data.fd, buff, 200, MSG_DONTWAIT);
-				if (rsize > 0)
-				{
-					buff[rsize] = '\0';
-					std::cout << "Event " << i << ": " << buff << std::endl;
-				}
-				close(epfd);
-			}
-			close(conn_fd);
-		}
-	}
+	server.start();
 	// socklen_t socklen;
 	// int nfd = accept(fd, addr->ai_addr, &socklen);
 	// std::cout << "nfd: " << nfd << std::endl;
 	// perror("listen");
-	addr_print(addr);
-	freeaddrinfo(addr);
-	close(fd);
+	// addr_print(addr);
+	// freeaddrinfo(addr);
+	// close(fd);
 	return (0);
 }

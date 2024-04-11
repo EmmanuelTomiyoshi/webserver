@@ -19,6 +19,7 @@
 
 #include "../parsing/Request.hpp"
 #include "../socket/IPResolver.hpp"
+#include "../socket/Server.hpp"
 
 #include "colors.hpp"
 

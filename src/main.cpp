@@ -21,7 +21,8 @@ int main(int argc, char *argv[])
 	IPResolver resolver;
 	resolver.printIPAdresses(hostname);
 
-	server_start();
+	Server server;
+	server.start();
 	return (0);
 
 }

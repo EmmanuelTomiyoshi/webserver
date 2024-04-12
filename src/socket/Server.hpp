@@ -1,5 +1,6 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
+# include <list>
 
 class Server
 {
@@ -17,9 +18,9 @@ class Server
 		void start_addrinfo(void);
 		void socket_bind(void);
 		void run(void);
-		void send_message(int conn_fd);
-		void recv_message(int conn_fd);
-		void new_epoll(int conn_fd);
+		void send_message(epoll_event & event);
+		void recv_message(epoll_event & event);
+		void new_epoll_event(int conn_fd, uint32_t operation);
 		static addrinfo get_hints(void);
 
 	public:

@@ -21,7 +21,7 @@ addrinfo get_hints(void) {
 	return hints;
 }
 
-void recv_message(int fd)
+int recv_message(int fd)
 {
 	char buffer[100];
 	int rsize = recv(fd, buffer, 100, MSG_WAITALL);
@@ -31,7 +31,8 @@ void recv_message(int fd)
 		std::cout << "MESSAGE RECEIVED: " << buffer << std::endl;	
 	}
 	else
-		std::cout << "message not received!!!" << std::endl;	
+		std::cout << "message not received!!!" << std::endl;
+	return rsize;
 }
 
 int main (void)
@@ -50,11 +51,17 @@ int main (void)
 	if (bsent > 0)
 		std::cout << "MESSAGE SENT SUCCESSFULLY" << std::endl;
 	
-	while (1)
+	for (int i = 0; i < 10; i++)
 	{
 		sleep(1);
-		recv_message(fd);
-		break ;
+		char buff[100];
+		int rsize = recv(fd, buff, 100, MSG_WAITALL);
+		if (rsize > 0)
+		{
+			buff[rsize] = '\0';
+			std::cout << "MSG: " << buff << std::endl;
+			break ;
+		}
 	}
 	close(fd);
 	freeaddrinfo(addr);

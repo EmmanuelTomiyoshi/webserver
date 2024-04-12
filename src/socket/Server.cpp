@@ -43,48 +43,52 @@ Server::~Server(void)
 		freeaddrinfo(_addr_res);
 }
 
-void	Server::new_epoll(int conn_fd)
+void	Server::new_epoll_event(int conn_fd, uint32_t operation)
 {
 	epoll_event event;
-	event.events = EPOLLIN | EPOLLOUT;
+	event.events = operation;
 	event.data.fd = conn_fd;
 	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, &event);
 }
 
-void	Server::send_message(int conn_fd)
+void	Server::send_message(epoll_event & event)
 {
-	new_epoll(conn_fd);
-	int event_count = epoll_wait(_epfd, _events, 5, 30000);
-	for (int i = 0; i < event_count; i++)
-	{
-		char msg[] = "yeaaaaaaaaaaah!!!!!!!";
-		send(conn_fd, msg, strlen(msg), MSG_WAITALL);
-		std::cout << "message sent" << std::endl;
-	}
+	if (event.events != EPOLLOUT)
+		return ;
+	char msg[] = "yeaaaaaaaaaaah!!!!!!!";
+	send(event.data.fd, msg, strlen(msg), MSG_WAITALL);
+	std::cout << "MESSAGE SENT" << std::endl;
+	epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
+	close(event.data.fd);
+	std::cout << "CONNECTION CLOSED" << std::endl;
 }
 
-void Server::recv_message(int conn_fd)
+void Server::recv_message(epoll_event & event)
 {
-	new_epoll(conn_fd);
-	int event_count = epoll_wait(_epfd, _events, 5, 30000);
-	for (int i = 0; i < event_count; i++)
-	{
-		char buff[100];
-		int rsize = recv(conn_fd, buff, 100, MSG_WAITALL);
-		buff[rsize] = '\0';
-		std::cout << "MESSAGE: " << buff << std::endl;
-	}
+	if (event.events != EPOLLIN)
+		return ;
+	char buff[100];
+	int rsize = recv(event.data.fd, buff, 100, MSG_WAITALL);
+	buff[rsize] = '\0';
+	Request http(buff);
+	std::cout << "REQUEST LINE: " << http.get_request_line() << std::endl;
+	std::cout << "METHOD: " << http.get_method() << std::endl;
+	epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
+	new_epoll_event(event.data.fd, EPOLLOUT);
+	std::cout << "OUTPUT EVENT CREATED" << std::endl;
 }
-
 
 void	Server::run(void)
 {
 	while (1) {
 		int conn_fd = accept(_socket_fd, NULL, NULL);
-		if (conn_fd != -1) {
-			send_message(conn_fd);
-			recv_message(conn_fd);
-			close(conn_fd);
+		if (conn_fd != -1)
+			new_epoll_event(conn_fd, EPOLLIN);
+		int event_count = epoll_wait(_epfd, _events, 5, 5);
+		for (int i = 0; i < event_count; i++)
+		{
+			recv_message(_events[i]);
+			send_message(_events[i]);
 		}
 	}
 }

@@ -58,13 +58,14 @@ void	Server::send_message(epoll_event & event)
 		return ;
 	std::string msg = "HTTP/1.1 200\r\ncontent-type: text/html; charset=utf-8\r\n\r\n" + _target;
 	int sent = send(event.data.fd, msg.c_str(), strlen(msg.c_str()) + 1, MSG_DONTWAIT);
+	close(event.data.fd);
+	epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
 	if (sent != -1)
-	{
-		std::cout << "MESSAGE SENT" << std::endl;
-		close(event.data.fd);
-		epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
-		std::cout << "CONNECTION CLOSED" << std::endl;
-	}
+		std::cout << "MESSAGE SENT SUCCESSFULY" << std::endl;
+	else
+		std::cout << "FAILED TO SEND MESSAGE" << std::endl;
+	std::cout << "CONNECTION CLOSED" << std::endl;
+	
 }
 
 void Server::recv_message(epoll_event & event)

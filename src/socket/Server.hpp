@@ -14,6 +14,9 @@ class Server
 
 		epoll_event	_events[5];
 		int			_epfd;
+		int			_timeout_ms;
+
+		std::string	_target;
 
 		void start_addrinfo(void);
 		void socket_bind(void);

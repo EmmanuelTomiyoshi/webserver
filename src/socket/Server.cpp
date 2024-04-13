@@ -34,7 +34,7 @@ Server::Server(void) : _addr_res(NULL)
 	_domain_name = "localhost";
 	_addr_hints = get_hints();
 	_epfd = epoll_create1(EPOLL_CLOEXEC);
-	_timeout_ms = 3000;
+	_timeout_ms = 0;
 }
 
 Server::~Server(void)

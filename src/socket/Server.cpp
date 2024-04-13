@@ -8,40 +8,15 @@ addrinfo Server::get_hints(void)
 	return hints;
 }
 
-void	Server::start_addrinfo(void)
+Server::Server(void)
 {
-	getaddrinfo(
-		_domain_name.c_str(),
-		_port.c_str(),
-		&_addr_hints,
-		&_addr_res
-	);
-}
-
-void	Server::socket_bind(void)
-{
-	bind(
-		_socket_fd,
-		_addr_res->ai_addr,
-		_addr_res->ai_addrlen
-	);
-}
-
-Server::Server(void) : _addr_res(NULL)
-{
-	_socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
-	_port = "3005";
-	_domain_name = "localhost";
-	_addr_hints = get_hints();
-	_epfd = epoll_create1(EPOLL_CLOEXEC);
-	_timeout_ms = 0;
 }
 
 Server::~Server(void)
 {
 	close(_epfd);
-	if (_addr_res != NULL)
-		freeaddrinfo(_addr_res);
+	// if (_addr_res != NULL)
+	// 	freeaddrinfo(_addr_res);
 }
 
 void	Server::new_epoll_event(int conn_fd, uint32_t operation)
@@ -93,9 +68,12 @@ void Server::recv_message(epoll_event & event)
 void	Server::run(void)
 {
 	while (1) {
-		int conn_fd = accept(_socket_fd, NULL, NULL);
-		if (conn_fd != -1)
-			new_epoll_event(conn_fd, EPOLLIN);
+		for (int i = 0; i < 5; i++)
+		{
+			int conn_fd = accept(_socket_fds[i], NULL, NULL);
+			if (conn_fd != -1)
+				new_epoll_event(conn_fd, EPOLLIN);
+		}
 		int event_count = epoll_wait(_epfd, _events, 5, _timeout_ms);
 		for (int i = 0; i < event_count; i++)
 		{
@@ -105,11 +83,39 @@ void	Server::run(void)
 	}
 }
 
+void Server::setup(void)
+{
+	_domain_name = "localhost";
+	_addr_hints = get_hints();
+	_epfd = epoll_create1(EPOLL_CLOEXEC);
+	_timeout_ms = 0;
+
+	const char	*ports[5] = {"3004", "3005", "3006", "3007", "3008"};
+
+	for (int i = 0; i < 5; i++)
+	{
+		getaddrinfo(
+			_domain_name.c_str(),
+			ports[i],
+			&_addr_hints,
+			&_addr_res[i]
+		);
+
+		_socket_fds[i] = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+
+		bind(
+			_socket_fds[i],
+			_addr_res[i]->ai_addr,
+			_addr_res[i]->ai_addrlen
+		);
+
+		listen(_socket_fds[i], 5);
+	}
+}
+
 void Server::start(void)
 {
-	start_addrinfo();
-	socket_bind();
-	listen(_socket_fd, 5);
+	setup();
 	std::cout << "Server started." << std::endl;
 	run();
 }

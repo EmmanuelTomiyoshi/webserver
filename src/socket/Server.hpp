@@ -5,12 +5,11 @@
 class Server
 {
 	private:
-		int			_socket_fd;
 		addrinfo	_addr_hints;
-		addrinfo	*_addr_res;
+		addrinfo	*_addr_res[5];
+		int			_socket_fds[5];
 
 		std::string _domain_name;
-		std::string	_port;
 
 		epoll_event	_events[5];
 		int			_epfd;
@@ -18,13 +17,12 @@ class Server
 
 		std::string	_target;
 
-		void start_addrinfo(void);
-		void socket_bind(void);
 		void run(void);
 		void send_message(epoll_event & event);
 		void recv_message(epoll_event & event);
 		void new_epoll_event(int conn_fd, uint32_t operation);
 		static addrinfo get_hints(void);
+		void setup(void);
 
 	public:
 		Server(void);

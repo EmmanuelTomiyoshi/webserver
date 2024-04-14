@@ -4,11 +4,13 @@ SRC 		=	main.cpp \
 				IPResolver.cpp \
 				Request.cpp \
 				Server.cpp \
+				Config.cpp
 
 VPATH		=	./src \
 				./src/parsing \
 				./src/utils \
-				./src/socket
+				./src/socket \
+				./src/config \
 
 CXX 		=	c++
 # CXXFLAGS 	=	-Wall -Wextra -Werror -std=c++98 -g

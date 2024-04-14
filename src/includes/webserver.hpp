@@ -20,6 +20,7 @@
 #include "../parsing/Request.hpp"
 #include "../socket/IPResolver.hpp"
 #include "../socket/Server.hpp"
+#include "../config/Config.hpp"
 
 #include "colors.hpp"
 

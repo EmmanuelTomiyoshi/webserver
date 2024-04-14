@@ -1,28 +1,30 @@
 #include "webserver.hpp"
 
-int main(int argc, char *argv[])
+void	verify_args(int argc, char **argv)
 {
 	if (argc != 2)
 	{
 		std::cerr << "Wrong arguments number" << std::endl;
-		return (EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
 
 	std::string str = std::string(argv[1]);
 	if (str.empty())
 	{
 		std::cerr << "Argument must not be empty" << std::endl;
-		return (EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
+}
 
-	IPResolver ip;
+int main(int argc, char *argv[])
+{
+	verify_args(argc, argv);
 
-	std::string hostname = "google.com";
-	IPResolver resolver;
-	resolver.printIPAdresses(hostname);
+	Config config("sellatos");
 
-	Server server;
-	server.start();
+	// Server server;
+	// server.start();
+
 	return (0);
 
 }

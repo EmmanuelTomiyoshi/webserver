@@ -33,11 +33,19 @@ Config::Config(std::string path)
 	std::cout << "Opening: " << path << std::endl;
 
 	std::cout << "KEYS:\n";
-	for (t_vec::iterator it = _keys.begin(); it != _keys.end(); it++)
-		std::cout << *it << std::endl;
+
 
 	std::cout << "\nROUTE_KEYS:\n";
 	for (t_vec::iterator it = _keys.begin(); it != _keys.end(); it++)
 		std::cout << *it << std::endl;
+
+	this->setup();
 }
 
+void Config::setup(void)
+{
+	for (t_vec::iterator it = _keys.begin(); it != _keys.end(); it++)
+		_rules[*it] = "";
+
+	std::cout << "rule: " << _rules["server_name"] << std::endl;
+}

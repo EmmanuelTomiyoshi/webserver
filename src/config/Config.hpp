@@ -3,6 +3,7 @@
 # include <webserver.hpp>
 # include <map>
 # include <vector>
+# include <algorithm>
 
 typedef std::map<std::string, std::string> t_map;
 typedef std::vector<std::string> t_vec;

@@ -22,6 +22,8 @@ int main(int argc, char *argv[])
 
 	Config config("sellatos");
 
+	std::cout << "\nHOST:" << config.get_rule("host") << std::endl;
+	std::cout << "JAMELAUM:" << config.get_rule("JAMELAUM") << std::endl;
 	// Server server;
 	// server.start();
 

@@ -28,7 +28,7 @@ Config::~Config(void)
 Config::Config(Config const & rhs)
 {}
 
-Config::Config(std::string path)
+Config::Config(t_str path)
 {
 	std::cout << "Opening: " << path << std::endl;
 
@@ -40,6 +40,7 @@ Config::Config(std::string path)
 		std::cout << *it << std::endl;
 
 	this->setup();
+	this->set_rule("host", "localhost");
 }
 
 void Config::setup(void)
@@ -48,4 +49,29 @@ void Config::setup(void)
 		_rules[*it] = "";
 
 	std::cout << "rule: " << _rules["server_name"] << std::endl;
+}
+
+void Config::set_rule(const t_str key, t_str value)
+{	
+	try
+	{
+		t_str & rule = _rules.at(key);
+		rule = value;
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "INVALID RULE: " << key << '\n';
+	}
+}
+
+t_str Config::get_rule(t_str key) const
+{
+	try
+	{
+		return this->_rules.at(key);
+	}
+	catch (std::exception & e)
+	{
+		return t_str("");
+	}
 }

@@ -5,8 +5,9 @@
 # include <vector>
 # include <algorithm>
 
-typedef std::map<std::string, std::string> t_map;
-typedef std::vector<std::string> t_vec;
+typedef std::string t_str;
+typedef std::map<t_str, t_str> t_map;
+typedef std::vector<t_str> t_vec;
 
 class Config
 {
@@ -17,12 +18,14 @@ class Config
 		t_map _rules_route;
 
 		void setup(void);
+		void set_rule(t_str key, t_str value);
 	public:
 		Config(void);
-		Config(std::string path);
+		Config(t_str path);
 		Config(Config const & rhs);
 		~Config(void);
 
+		t_str get_rule(t_str key) const;
 };
 
 #endif

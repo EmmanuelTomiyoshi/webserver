@@ -21,11 +21,6 @@
 # include <list>
 # include <algorithm>
 
-typedef std::string t_str;
-typedef std::map<t_str, t_str> t_map;
-typedef std::vector<t_str> t_vec;
-typedef std::list<t_str> t_list;
-
 #include "../parsing/Request.hpp"
 #include "../socket/IPResolver.hpp"
 #include "../socket/Server.hpp"

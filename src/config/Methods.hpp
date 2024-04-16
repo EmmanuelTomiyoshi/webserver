@@ -15,6 +15,8 @@ class Methods
 
 		bool is_allowed(std::string method) const;
 		void allow(std::string method);
+		void allow(std::vector<std::string> & methods);
+		void info(void) const;
 };
 
 #endif

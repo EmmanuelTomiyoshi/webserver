@@ -30,3 +30,27 @@ void Methods::allow(std::string method)
 	bool & m = this->_methods.at(method);
 	m = true;
 }
+
+void Methods::allow(std::vector<std::string> & methods)
+{
+	std::vector<std::string>::iterator it = methods.begin();
+	while (it != methods.end())
+	{
+		bool & m = _methods.at(*it);
+		m = true;
+		it++;
+	}
+}
+
+void Methods::info(void) const
+{
+	std::map<std::string, bool>::const_iterator it;
+	it = _methods.begin();
+	std::cout << "METHODS INFORMATION:\n";
+	while (it != _methods.end())
+	{
+		std::cout << (*it).first << ": " << ((*it).second ? "true\n" : "false\n");
+		it++;
+	}
+}
+

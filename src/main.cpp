@@ -20,18 +20,16 @@ int main(int argc, char *argv[])
 {
 	verify_args(argc, argv);
 
-	std::cout << "\nSTRATEGY 2" << std::endl;
 	// Server server;
 	// server.start();
 
 	Config config;
 
 	Methods methods;
-	methods.allow("GET");
-	if (methods.is_allowed("GET") == false)
-		std::cout << "GET not allowed" << std::endl;
-	else
-		std::cout << "GET allowed" << std::endl;
+	std::vector<std::string> allowed_methods = {"GET", "POST"};
+	std::cout << std::endl;
+	methods.allow(allowed_methods);
+	methods.info();
 	return (0);
 
 }

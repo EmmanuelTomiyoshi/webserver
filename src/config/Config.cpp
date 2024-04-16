@@ -61,7 +61,7 @@ void Config::Ports::info(void) const
 	std::cout << std::endl;
 }
 
-//--------------- Ports ------------------//
+//--------------- Routes ------------------//
 Route const & Config::Routes::get(std::string location) const
 {
 	return this->_routes.at(location);
@@ -72,4 +72,17 @@ void Config::Routes::set(std::string location)
 	Route & route = this->_routes[location];
 	route.location.set(location);
 	route.methods.allow("GET");
+}
+
+
+//--------------- BodySize ------------------//
+int Config::BodySize::get(void) const
+{
+	return this->_body_size;
+}
+
+void Config::BodySize::set(std::string value)
+{
+	std::stringstream ss(value);
+	ss >> this->_body_size;
 }

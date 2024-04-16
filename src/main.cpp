@@ -38,6 +38,10 @@ void config_test(void)
 	ports.push_back("3050"); ports.push_back("3002");
 	config.ports.set(ports);
 	config.ports.info();
+
+	std::cout << std::endl;
+	config.body_size.set("1024");
+	std::cout << "BODY_SIZE: " << config.body_size.get() << std::endl;
 }
 
 int main(int argc, char *argv[])

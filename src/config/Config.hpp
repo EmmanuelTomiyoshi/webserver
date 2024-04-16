@@ -31,9 +31,9 @@ class Config
 
 		class BodySize {
 			private:
-				std::string _host;
+				int _body_size;
 			public:
-				std::string get(void) const;
+				int get(void) const;
 				void set(std::string value);
 		};
 
@@ -53,6 +53,7 @@ class Config
 		Host host;
 		Ports ports;
 		Routes routes;
+		BodySize body_size;
 };
 
 #endif

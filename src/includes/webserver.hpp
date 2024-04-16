@@ -29,7 +29,6 @@ typedef std::list<t_str> t_list;
 #include "../parsing/Request.hpp"
 #include "../socket/IPResolver.hpp"
 #include "../socket/Server.hpp"
-#include "../config/Methods.hpp"
 #include "../config/Route.hpp"
 #include "../config/Config.hpp"
 

@@ -20,13 +20,11 @@ int main(int argc, char *argv[])
 {
 	verify_args(argc, argv);
 
-	Config config("sellatos");
-
 	std::cout << "\nSTRATEGY 2" << std::endl;
 	// Server server;
 	// server.start();
 
-	
+	Config config;
 	return (0);
 
 }

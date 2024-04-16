@@ -1,15 +1,10 @@
 #include <webserver.hpp>
 
 Route::Route(void)
-{}
-Route::~Route(void) {}
-
-t_str Route::Location::get(void) const
 {
-	return this->_location;
+	std::cout << "Route created\n";
 }
 
-void Route::Location::set(t_str value)
+Route::~Route(void)
 {
-	this->_location = value;
 }

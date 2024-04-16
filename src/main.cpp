@@ -25,6 +25,13 @@ int main(int argc, char *argv[])
 	// server.start();
 
 	Config config;
+
+	Methods methods;
+	methods.allow("GET");
+	if (methods.is_allowed("GET") == false)
+		std::cout << "GET not allowed" << std::endl;
+	else
+		std::cout << "GET allowed" << std::endl;
 	return (0);
 
 }

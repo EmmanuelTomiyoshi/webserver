@@ -19,3 +19,14 @@ Methods::Methods(void)
 Methods::~Methods(void)
 {
 }
+
+bool Methods::is_allowed(std::string method) const
+{
+	return this->_methods.at(method);
+}
+
+void Methods::allow(std::string method)
+{
+	bool & m = this->_methods.at(method);
+	m = true;
+}

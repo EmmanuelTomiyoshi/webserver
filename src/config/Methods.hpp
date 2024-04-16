@@ -12,6 +12,9 @@ class Methods
 	public:
 		Methods(void);
 		~Methods(void);
+
+		bool is_allowed(std::string method) const;
+		void allow(std::string method);
 };
 
 #endif

@@ -42,6 +42,13 @@ void config_test(void)
 	std::cout << std::endl;
 	config.body_size.set("1024");
 	std::cout << "BODY_SIZE: " << config.body_size.get() << std::endl;
+
+	std::cout << std::endl;
+	std::list<std::string> server_names;
+	server_names.push_back("www.google.com"); server_names.push_back("google.com");
+	config.server_names.set(server_names);
+	std::cout << "SERVER_NAMES: " << config.server_names.get().front() 
+		<< " " << config.server_names.get().back() << std::endl;
 }
 
 int main(int argc, char *argv[])

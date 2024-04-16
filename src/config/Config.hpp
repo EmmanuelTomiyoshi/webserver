@@ -12,12 +12,13 @@ class Config
 				void set(std::string value);
 		};
 
-		class ServerName {
+		//needs to be done
+		class ServerNames {
 			private:
-				std::string _value;
+				std::list<std::string> _values;
 			public:
-				std::string get(void) const;
-				void set(std::string value);
+				std::list<std::string> const & get(void) const;
+				void set(std::list<std::string> & values);
 		};
 
 		class Ports {
@@ -54,6 +55,7 @@ class Config
 		Ports ports;
 		Routes routes;
 		BodySize body_size;
+		ServerNames server_names;
 };
 
 #endif

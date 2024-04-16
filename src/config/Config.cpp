@@ -20,17 +20,6 @@ std::string Config::Host::get(void) const
 	return this->_value;
 }
 
-//--------------- ServerName ------------------//
-void Config::ServerName::set(std::string value)
-{
-	this->_value = value;
-}
-
-std::string Config::ServerName::get(void) const
-{
-	return this->_value;
-}
-
 //--------------- Ports ------------------//
 void Config::Ports::set(std::list<std::string> values)
 {
@@ -85,4 +74,21 @@ void Config::BodySize::set(std::string value)
 {
 	std::stringstream ss(value);
 	ss >> this->_body_size;
+}
+
+//--------------- ServerName ------------------//
+std::list<std::string> const & Config::ServerNames::get(void) const
+{
+	return this->_values;
+}
+
+void Config::ServerNames::set(std::list<std::string> & values)
+{
+	std::list<std::string>::iterator it;
+	it = values.begin();
+	while (it != values.end())
+	{
+		this->_values.push_back(*it);
+		it++;
+	}
 }

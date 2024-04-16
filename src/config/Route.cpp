@@ -8,3 +8,13 @@ Route::Route(void)
 Route::~Route(void)
 {
 }
+
+void Route::Location::set(std::string value)
+{
+	this->_location = value;
+}
+
+std::string Route::Location::get(void) const
+{
+	return this->_location;
+}

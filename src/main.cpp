@@ -25,11 +25,14 @@ int main(int argc, char *argv[])
 
 	Config config;
 
-	Methods methods;
 	std::vector<std::string> allowed_methods = {"GET", "POST"};
 	std::cout << std::endl;
-	methods.allow(allowed_methods);
-	methods.info();
+	config.route.methods.allow(allowed_methods);
+	config.route.methods.info();
+
+	std::cout << std::endl;
+	config.route.location.set("/home");
+	std::cout << "LOCATION: " << config.route.location.get() << std::endl;
 	return (0);
 
 }

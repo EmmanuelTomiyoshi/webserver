@@ -9,6 +9,13 @@ Route::~Route(void)
 {
 }
 
+Route & Route::operator=(Route const & rhs)
+{
+	this->location.set(rhs.location.get());
+	this->methods = rhs.methods;
+	return (*this);
+}
+
 void Route::Location::set(std::string value)
 {
 	this->_location = value;

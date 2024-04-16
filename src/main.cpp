@@ -20,14 +20,14 @@ void config_test(void)
 {
 	Config config;
 
-	std::vector<std::string> allowed_methods = {"GET", "POST"};
 	std::cout << std::endl;
-	config.route.methods.allow(allowed_methods);
-	config.route.methods.info();
+	config.routes.set("/janaina");
+	config.routes.set("/home");
 
 	std::cout << std::endl;
-	config.route.location.set("/home");
-	std::cout << "LOCATION: " << config.route.location.get() << std::endl;
+	std::cout << "JANAINA INFO:\n";
+	config.routes.get("/janaina").methods.info();
+	std::cout << "LOCATION: " << config.routes.get("/janaina").location.get() << std::endl;
 
 	std::cout << std::endl;
 	config.host.set("localhost");

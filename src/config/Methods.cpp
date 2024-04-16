@@ -20,6 +20,19 @@ Methods::~Methods(void)
 {
 }
 
+Methods & Methods::operator=(Methods const & rhs)
+{
+	std::map<std::string, bool>::const_iterator it;
+	it = rhs._methods.begin();
+	while (it != rhs._methods.end())
+	{
+		this->_methods.at((*it).first) = (*it).second;
+		it++;
+	}
+	return (*this);
+}
+
+
 bool Methods::is_allowed(std::string method) const
 {
 	return this->_methods.at(method);

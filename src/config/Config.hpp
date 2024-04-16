@@ -37,13 +37,22 @@ class Config
 				void set(std::string value);
 		};
 
+		class Routes {
+			private:
+				std::map<std::string, Route> _routes;
+			public:
+				Route const & get(std::string) const;
+				void set(std::string info); //pass all the information need to create a route
+		};
+
 	public:
 		Config(void);
 		~Config(void);
 
-		Route route;
+		
 		Host host;
 		Ports ports;
+		Routes routes;
 };
 
 #endif

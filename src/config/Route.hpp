@@ -16,6 +16,7 @@ class Route
 	public:
 		Route(void);
 		~Route(void);
+		Route & operator=(Route const & rhs);
 
 		Methods methods;
 

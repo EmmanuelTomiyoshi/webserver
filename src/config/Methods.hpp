@@ -12,6 +12,7 @@ class Methods
 	public:
 		Methods(void);
 		~Methods(void);
+		Methods & operator=(Methods const & rhs);
 
 		bool is_allowed(std::string method) const;
 		void allow(std::string method);

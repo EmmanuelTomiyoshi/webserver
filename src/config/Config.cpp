@@ -60,3 +60,16 @@ void Config::Ports::info(void) const
 	}
 	std::cout << std::endl;
 }
+
+//--------------- Ports ------------------//
+Route const & Config::Routes::get(std::string location) const
+{
+	return this->_routes.at(location);
+}
+
+void Config::Routes::set(std::string location)
+{
+	Route & route = this->_routes[location];
+	route.location.set(location);
+	route.methods.allow("GET");
+}

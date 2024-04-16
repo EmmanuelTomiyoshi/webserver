@@ -34,5 +34,6 @@
 
 void webtest(void);
 int server_start(void);
+void config_test(void);
 
 #endif // WEBSERVER_HPP

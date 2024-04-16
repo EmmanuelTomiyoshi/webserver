@@ -6,6 +6,7 @@ SRC 		=	main.cpp \
 				Server.cpp \
 				Config.cpp \
 				Route.cpp \
+				Methods.cpp \
 
 VPATH		=	./src \
 				./src/parsing \

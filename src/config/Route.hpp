@@ -7,6 +7,8 @@ class Route
 	public:
 		Route(void);
 		~Route(void);
+
+		Methods methods;
 };
 
 #endif

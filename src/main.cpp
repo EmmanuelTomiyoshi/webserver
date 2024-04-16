@@ -32,6 +32,12 @@ void config_test(void)
 	std::cout << std::endl;
 	config.host.set("localhost");
 	std::cout << "HOST: " << config.host.get() << std::endl;
+
+	std::cout << std::endl;
+	std::list<std::string> ports;
+	ports.push_back("3050"); ports.push_back("3002");
+	config.ports.set(ports);
+	config.ports.info();
 }
 
 int main(int argc, char *argv[])

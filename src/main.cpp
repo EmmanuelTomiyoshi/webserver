@@ -16,13 +16,8 @@ void	verify_args(int argc, char **argv)
 	}
 }
 
-int main(int argc, char *argv[])
+void config_test(void)
 {
-	verify_args(argc, argv);
-
-	// Server server;
-	// server.start();
-
 	Config config;
 
 	std::vector<std::string> allowed_methods = {"GET", "POST"};
@@ -33,6 +28,20 @@ int main(int argc, char *argv[])
 	std::cout << std::endl;
 	config.route.location.set("/home");
 	std::cout << "LOCATION: " << config.route.location.get() << std::endl;
+
+	std::cout << std::endl;
+	config.host.set("localhost");
+	std::cout << "HOST: " << config.host.get() << std::endl;
+}
+
+int main(int argc, char *argv[])
+{
+	verify_args(argc, argv);
+
+	// Server server;
+	// server.start();
+
+	config_test();
 	return (0);
 
 }

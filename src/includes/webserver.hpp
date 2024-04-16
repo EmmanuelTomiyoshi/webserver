@@ -15,11 +15,22 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sstream>
-#include <sys/epoll.h> 
+#include <sys/epoll.h>
+# include <map>
+# include <vector>
+# include <list>
+# include <algorithm>
+
+typedef std::string t_str;
+typedef std::map<t_str, t_str> t_map;
+typedef std::vector<t_str> t_vec;
+typedef std::list<t_str> t_list;
 
 #include "../parsing/Request.hpp"
 #include "../socket/IPResolver.hpp"
 #include "../socket/Server.hpp"
+#include "../config/Methods.hpp"
+#include "../config/Route.hpp"
 #include "../config/Config.hpp"
 
 #include "colors.hpp"

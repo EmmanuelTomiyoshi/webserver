@@ -4,7 +4,9 @@ SRC 		=	main.cpp \
 				IPResolver.cpp \
 				Request.cpp \
 				Server.cpp \
-				Config.cpp
+				Config.cpp \
+				Route.cpp \
+				Methods.cpp \
 
 VPATH		=	./src \
 				./src/parsing \

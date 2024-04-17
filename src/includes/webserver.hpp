@@ -9,12 +9,14 @@
 #include <arpa/inet.h>			// for manipulating IP addresses
 #include <cstring>				// for c string manipulation functions
 #include <errno.h>				// for error macros
+#include <stdexcept>
 #include <unistd.h>				// close()
 #include <error.h>
 #include <stdio.h> 
 #include <string.h>
 #include <stdlib.h>
 #include <sstream>
+#include <fstream>
 #include <sys/epoll.h>
 # include <map>
 # include <vector>
@@ -27,6 +29,7 @@
 #include "../config/Methods.hpp"
 #include "../config/Route.hpp"
 #include "../config/Config.hpp"
+#include "../parsing/Parser.hpp"
 
 #include "colors.hpp"
 

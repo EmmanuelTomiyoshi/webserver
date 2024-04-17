@@ -22,8 +22,42 @@ int main(int argc, char *argv[])
 
 	// Server server;
 	// server.start();
+	// config_test();
 
-	config_test();
+	try {
+		std::ifstream inputFile("y_http.http");
+		if (!inputFile.is_open())
+		{
+			std::cerr << "Failed to open file." << std::endl;
+			return (1);
+		}
+
+		std::string httpRequest;
+		std::getline(inputFile, httpRequest);
+
+		Parser parser;
+		parser.parseRequest(httpRequest);
+
+		std::cout << "Request Method: " << parser.getRequestMethod() << std::endl;
+		std::cout << "Request URL: " << parser.getRequestURL() << std::endl;
+		std::cout << "HTTP Version: " << parser.getHTTPVersion() << std::endl;
+		std::map<std::string, std::string> headers = parser.getHeaders();
+		std::cout << "Headers:\n";
+
+        for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it)
+		{
+            std::cout << it->first << ": " << it->second << std::endl;
+        }
+	
+		std::cout << "Content-Length: " << parser.getContentLength() << std::endl;
+		std::cout << "Transfer-Encoding: " << parser.getTransferEncoding() << std::endl;
+		std::cout << "Message Body:\n" << parser.getMessageBody() << std::endl;
+
+		}
+		catch (const std::exception& ex)
+		{
+			std::cerr << "Error: " << ex.what() << std::endl;
+			return 1;
+		}
 	return (0);
-
 }

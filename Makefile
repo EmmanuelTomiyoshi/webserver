@@ -8,6 +8,7 @@ SRC 		=	main.cpp \
 				Route.cpp \
 				Methods.cpp \
 				config_test.cpp \
+				Parser.cpp
 
 VPATH		=	./src \
 				./src/parsing \
@@ -16,7 +17,7 @@ VPATH		=	./src \
 				./src/config \
 
 CXX 		=	c++
-# CXXFLAGS 	=	-Wall -Wextra -Werror -std=c++98 -g
+CXXFLAGS 	=	-Wall -Wextra -Werror -std=c++98 -g
 CPPFLAGS 	=	-MMD -MP -I ./src/includes
 BUILD_DIR 	=	build
 

@@ -25,18 +25,9 @@ int main(int argc, char *argv[])
 	// config_test();
 
 	try {
-		std::ifstream inputFile("y_http.http");
-		if (!inputFile.is_open())
-		{
-			std::cerr << "Failed to open file." << std::endl;
-			return (1);
-		}
-
-		std::string httpRequest;
-		std::getline(inputFile, httpRequest);
 
 		Parser parser;
-		parser.parseRequest(httpRequest);
+		parser.parseRequest("y_http.http");
 
 		std::cout << "Request Method: " << parser.getRequestMethod() << std::endl;
 		std::cout << "Request URL: " << parser.getRequestURL() << std::endl;

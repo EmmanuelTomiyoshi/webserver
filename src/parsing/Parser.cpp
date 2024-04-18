@@ -1,4 +1,4 @@
-#include "Parser.hpp"
+#include <webserver.hpp>
 
 Parser::Parser() : contentLength(0), responseStatusCode(0) { }
 
@@ -26,11 +26,16 @@ Parser &Parser::operator=(const Parser &copy)
 	return *this;
 }
 
-void Parser::parseRequest(const std::string &requestString)
+void Parser::parseRequest(const std::string &fileName)
 {
-	std::istringstream iss(requestString);
+	std::ifstream iss(fileName.c_str());
+	if (!iss.is_open())
+	{
+		throw new std::exception();
+	}
 	std::string line;
 
+	// std::cout << "*****REQUESTSTRING*******\n" << requestString << "\n***********************\n";
 	// Parse request line
 	if (!std::getline(iss, line))
 	{
@@ -71,8 +76,12 @@ void Parser::parseRequest(const std::string &requestString)
 	}
 
 	// Parse message body if present
-	std::stringstream messageBodyStream;
-	messageBodyStream >> messageBody;
+	char buff[2000];
+	while (!iss.eof())
+	{	
+		iss.getline(buff, 2000, '\0');
+		messageBody += buff;
+	}
 }
 
 std::string Parser::getRequestMethod() const

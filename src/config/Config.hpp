@@ -42,7 +42,7 @@ class Config
 			private:
 				std::map<std::string, Route> _routes;
 			public:
-				Route const & get(std::string) const;
+				Route & get(std::string);
 				void set(std::string info); //pass all the information need to create a route
 		};
 

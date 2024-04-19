@@ -51,7 +51,7 @@ void Config::Ports::info(void) const
 }
 
 //--------------- Routes ------------------//
-Route const & Config::Routes::get(std::string location) const
+Route & Config::Routes::get(std::string location)
 {
 	return this->_routes.at(location);
 }

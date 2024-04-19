@@ -25,3 +25,46 @@ std::string Route::Location::get(void) const
 {
 	return this->_location;
 }
+
+std::string Route::Root::get(void) const
+{
+	return this->_root;
+}
+
+void Route::Root::set(std::string root)
+{
+	this->_root = root;
+}
+
+//TRY FILES
+
+Route::TryFiles::TryFiles(void)
+{
+	this->_it = this->_try_files.begin();
+}
+
+std::list<std::string> Route::TryFiles::get(void) const
+{
+	return this->_try_files;
+}
+
+std::string Route::TryFiles::next(void)
+{
+	if (this->_it == this->_try_files.end())	
+		return "";
+	std::string & file = *(this->_it);
+	this->_it++;
+	return file;
+}
+
+void Route::TryFiles::set(std::list<std::string> const & files) 
+{
+	std::list<std::string>::const_iterator it;
+	it = files.begin();
+	while (it != files.end())
+	{
+		this->_try_files.push_back(*it);
+		it++;
+	}
+	this->_it = this->_try_files.begin();
+}

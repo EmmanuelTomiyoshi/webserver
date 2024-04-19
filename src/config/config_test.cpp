@@ -33,4 +33,12 @@ void config_test(void)
 	config.server_names.set(server_names);
 	std::cout << "SERVER_NAMES: " << config.server_names.get().front() 
 		<< " " << config.server_names.get().back() << std::endl;
+
+
+	Route & route = config.routes.get("/janaina");
+	std::list<std::string> files;
+	files.push_back("index.html"); files.push_back("index.php");
+	route.try_files.set(files);
+	std::cout << "TryFiles: " << route.try_files.next()
+		<< " " << route.try_files.next() << " " << route.try_files.next() << std::endl;
 }

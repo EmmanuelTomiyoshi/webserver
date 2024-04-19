@@ -16,6 +16,7 @@ Route & Route::operator=(Route const & rhs)
 	return (*this);
 }
 
+/* ---------------- LOCATION ----------------- */
 void Route::Location::set(std::string value)
 {
 	this->_location = value;
@@ -26,6 +27,7 @@ std::string Route::Location::get(void) const
 	return this->_location;
 }
 
+/* ----------------- ROOT ------------------ */
 std::string Route::Root::get(void) const
 {
 	return this->_root;
@@ -36,8 +38,7 @@ void Route::Root::set(std::string root)
 	this->_root = root;
 }
 
-//TRY FILES
-
+/* ---------------- TRY FILES ----------------- */
 Route::TryFiles::TryFiles(void)
 {
 	this->_it = this->_try_files.begin();
@@ -67,4 +68,37 @@ void Route::TryFiles::set(std::list<std::string> const & files)
 		it++;
 	}
 	this->_it = this->_try_files.begin();
+}
+
+
+/* ---------------- SAVE FILES PATH ----------------- */
+std::string Route::SaveFilesPath::get(void) const
+{
+	return this->_save_files_path;
+}
+
+void Route::SaveFilesPath::set(std::string path)
+{
+	this->_save_files_path = path;
+}
+
+
+/* ---------------- SAVE FILES PATH ----------------- */
+Route::Autoindex::Autoindex(void) : _on(false)
+{
+}
+
+bool Route::Autoindex::on(void) const
+{
+	return this->_on;
+}
+
+void Route::Autoindex::turn_on(void)
+{
+	this->_on = true;
+}
+
+void Route::Autoindex::turn_off(void)
+{
+	this->_on = false;
 }

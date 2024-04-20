@@ -3,17 +3,21 @@
 
 #include <webserver.hpp>
 
+typedef std::vector<std::string> StringVector;
+
 class Parser
 {
 	private:
-		std::string	requestMethod;
-		std::string	requestURL;
-		std::string	httpVersion;
-		std::map<std::string, std::string> headers;
-		size_t	contentLength;
-		int		responseStatusCode;
-		std::string	transferEncoding;
-		std::string messageBody;
+		std::string							_requestMethod;
+		std::string							_requestURL;
+		std::string							_httpVersion;
+		std::map<std::string, std::string>	_headers;
+		size_t								_contentLength;
+		int									_responseStatusCode;
+		std::string							_transferEncoding;
+		std::string							_messageBody;
+
+		StringVector						methods;
 
 	public:
 		Parser();

@@ -46,8 +46,11 @@ class Config
 				void set(std::string info); //pass all the information need to create a route
 		};
 
+		std::string _file_name;
+		void analise_words();
+
 	public:
-		Config(void);
+		Config(std::string file_name);
 		~Config(void);
 
 		

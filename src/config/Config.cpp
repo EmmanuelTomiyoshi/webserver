@@ -1,8 +1,10 @@
 #include <webserver.hpp>
 
-Config::Config(void)
+Config::Config(std::string file_name)
 {
-	std::cout << "Config created!\n";
+	std::fstream file(file_name);
+	if (file.bad())
+		throw std::runtime_error("failed to open '" + file_name + "'");
 }
 
 Config::~Config(void)

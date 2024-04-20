@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <sstream>
 #include <sys/epoll.h>
+#include <fstream>
 # include <map>
 # include <vector>
 # include <list>
@@ -27,6 +28,7 @@
 #include "../config/Methods.hpp"
 #include "../config/Route.hpp"
 #include "../config/Config.hpp"
+#include "../config/File.hpp"
 
 #include "colors.hpp"
 

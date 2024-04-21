@@ -16,22 +16,12 @@ File::File(std::string file_name) : _file(file_name)
 {
 	if (this->_file.bad())
 		throw std::runtime_error("failed to open '" + file_name + "'");
-	read_data();
-	while (_data.empty() == false)
-	{
-		try
-		{
-			read_config_block();
-		}
-		catch (std::exception & e)
-		{
-			std::cerr << e.what() << std::endl;
-			break ;
-		}
-	}
+	fill_data();
+	extract_blocks();
+	parse_blocks();
 }
 
-void File::read_data(void)
+void File::fill_data(void)
 {
 	char buffer[2000];
 	while (!_file.eof())
@@ -123,7 +113,64 @@ void File::read_config_block(void)
 
 	_data = _data.substr(close + 1);
 	_server_configs.push_back(block);
-	std::cout << "------------------ BLOCK ------------------\n" << block << std::endl;
+}
+
+void File::extract_blocks(void)
+{
+	while (_data.empty() == false)
+	{
+		try
+		{
+			read_config_block();
+		}
+		catch (std::exception & e)
+		{
+			std::cerr << e.what() << std::endl;
+			break ;
+		}
+	}
+}
+
+std::vector<std::string> single_value_keys = {
+	"host",
+	"body_size",
+	"root"
+};
+
+std::vector<std::string> multi_value_keys = {
+	"server_name",
+	"ports",
+};
+
+void File::parse_block(std::string & block)
+{
+	std::stringstream ss(block);
+	std::string word;
+
+	ss >> word;
+	std::vector<std::string>::iterator it;
+	it = std::find(single_value_keys.begin(), single_value_keys.end(), word);
+	std::string line = block.substr(block.find(word) + word.length(), '\n');
+	std::stringstream ss_line(line);
+	ss_line >> _single_value[word];
+	std::string aux;
+	ss_line >> aux;
+	if (aux.empty() == false)
+		throw std::runtime_error("'" + word + "' accepts just one value");
+	block = block.substr(block.find(line) + line.length());
+	std::cout << word << ": " << _single_value[word] << std::endl;
+	std::cout << "BLOCK:\n" << block << std::endl;
+}
+
+void File::parse_blocks(void)
+{
+	while (_server_configs.empty() == false)
+	{
+		std::string block = _server_configs.front();
+		_server_configs.pop_front();
+		parse_block(block);
+		return ;
+	}
 }
 
 File::~File(void)

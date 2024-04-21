@@ -9,7 +9,8 @@ class Config
 				std::string _value;
 			public:
 				std::string get(void) const;
-				void set(std::string value);
+				void set(std::string & value);
+
 		};
 
 		//needs to be done

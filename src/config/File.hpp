@@ -9,11 +9,17 @@ class File {
 
 		std::list<std::string> _server_configs;
 
-		void read_data(void);
+		void fill_data(void);
 		void read_config_block(void);
+		void extract_blocks(void);
+		void parse_blocks(void);
+		void parse_block(std::string & block);
 
 		static std::string read_stream(std::stringstream & ss);
 		static std::string find(std::string str);
+
+		std::map<std::string, std::string> _single_value;
+		std::map<std::string, std::list<std::string>> _multi_values;
 
 	public:
 		File(std::string file_name);

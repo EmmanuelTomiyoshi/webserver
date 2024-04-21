@@ -12,7 +12,7 @@ Config::~Config(void)
 }
 
 //--------------- Host ------------------//
-void Config::Host::set(std::string value)
+void Config::Host::set(std::string & value)
 {
 	this->_value = value;
 }

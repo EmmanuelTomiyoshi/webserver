@@ -142,7 +142,7 @@ std::vector<std::string> multi_value_keys = {
 	"ports",
 };
 
-void File::parse_block(std::string & block)
+void File::parse_single_value(std::string & block)
 {
 	std::stringstream ss(block);
 	std::string word;
@@ -150,6 +150,8 @@ void File::parse_block(std::string & block)
 	ss >> word;
 	std::vector<std::string>::iterator it;
 	it = std::find(single_value_keys.begin(), single_value_keys.end(), word);
+	if (it == single_value_keys.end())
+		return ;
 	std::string line = block.substr(block.find(word) + word.length(), '\n');
 	std::stringstream ss_line(line);
 	ss_line >> _single_value[word];
@@ -162,13 +164,37 @@ void File::parse_block(std::string & block)
 	std::cout << "BLOCK:\n" << block << std::endl;
 }
 
+void File::parse_multi_value(std::string & block)
+{
+	std::stringstream ss(block);
+	std::string word;
+
+	ss >> word;
+	std::vector<std::string>::iterator it;
+	it = std::find(multi_value_keys.begin(), multi_value_keys.end(), word);
+	if (it == multi_value_keys.end())
+		return ;
+	std::string line = block.substr(block.find(word) + word.length(), '\n');
+	std::stringstream ss_line(line);
+	std::string value;
+	while (ss_line.eof() == false)
+	{
+		ss_line >> value;
+		_multi_values[word].push_back(value);
+	}
+	block = block.substr(block.find(line) + line.length());
+	std::cout << word << "first: '" << _multi_values[word].front() 
+		<< "' last: '" << _multi_values[word].back() << std::endl;
+	std::cout << "BLOCK:\n" << block << std::endl;
+}
+
 void File::parse_blocks(void)
 {
 	while (_server_configs.empty() == false)
 	{
 		std::string block = _server_configs.front();
 		_server_configs.pop_front();
-		parse_block(block);
+		parse_multi_value(block);
 		return ;
 	}
 }

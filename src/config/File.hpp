@@ -13,7 +13,8 @@ class File {
 		void read_config_block(void);
 		void extract_blocks(void);
 		void parse_blocks(void);
-		void parse_block(std::string & block);
+		void parse_single_value(std::string & block);
+		void parse_multi_value(std::string & block);
 
 		static std::string read_stream(std::stringstream & ss);
 		static std::string find(std::string str);

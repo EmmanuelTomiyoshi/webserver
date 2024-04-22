@@ -13,9 +13,10 @@ class File {
 		void read_config_block(void);
 		void extract_blocks(void);
 		void parse_blocks(void);
-		void parse_single_value(std::string & block);
-		void parse_multi_value(std::string & block);
+		bool parse_single_value(std::string & block);
+		bool parse_multi_value(std::string & block);
 
+		static bool is_inside(std::vector<std::string> & arr, std::string & str);
 		static std::string read_stream(std::stringstream & ss);
 		static std::string find(std::string str);
 
@@ -25,6 +26,8 @@ class File {
 	public:
 		File(std::string file_name);
 		~File(void);
+
+		void info(void) const;
 };
 
 #endif

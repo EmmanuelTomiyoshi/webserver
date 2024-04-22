@@ -2,7 +2,7 @@
 
 Config::Config(std::string file_name)
 {
-	std::fstream file(file_name);
+	std::ifstream file(file_name.c_str());
 	if (file.bad())
 		throw std::runtime_error("failed to open '" + file_name + "'");
 }

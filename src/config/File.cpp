@@ -12,10 +12,28 @@
 
  */
 
-File::File(std::string file_name) : _file(file_name)
+File::File(std::string file_name) : _file(file_name.c_str())
 {
 	if (this->_file.bad())
 		throw std::runtime_error("failed to open '" + file_name + "'");
+	std::string aux[] = {
+		"host",
+		"body_size",
+		"root",
+		"port"
+	};
+
+	for (int i = 0; i < 4; i++)
+		single_value_keys.push_back(aux[i]);
+
+	std::string aux2[] = {
+		"server_name",
+		"try_files"
+	};
+
+	for (int i = 0; i < 2; i++)
+		multi_value_keys.push_back(aux2[i]);
+ 
 	fill_data();
 	extract_blocks();
 	parse_blocks();
@@ -132,16 +150,7 @@ void File::extract_blocks(void)
 	}
 }
 
-std::vector<std::string> single_value_keys = {
-	"host",
-	"body_size",
-	"root",
-	"port"
-};
 
-std::vector<std::string> multi_value_keys = {
-	"server_name",
-};
 
 bool File::parse_single_value(std::string & block, Conf & conf)
 {
@@ -231,7 +240,7 @@ void File::info(void) const
 			std::cout << (*it).first << ": " << (*it).second << std::endl;
 		
 		std::cout << "\n               MULTI-VALUES\n";
-		std::map<std::string, std::list<std::string>>::const_iterator it2;
+		std::map<std::string, std::list<std::string> >::const_iterator it2;
 		it2 = conf._multi_values.begin();
 		for (; it2 != conf._multi_values.end(); it2++)
 		{

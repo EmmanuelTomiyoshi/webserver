@@ -9,7 +9,8 @@ class Config
 				std::string _value;
 			public:
 				std::string get(void) const;
-				void set(std::string value);
+				void set(std::string & value);
+
 		};
 
 		//needs to be done
@@ -42,12 +43,15 @@ class Config
 			private:
 				std::map<std::string, Route> _routes;
 			public:
-				Route const & get(std::string) const;
+				Route & get(std::string);
 				void set(std::string info); //pass all the information need to create a route
 		};
 
+		std::string _file_name;
+		void analise_words();
+
 	public:
-		Config(void);
+		Config(std::string file_name);
 		~Config(void);
 
 		

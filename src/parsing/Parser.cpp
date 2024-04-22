@@ -25,28 +25,34 @@ Parser &Parser::operator=(const Parser &copy)
 		this->_headers = copy._headers;
 		this->_contentLength = copy._contentLength;
 		this->_responseStatusCode = copy._responseStatusCode;
-		this->_transferEncoding = copy._transferEncoding;
 		this->_messageBody = copy._messageBody;
 	}
 	return *this;
 }
 
-void Parser::parseRequest(const std::string &fileName)
+void Parser::parseRequest(const std::string &file)
 {
-	std::ifstream iss(fileName.c_str());
-	if (!iss.is_open())
-	{
-		throw new std::exception();
-	}
-	std::string line;
+	std::ifstream inputFile(file.c_str());
 
-	// std::cout << "*****REQUESTSTRING*******\n" << requestString << "\n***********************\n";
-	// Parse request line
-	if (!std::getline(iss, line))
+	//file validation
+	if (!inputFile.is_open())
+	{
+		throw std::runtime_error("opening the file " + file);
+	}
+	else if (inputFile.seekg(0, std::ios::end)) //move to the end of the file
+	{
+		if (inputFile.tellg() == 0)
+			throw std::runtime_error("http file is empty");
+	}
+	inputFile.seekg(0, std::ios::beg); //move to the beginning of the file
+
+
+	//gets string for the first line
+	std::string line;
+	if (!std::getline(inputFile, line))
 	{
 		throw std::invalid_argument("Empty request");
 	}
-
 	std::istringstream lineStream(line);
 	if (!(lineStream >> _requestMethod >> _requestURL >> _httpVersion) ||
 		_requestMethod.empty() || _requestURL.empty() || _httpVersion.empty())
@@ -54,6 +60,7 @@ void Parser::parseRequest(const std::string &fileName)
 		throw std::invalid_argument("Invalid request line");
 	}
 
+	//validation for methods
 	int value = 0;
 	for (StringVector::const_iterator it = methods.begin(); it != methods.end(); ++it)
 	{
@@ -64,11 +71,27 @@ void Parser::parseRequest(const std::string &fileName)
 	}
 	if (value == 0)
 	{
-		throw std::invalid_argument("Invalid request line");
+		throw std::invalid_argument("Invalid method: " + _requestMethod);
 	}
 
+	//URI validation
+	utils::Utils obj;
+	std::string invalidChars = " \t\n\r\f$|<>";
+	if (_requestURL.at(0) != '/' || obj.hasInvalidURICharacters(_requestURL) || _requestURL.size() > MAX_URI_LENGTH)
+	{
+		throw std::invalid_argument("Invalid URI: " + _requestURL);
+	}
+
+	//HTTP Version validation
+	if (_httpVersion != WEBSERVER_HTTP_VERSION)
+	{
+		throw std::invalid_argument("Invalid HTTP Version: " + _httpVersion);
+	}
+
+	std::cout << COLOR_BHBLUE << _requestMethod << _requestURL << _httpVersion << COLOR_RESET << std::endl;
+
 	// Parse headers
-	while (std::getline(iss, line) && !line.empty())
+	while (std::getline(inputFile, line) && !line.empty())
 	{
 		size_t pos = line.find(':');
 		if (pos != std::string::npos)
@@ -79,27 +102,27 @@ void Parser::parseRequest(const std::string &fileName)
 		}
 	}
 
-	// Parse Content-Length if present
+	// Parse Content-Length
 	std::map<std::string, std::string>::iterator it = _headers.find("Content-Length");
 	if (it != _headers.end())
 	{
 		_contentLength = std::atol(it->second.c_str());
 	}
 
-	// Parse Transfer-Encoding if present
-	it = _headers.find("Transfer-Encoding");
-	if (it != _headers.end())
-	{
-		_transferEncoding = it->second;
-	}
-
 	// Parse message body if present
-	char buff[2000];
-	while (!iss.eof())
+	char buff[MESSAGE_BODY_BUFFER];
+	while (!inputFile.eof())
 	{	
-		iss.getline(buff, 2000, '\0');
+		inputFile.getline(buff, MESSAGE_BODY_BUFFER, '\0');
 		_messageBody += buff;
 	}
+
+	std::cout << _contentLength << " " << _messageBody.size() << std::endl;
+	if (_contentLength <= 0 || _messageBody.size() > _contentLength)
+	{
+		throw std::invalid_argument("Content length differs from the size of the message body");
+	}
+
 }
 
 std::string Parser::getRequestMethod() const
@@ -129,10 +152,6 @@ size_t Parser::getContentLength() const
 
 int Parser::getResponseStatusCode() const {
     return _responseStatusCode;
-}
-
-std::string Parser::getTransferEncoding() const {
-    return _transferEncoding;
 }
 
 std::string Parser::getMessageBody() const {

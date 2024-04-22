@@ -33,6 +33,7 @@
 #include "../config/Config.hpp"
 #include "../config/File.hpp"
 #include "../parsing/Parser.hpp"
+#include "../utils/Utils.hpp"
 
 #include "colors.hpp"
 

@@ -8,8 +8,9 @@ SRC 		=	main.cpp \
 				Route.cpp \
 				Methods.cpp \
 				config_test.cpp \
+				Parser.cpp	\
+				Utils.cpp
 				File.cpp \
-				Parser.cpp \
 
 VPATH		=	./src \
 				./src/parsing \

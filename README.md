@@ -31,8 +31,8 @@ What does the parser need to have
 	# If str[0] != '/' or uri.empty().
 	# Invalid characters are: spaces, control characters, $, |, < and >
 	# reject urls that contain path traversal sequences such as '..' or '/../'
-
 	# Validate URI Length, limitate to a maximum URI length (such as 2048 chars)
+
 3) HTTP Versioning:
 	Correct: HTTP/1.1, HTTP/1.0
 	Incorrect: http/1.1 (case-sensitive, must be uppercase)

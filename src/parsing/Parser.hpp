@@ -3,6 +3,9 @@
 
 #include <webserver.hpp>
 
+# define MAX_URI_LENGTH			2048
+# define WEBSERVER_HTTP_VERSION	"HTTP/1.1"
+
 typedef std::vector<std::string> StringVector;
 
 class Parser

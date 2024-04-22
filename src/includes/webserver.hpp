@@ -30,6 +30,7 @@
 #include "../config/Route.hpp"
 #include "../config/Config.hpp"
 #include "../parsing/Parser.hpp"
+#include "../utils/Utils.hpp"
 
 #include "colors.hpp"
 

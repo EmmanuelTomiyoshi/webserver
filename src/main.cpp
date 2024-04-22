@@ -41,7 +41,6 @@ int main(int argc, char *argv[])
         }
 	
 		std::cout << "Content-Length: " << parser.getContentLength() << std::endl;
-		std::cout << "Transfer-Encoding: " << parser.getTransferEncoding() << std::endl;
 		std::cout << "Message Body:\n" << parser.getMessageBody() << std::endl;
 
 		}

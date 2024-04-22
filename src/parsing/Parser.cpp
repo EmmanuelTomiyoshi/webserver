@@ -25,7 +25,6 @@ Parser &Parser::operator=(const Parser &copy)
 		this->_headers = copy._headers;
 		this->_contentLength = copy._contentLength;
 		this->_responseStatusCode = copy._responseStatusCode;
-		this->_transferEncoding = copy._transferEncoding;
 		this->_messageBody = copy._messageBody;
 	}
 	return *this;
@@ -106,40 +105,39 @@ void Parser::parseRequest(const std::string &file)
 
 	std::cout << COLOR_BHBLUE << _requestMethod << _requestURL << _httpVersion << COLOR_RESET << std::endl;
 
-
 	// Parse headers
-	// while (std::getline(inputFile, line) && !line.empty())
-	// {
-	// 	size_t pos = line.find(':');
-	// 	if (pos != std::string::npos)
-	// 	{
-	// 		std::string headerName = line.substr(0, pos);
-	// 		std::string headerValue = line.substr(pos + 1);
-	// 		_headers[headerName] = headerValue;
-	// 	}
-	// }
+	while (std::getline(inputFile, line) && !line.empty())
+	{
+		size_t pos = line.find(':');
+		if (pos != std::string::npos)
+		{
+			std::string headerName = line.substr(0, pos);
+			std::string headerValue = line.substr(pos + 1);
+			_headers[headerName] = headerValue;
+		}
+	}
 
-	// // Parse Content-Length if present
-	// std::map<std::string, std::string>::iterator it = _headers.find("Content-Length");
-	// if (it != _headers.end())
-	// {
-	// 	_contentLength = std::atol(it->second.c_str());
-	// }
+	// Parse Content-Length
+	std::map<std::string, std::string>::iterator it = _headers.find("Content-Length");
+	if (it != _headers.end())
+	{
+		_contentLength = std::atol(it->second.c_str());
+	}
 
-	// // Parse Transfer-Encoding if present
-	// it = _headers.find("Transfer-Encoding");
-	// if (it != _headers.end())
-	// {
-	// 	_transferEncoding = it->second;
-	// }
+	// Parse message body if present
+	char buff[MESSAGE_BODY_BUFFER];
+	while (!inputFile.eof())
+	{	
+		inputFile.getline(buff, MESSAGE_BODY_BUFFER, '\0');
+		_messageBody += buff;
+	}
 
-	// // Parse message body if present
-	// char buff[2000];
-	// while (!inputFile.eof())
-	// {	
-	// 	inputFile.getline(buff, 2000, '\0');
-	// 	_messageBody += buff;
-	// }
+	std::cout << _contentLength << " " << _messageBody.size() << std::endl;
+	if (_contentLength <= 0 || _messageBody.size() > _contentLength)
+	{
+		throw std::invalid_argument("Content length differs from the size of the message body");
+	}
+
 }
 
 std::string Parser::getRequestMethod() const
@@ -169,10 +167,6 @@ size_t Parser::getContentLength() const
 
 int Parser::getResponseStatusCode() const {
     return _responseStatusCode;
-}
-
-std::string Parser::getTransferEncoding() const {
-    return _transferEncoding;
 }
 
 std::string Parser::getMessageBody() const {

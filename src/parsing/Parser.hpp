@@ -5,6 +5,7 @@
 
 # define MAX_URI_LENGTH			2048
 # define WEBSERVER_HTTP_VERSION	"HTTP/1.1"
+# define MESSAGE_BODY_BUFFER	2048
 
 typedef std::vector<std::string> StringVector;
 
@@ -17,7 +18,6 @@ class Parser
 		std::map<std::string, std::string>	_headers;
 		size_t								_contentLength;
 		int									_responseStatusCode;
-		std::string							_transferEncoding;
 		std::string							_messageBody;
 
 		StringVector						methods;
@@ -38,7 +38,6 @@ class Parser
 		std::map<std::string, std::string> getHeaders() const;
 		size_t getContentLength() const;
 		int getResponseStatusCode() const;
-		std::string getTransferEncoding() const;
 		std::string getMessageBody() const;
 };
 

@@ -1,8 +1,10 @@
 #include <webserver.hpp>
 
-Config::Config(void)
+Config::Config(std::string file_name)
 {
-	std::cout << "Config created!\n";
+	std::fstream file(file_name);
+	if (file.bad())
+		throw std::runtime_error("failed to open '" + file_name + "'");
 }
 
 Config::~Config(void)
@@ -10,7 +12,7 @@ Config::~Config(void)
 }
 
 //--------------- Host ------------------//
-void Config::Host::set(std::string value)
+void Config::Host::set(std::string & value)
 {
 	this->_value = value;
 }
@@ -51,7 +53,7 @@ void Config::Ports::info(void) const
 }
 
 //--------------- Routes ------------------//
-Route const & Config::Routes::get(std::string location) const
+Route & Config::Routes::get(std::string location)
 {
 	return this->_routes.at(location);
 }

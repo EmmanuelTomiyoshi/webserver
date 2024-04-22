@@ -32,7 +32,7 @@ IPResolver &IPResolver::operator=(const IPResolver &copy)
 
 void IPResolver::printIPAdresses(const std::string &hostname) const
 {
-	int		status;
+	int	status;
 
 	// Resolve the hostname
 	if ((status = getaddrinfo(hostname.c_str(), NULL, &_hints, const_cast<struct addrinfo **>(&_res))) != 0)
@@ -45,7 +45,6 @@ void IPResolver::printIPAdresses(const std::string &hostname) const
 
 	for (struct addrinfo *p = _res; p != NULL; p = p->ai_next)
 	{
-		char ipver[INET6_ADDRSTRLEN]; //max number for the scenario of IPv6 + IPv4
 		const void *addr;
 		std::string ipver_str;
 
@@ -63,11 +62,13 @@ void IPResolver::printIPAdresses(const std::string &hostname) const
 		}
 
 		//convert IP to a readable string and print it
+		std::ostringstream ipstr_stream;
 		const unsigned char *ip_bytes = reinterpret_cast<const unsigned char*>(addr);
-        std::string ipstr = std::to_string(ip_bytes[0]) + "." +
-                             std::to_string(ip_bytes[1]) + "." +
-                             std::to_string(ip_bytes[2]) + "." +
-                             std::to_string(ip_bytes[3]);
+		ipstr_stream << static_cast<unsigned int>(ip_bytes[0]) << '.'
+		             << static_cast<unsigned int>(ip_bytes[1]) << '.'
+                     << static_cast<unsigned int>(ip_bytes[2]) << '.'
+                     << static_cast<unsigned int>(ip_bytes[3]);
+		std::string ipstr = ipstr_stream.str();
 
 		std::cout << ipver_str << ": " << ipstr << std::endl;
 	}

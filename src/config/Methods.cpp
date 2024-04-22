@@ -1,14 +1,14 @@
 #include <webserver.hpp>
 
-std::vector<std::string> Methods::_methods_available = {
-	"GET",
-	"POST",
-	"UPDATE",
-	"DELETE"
-};
+std::vector<std::string> Methods::_methods_available;
 
 Methods::Methods(void)
 {
+	_methods_available.push_back("GET");
+    _methods_available.push_back("POST");
+    _methods_available.push_back("UPDATE");
+    _methods_available.push_back("DELETE");
+
 	std::vector<std::string>::iterator it;
 
 	for (it = _methods_available.begin(); it != _methods_available.end(); it++)
@@ -16,22 +16,22 @@ Methods::Methods(void)
 	std::cout << "Methods created\n";
 }
 
-Methods::~Methods(void)
-{
-}
+Methods::~Methods(void) { }
 
 Methods & Methods::operator=(Methods const & rhs)
 {
-	std::map<std::string, bool>::const_iterator it;
-	it = rhs._methods.begin();
-	while (it != rhs._methods.end())
+	if (this != &rhs)
 	{
-		this->_methods.at((*it).first) = (*it).second;
-		it++;
+		std::map<std::string, bool>::const_iterator it;
+		it = rhs._methods.begin();
+		while (it != rhs._methods.end())
+		{
+			this->_methods.at((*it).first) = (*it).second;
+			it++;
+		}
 	}
 	return (*this);
 }
-
 
 bool Methods::is_allowed(std::string method) const
 {

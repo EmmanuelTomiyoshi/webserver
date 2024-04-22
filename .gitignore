@@ -39,3 +39,4 @@ client
 .cache
 *.idx
 *.json
+example.conf

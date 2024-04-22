@@ -44,21 +44,3 @@ What does the parser need to have
 6) Status Codes:
 	Correct: 200 OK, 404 Not Found, 500 Internal Server Error
 	Incorrect: 200, not found, Server Error (incorrect format or missing status phrase)
-7) Prevent Header Injection:
-	Ensure that headers like User-Agent, Referer, and Host do not contain newline characters or other special characters that could be used for injection attacks.
-8) Prevent Buffer Overflow Attacks:
-	Validate the Content-Length header against the actual length of the message body.
-9) URI Syntax:
-	Understand the URI syntax components: scheme, authority, path, query, and fragment.
-	Example: https://www.example.com/path?query=value#fragment
-10) URI Normalization
-	Convert Uppercase Letters to Lowercase:
-		Input URI: HTTP://www.EXAMPLE.com/Path/To/Resource
-		Normalized URI: http://www.example.com/Path/To/Resource
-	Remove Dot-Segments (Path Normalization):
-		Input URI: http://www.example.com/../a/b/../c/./d.html
-		Normalized URI: http://www.example.com/a/c/d.html
-	Remove Default Ports:
-		Input URI: https://www.example.com:443/path
-		Normalized URI: https://www.example.com/path
-11) 

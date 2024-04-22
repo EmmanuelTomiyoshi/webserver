@@ -30,21 +30,6 @@ Parser &Parser::operator=(const Parser &copy)
 	return *this;
 }
 
-
-bool hasInvalidURICharacters(const std::string &str)
-{
-	std::string invalidChars = " \t\n\r\f\a\b\e\v";
-	std::string traversalSequence = "../"; //for security reasons
-
-	if (str.find_first_of(invalidChars) != std::string::npos ||
-		str.find(traversalSequence) != std::string::npos)
-	{
-		return true;
-	}
-	return false;
-}
-
-
 void Parser::parseRequest(const std::string &file)
 {
 	std::ifstream inputFile(file.c_str());
@@ -90,14 +75,14 @@ void Parser::parseRequest(const std::string &file)
 	}
 
 	//URI validation
+	utils::Utils obj;
 	std::string invalidChars = " \t\n\r\f$|<>";
-	if (_requestURL.at(0) != '/' || hasInvalidURICharacters(_requestURL) || _requestURL.size() > MAX_URI_LENGTH)
+	if (_requestURL.at(0) != '/' || obj.hasInvalidURICharacters(_requestURL) || _requestURL.size() > MAX_URI_LENGTH)
 	{
 		throw std::invalid_argument("Invalid URI: " + _requestURL);
 	}
 
 	//HTTP Version validation
-
 	if (_httpVersion != WEBSERVER_HTTP_VERSION)
 	{
 		throw std::invalid_argument("Invalid HTTP Version: " + _httpVersion);

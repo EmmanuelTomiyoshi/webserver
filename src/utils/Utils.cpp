@@ -2,70 +2,71 @@
 
 namespace utils
 {
+	//orthodoxical cannonical form
 	Utils::Utils()
 	{
-        HttpStatusCode[100] = "Continue";
-        HttpStatusCode[101] = "Switching Protocols";
-        HttpStatusCode[102] = "Processing";
-        HttpStatusCode[103] = "Early Hints";
-        HttpStatusCode[200] = "OK";
-        HttpStatusCode[201] = "Created";
-        HttpStatusCode[202] = "Accepted";
-        HttpStatusCode[203] = "Non-Authoritative Information";
-        HttpStatusCode[204] = "No Content";
-        HttpStatusCode[205] = "Reset Content";
-        HttpStatusCode[206] = "Partial Content";
-        HttpStatusCode[207] = "Multi-Status";
-        HttpStatusCode[208] = "Already Reported";
-        HttpStatusCode[226] = "IM Used";
-        HttpStatusCode[300] = "Multiple Choices";
-        HttpStatusCode[301] = "Moved Permanently";
-        HttpStatusCode[302] = "Found";
-        HttpStatusCode[303] = "See Other";
-        HttpStatusCode[304] = "Not Modified";
-        HttpStatusCode[305] = "Use Proxy";
-        HttpStatusCode[307] = "Temporary Redirect";
-        HttpStatusCode[308] = "Permanent Redirect";
-        HttpStatusCode[400] = "Bad Request";
-        HttpStatusCode[401] = "Unauthorized";
-        HttpStatusCode[402] = "Payment Required";
-        HttpStatusCode[403] = "Forbidden";
-        HttpStatusCode[404] = "Not Found";
-        HttpStatusCode[405] = "Method Not Allowed";
-        HttpStatusCode[406] = "Not Acceptable";
-        HttpStatusCode[407] = "Proxy Authentication Required";
-        HttpStatusCode[408] = "Request Timeout";
-        HttpStatusCode[409] = "Conflict";
-        HttpStatusCode[410] = "Gone";
-        HttpStatusCode[411] = "Length Required";
-        HttpStatusCode[412] = "Precondition Failed";
-        HttpStatusCode[413] = "Payload Too Large";
-        HttpStatusCode[414] = "URI Too Long";
-        HttpStatusCode[415] = "Unsupported Media Type";
-        HttpStatusCode[416] = "Range Not Satisfiable";
-        HttpStatusCode[417] = "Expectation Failed";
-        HttpStatusCode[418] = "I'm a teapot";
-        HttpStatusCode[421] = "Misdirected Request";
-        HttpStatusCode[422] = "Unprocessable Entity";
-        HttpStatusCode[423] = "Locked";
-        HttpStatusCode[424] = "Failed Dependency";
-        HttpStatusCode[425] = "Too Early";
-        HttpStatusCode[426] = "Upgrade Required";
-        HttpStatusCode[428] = "Precondition Required";
-        HttpStatusCode[429] = "Too Many Requests";
-        HttpStatusCode[431] = "Request Header Fields Too Large";
-        HttpStatusCode[451] = "Unavailable For Legal Reasons";
-        HttpStatusCode[500] = "Internal Server Error";
-        HttpStatusCode[501] = "Not Implemented";
-        HttpStatusCode[502] = "Bad Gateway";
-        HttpStatusCode[503] = "Service Unavailable";
-        HttpStatusCode[504] = "Gateway Timeout";
-        HttpStatusCode[505] = "HTTP Version Not Supported";
-        HttpStatusCode[506] = "Variant Also Negotiates";
-        HttpStatusCode[507] = "Insufficient Storage";
-        HttpStatusCode[508] = "Loop Detected";
-        HttpStatusCode[510] = "Not Extended";
-        HttpStatusCode[511] = "Network Authentication Required";
+        _HttpStatusCode[100] = "Continue";
+        _HttpStatusCode[101] = "Switching Protocols";
+        _HttpStatusCode[102] = "Processing";
+        _HttpStatusCode[103] = "Early Hints";
+        _HttpStatusCode[200] = "OK";
+        _HttpStatusCode[201] = "Created";
+        _HttpStatusCode[202] = "Accepted";
+        _HttpStatusCode[203] = "Non-Authoritative Information";
+        _HttpStatusCode[204] = "No Content";
+        _HttpStatusCode[205] = "Reset Content";
+        _HttpStatusCode[206] = "Partial Content";
+        _HttpStatusCode[207] = "Multi-Status";
+        _HttpStatusCode[208] = "Already Reported";
+        _HttpStatusCode[226] = "IM Used";
+        _HttpStatusCode[300] = "Multiple Choices";
+        _HttpStatusCode[301] = "Moved Permanently";
+        _HttpStatusCode[302] = "Found";
+        _HttpStatusCode[303] = "See Other";
+        _HttpStatusCode[304] = "Not Modified";
+        _HttpStatusCode[305] = "Use Proxy";
+        _HttpStatusCode[307] = "Temporary Redirect";
+        _HttpStatusCode[308] = "Permanent Redirect";
+        _HttpStatusCode[400] = "Bad Request";
+        _HttpStatusCode[401] = "Unauthorized";
+        _HttpStatusCode[402] = "Payment Required";
+        _HttpStatusCode[403] = "Forbidden";
+        _HttpStatusCode[404] = "Not Found";
+        _HttpStatusCode[405] = "Method Not Allowed";
+        _HttpStatusCode[406] = "Not Acceptable";
+        _HttpStatusCode[407] = "Proxy Authentication Required";
+        _HttpStatusCode[408] = "Request Timeout";
+        _HttpStatusCode[409] = "Conflict";
+        _HttpStatusCode[410] = "Gone";
+        _HttpStatusCode[411] = "Length Required";
+        _HttpStatusCode[412] = "Precondition Failed";
+        _HttpStatusCode[413] = "Payload Too Large";
+        _HttpStatusCode[414] = "URI Too Long";
+        _HttpStatusCode[415] = "Unsupported Media Type";
+        _HttpStatusCode[416] = "Range Not Satisfiable";
+        _HttpStatusCode[417] = "Expectation Failed";
+        _HttpStatusCode[418] = "I'm a teapot";
+        _HttpStatusCode[421] = "Misdirected Request";
+        _HttpStatusCode[422] = "Unprocessable Entity";
+        _HttpStatusCode[423] = "Locked";
+        _HttpStatusCode[424] = "Failed Dependency";
+        _HttpStatusCode[425] = "Too Early";
+        _HttpStatusCode[426] = "Upgrade Required";
+        _HttpStatusCode[428] = "Precondition Required";
+        _HttpStatusCode[429] = "Too Many Requests";
+        _HttpStatusCode[431] = "Request Header Fields Too Large";
+        _HttpStatusCode[451] = "Unavailable For Legal Reasons";
+        _HttpStatusCode[500] = "Internal Server Error";
+        _HttpStatusCode[501] = "Not Implemented";
+        _HttpStatusCode[502] = "Bad Gateway";
+        _HttpStatusCode[503] = "Service Unavailable";
+        _HttpStatusCode[504] = "Gateway Timeout";
+        _HttpStatusCode[505] = "HTTP Version Not Supported";
+        _HttpStatusCode[506] = "Variant Also Negotiates";
+        _HttpStatusCode[507] = "Insufficient Storage";
+        _HttpStatusCode[508] = "Loop Detected";
+        _HttpStatusCode[510] = "Not Extended";
+        _HttpStatusCode[511] = "Network Authentication Required";
 	}
 
 	Utils::Utils(const Utils &copy)
@@ -84,4 +85,24 @@ namespace utils
 	}
 
 	Utils::~Utils() { }
+
+	//getters
+	std::map<int, std::string> Utils::getHttpStatusCode() const
+	{
+		return _HttpStatusCode;
+	}
+
+	//util functions
+	bool Utils::hasInvalidURICharacters(const std::string &str)
+	{
+		std::string invalidChars = " \t\n\r\f\a\b\e\v";
+		std::string traversalSequence = "../"; //for security reasons
+
+		if (str.find_first_of(invalidChars) != std::string::npos ||
+			str.find(traversalSequence) != std::string::npos)
+		{
+			return true;
+		}
+		return false;
+	}
 }

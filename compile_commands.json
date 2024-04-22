@@ -1,0 +1,173 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c++98",
+      "-g",
+      "-I",
+      "./src/includes",
+      "-c",
+      "-o",
+      "build/main.o",
+      "./src/main.cpp"
+    ],
+    "directory": "/home/etomiyos/42projetos/webserver",
+    "file": "/home/etomiyos/42projetos/webserver/src/main.cpp",
+    "output": "/home/etomiyos/42projetos/webserver/build/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c++98",
+      "-g",
+      "-I",
+      "./src/includes",
+      "-c",
+      "-o",
+      "build/IPResolver.o",
+      "./src/socket/IPResolver.cpp"
+    ],
+    "directory": "/home/etomiyos/42projetos/webserver",
+    "file": "/home/etomiyos/42projetos/webserver/src/socket/IPResolver.cpp",
+    "output": "/home/etomiyos/42projetos/webserver/build/IPResolver.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c++98",
+      "-g",
+      "-I",
+      "./src/includes",
+      "-c",
+      "-o",
+      "build/Request.o",
+      "./src/parsing/Request.cpp"
+    ],
+    "directory": "/home/etomiyos/42projetos/webserver",
+    "file": "/home/etomiyos/42projetos/webserver/src/parsing/Request.cpp",
+    "output": "/home/etomiyos/42projetos/webserver/build/Request.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c++98",
+      "-g",
+      "-I",
+      "./src/includes",
+      "-c",
+      "-o",
+      "build/Server.o",
+      "./src/socket/Server.cpp"
+    ],
+    "directory": "/home/etomiyos/42projetos/webserver",
+    "file": "/home/etomiyos/42projetos/webserver/src/socket/Server.cpp",
+    "output": "/home/etomiyos/42projetos/webserver/build/Server.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c++98",
+      "-g",
+      "-I",
+      "./src/includes",
+      "-c",
+      "-o",
+      "build/Config.o",
+      "./src/config/Config.cpp"
+    ],
+    "directory": "/home/etomiyos/42projetos/webserver",
+    "file": "/home/etomiyos/42projetos/webserver/src/config/Config.cpp",
+    "output": "/home/etomiyos/42projetos/webserver/build/Config.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c++98",
+      "-g",
+      "-I",
+      "./src/includes",
+      "-c",
+      "-o",
+      "build/Route.o",
+      "./src/config/Route.cpp"
+    ],
+    "directory": "/home/etomiyos/42projetos/webserver",
+    "file": "/home/etomiyos/42projetos/webserver/src/config/Route.cpp",
+    "output": "/home/etomiyos/42projetos/webserver/build/Route.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c++98",
+      "-g",
+      "-I",
+      "./src/includes",
+      "-c",
+      "-o",
+      "build/Methods.o",
+      "./src/config/Methods.cpp"
+    ],
+    "directory": "/home/etomiyos/42projetos/webserver",
+    "file": "/home/etomiyos/42projetos/webserver/src/config/Methods.cpp",
+    "output": "/home/etomiyos/42projetos/webserver/build/Methods.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c++98",
+      "-g",
+      "-I",
+      "./src/includes",
+      "-c",
+      "-o",
+      "build/config_test.o",
+      "./src/config/config_test.cpp"
+    ],
+    "directory": "/home/etomiyos/42projetos/webserver",
+    "file": "/home/etomiyos/42projetos/webserver/src/config/config_test.cpp",
+    "output": "/home/etomiyos/42projetos/webserver/build/config_test.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c++98",
+      "-g",
+      "-I",
+      "./src/includes",
+      "-c",
+      "-o",
+      "build/Parser.o",
+      "./src/parsing/Parser.cpp"
+    ],
+    "directory": "/home/etomiyos/42projetos/webserver",
+    "file": "/home/etomiyos/42projetos/webserver/src/parsing/Parser.cpp",
+    "output": "/home/etomiyos/42projetos/webserver/build/Parser.o"
+  }
+]

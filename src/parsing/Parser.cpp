@@ -31,18 +31,27 @@ Parser &Parser::operator=(const Parser &copy)
 	return *this;
 }
 
-void Parser::parseRequest(const std::string &fileName)
+
+
+void Parser::parseRequest(const std::string &file)
 {
-	std::ifstream iss(fileName.c_str());
-	if (!iss.is_open())
+	std::ifstream inputFile(file.c_str());
+
+	//file validation
+	if (!inputFile.is_open())
 	{
-		throw new std::exception();
+		throw std::runtime_error("opening the file " + file);
 	}
+	else if (inputFile.seekg(0, std::ios::end)) //move to the end of the file
+	{
+		if (inputFile.tellg() == 0)
+			throw std::runtime_error("http file is empty");
+	}
+	inputFile.seekg(0, std::ios::beg); //move to the beginning of the file
+
 	std::string line;
 
-	// std::cout << "*****REQUESTSTRING*******\n" << requestString << "\n***********************\n";
-	// Parse request line
-	if (!std::getline(iss, line))
+	if (!std::getline(inputFile, line))
 	{
 		throw std::invalid_argument("Empty request");
 	}
@@ -64,42 +73,44 @@ void Parser::parseRequest(const std::string &fileName)
 	}
 	if (value == 0)
 	{
-		throw std::invalid_argument("Invalid request line");
+		throw std::invalid_argument("Invalid method: " + _requestMethod);
 	}
+
+	std::cout << COLOR_BHBLUE << _requestMethod << _requestURL << _httpVersion << COLOR_RESET << std::endl;
 
 	// Parse headers
-	while (std::getline(iss, line) && !line.empty())
-	{
-		size_t pos = line.find(':');
-		if (pos != std::string::npos)
-		{
-			std::string headerName = line.substr(0, pos);
-			std::string headerValue = line.substr(pos + 1);
-			_headers[headerName] = headerValue;
-		}
-	}
+	// while (std::getline(inputFile, line) && !line.empty())
+	// {
+	// 	size_t pos = line.find(':');
+	// 	if (pos != std::string::npos)
+	// 	{
+	// 		std::string headerName = line.substr(0, pos);
+	// 		std::string headerValue = line.substr(pos + 1);
+	// 		_headers[headerName] = headerValue;
+	// 	}
+	// }
 
-	// Parse Content-Length if present
-	std::map<std::string, std::string>::iterator it = _headers.find("Content-Length");
-	if (it != _headers.end())
-	{
-		_contentLength = std::atol(it->second.c_str());
-	}
+	// // Parse Content-Length if present
+	// std::map<std::string, std::string>::iterator it = _headers.find("Content-Length");
+	// if (it != _headers.end())
+	// {
+	// 	_contentLength = std::atol(it->second.c_str());
+	// }
 
-	// Parse Transfer-Encoding if present
-	it = _headers.find("Transfer-Encoding");
-	if (it != _headers.end())
-	{
-		_transferEncoding = it->second;
-	}
+	// // Parse Transfer-Encoding if present
+	// it = _headers.find("Transfer-Encoding");
+	// if (it != _headers.end())
+	// {
+	// 	_transferEncoding = it->second;
+	// }
 
-	// Parse message body if present
-	char buff[2000];
-	while (!iss.eof())
-	{	
-		iss.getline(buff, 2000, '\0');
-		_messageBody += buff;
-	}
+	// // Parse message body if present
+	// char buff[2000];
+	// while (!inputFile.eof())
+	// {	
+	// 	inputFile.getline(buff, 2000, '\0');
+	// 	_messageBody += buff;
+	// }
 }
 
 std::string Parser::getRequestMethod() const

@@ -13,15 +13,21 @@ class File {
 		void read_config_block(void);
 		void extract_blocks(void);
 		void parse_blocks(void);
-		bool parse_single_value(std::string & block);
-		bool parse_multi_value(std::string & block);
 
 		static bool is_inside(std::vector<std::string> & arr, std::string & str);
 		static std::string read_stream(std::stringstream & ss);
 		static std::string find(std::string str);
 
-		std::map<std::string, std::string> _single_value;
-		std::map<std::string, std::list<std::string>> _multi_values;
+		class Conf {
+			public:
+				std::map<std::string, std::string> _single_value;
+				std::map<std::string, std::list<std::string>> _multi_values;
+		};
+
+		bool parse_single_value(std::string & block, Conf & conf);
+		bool parse_multi_value(std::string & block, Conf & conf);
+
+		std::list<Conf> _confs;
 
 	public:
 		File(std::string file_name);

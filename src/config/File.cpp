@@ -135,15 +135,15 @@ void File::extract_blocks(void)
 std::vector<std::string> single_value_keys = {
 	"host",
 	"body_size",
-	"root"
+	"root",
+	"port"
 };
 
 std::vector<std::string> multi_value_keys = {
 	"server_name",
-	"ports",
 };
 
-bool File::parse_single_value(std::string & block)
+bool File::parse_single_value(std::string & block, Conf & conf)
 {
 	std::stringstream ss(block);
 	std::string word;
@@ -152,7 +152,7 @@ bool File::parse_single_value(std::string & block)
 	std::string line = block.substr(block.find(word) + word.length());
 	line = line.substr(0, line.find_first_of('\n'));
 	std::stringstream ss_line(line);
-	ss_line >> _single_value[word];
+	ss_line >> conf._single_value[word];
 	std::string aux;
 	ss_line >> aux;
 	if (aux.empty() == false)
@@ -168,7 +168,7 @@ bool File::is_inside(std::vector<std::string> & arr, std::string & str)
 	return it != arr.end();
 }
 
-bool File::parse_multi_value(std::string & block)
+bool File::parse_multi_value(std::string & block, Conf & conf)
 {
 	std::stringstream ss(block);
 	std::string word;
@@ -184,7 +184,7 @@ bool File::parse_multi_value(std::string & block)
 		ss_line >> value;
 		if (value.empty())
 			break ;
-		_multi_values[word].push_back(value);
+		conf._multi_values[word].push_back(value);
 		value.erase();
 	}
 	block = block.substr(block.find(line) + line.length());
@@ -197,6 +197,7 @@ void File::parse_blocks(void)
 	{
 		std::string block = _server_configs.front();
 		_server_configs.pop_front();
+		Conf config;
 		while (true)
 		{
 			std::string word;
@@ -205,37 +206,46 @@ void File::parse_blocks(void)
 			if (word.empty())
 				break ;
 			if (is_inside(single_value_keys, word))
-				parse_single_value(block);
+				parse_single_value(block, config);
 			else if (is_inside(multi_value_keys, word))
-				parse_multi_value(block);
+				parse_multi_value(block, config);
 			else
 				throw std::runtime_error("'" + word + "' is invalid");
 		}
-		return ;
+		_confs.push_back(config);
 	}
 }
 
 void File::info(void) const
 {
-	std::cout << "---------- SINGLE-VALUES ----------\n";
-	std::map<std::string, std::string>::const_iterator it;
-	it = _single_value.begin();
-	for (; it != _single_value.end(); it++)
-		std::cout << (*it).first << ": " << (*it).second << std::endl;
-	
-	std::cout << "\n---------- MULTI-VALUES ----------\n";
-	std::map<std::string, std::list<std::string>>::const_iterator it2;
-	it2 = _multi_values.begin();
-	for (; it2 != _multi_values.end(); it2++)
+	std::list<Conf>::const_iterator it;
+	it = _confs.begin();
+	for (int i = 0; it != _confs.end(); it++)
 	{
-		std::cout << (*it2).first << ": ";
-		std::list<std::string> const & list = (*it2).second;
-		std::list<std::string>::const_iterator it3;
-		it3 = list.begin();
-		for (; it3 != list.end(); it3++)
-			std::cout << (*it3) << " ";
-		std::cout << std::endl;
+		Conf const & conf = (*it);
+		std::cout << "\n----------------- CONFIG " << i << " ----------------" << std::endl;
+		std::cout << "                SINGLE-VALUES\n";
+		std::map<std::string, std::string>::const_iterator it;
+		it = conf._single_value.begin();
+		for (; it != conf._single_value.end(); it++)
+			std::cout << (*it).first << ": " << (*it).second << std::endl;
+		
+		std::cout << "\n               MULTI-VALUES\n";
+		std::map<std::string, std::list<std::string>>::const_iterator it2;
+		it2 = conf._multi_values.begin();
+		for (; it2 != conf._multi_values.end(); it2++)
+		{
+			std::cout << (*it2).first << ": ";
+			std::list<std::string> const & list = (*it2).second;
+			std::list<std::string>::const_iterator it3;
+			it3 = list.begin();
+			for (; it3 != list.end(); it3++)
+				std::cout << (*it3) << " ";
+			std::cout << std::endl;
+		}
+		i++;
 	}
+
 }
 
 File::~File(void)

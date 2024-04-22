@@ -36,3 +36,6 @@ webserver
 .vscode
 build
 client
+.cache
+*.idx
+*.json

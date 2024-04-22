@@ -28,19 +28,25 @@ What does the parser need to have
 2) URI Structure:
 	Correct: /path/to/resource, /api/user?id=123
 	Incorrect: /../../etc/passwd, ?id=123 (missing leading / in absolute path)
+	<!---
 	# If str[0] != '/' or uri.empty().
 	# Invalid characters are: spaces, control characters, $, |, < and >
 	# reject urls that contain path traversal sequences such as '..' or '/../'
 	# Validate URI Length, limitate to a maximum URI length (such as 2048 chars)
+	-->
 3) HTTP Versioning:
 	Correct: HTTP/1.1, HTTP/1.0
 	Incorrect: http/1.1 (case-sensitive, must be uppercase)
+	<!---
 	# Must also check which versions our webserver accepts
+	-->
 
 4) Message Headers:
 	Correct (mandatory): Host: www.example.com, Content-Type: application/json, Content-Length: 123
 	Incorrect: (missing mandatory headers): Missing Content-Type header
+	<!---
 	# validate mandatory headers, host and content length must be present.
+	-->
 6) Status Codes:
 	Correct: 200 OK, 404 Not Found, 500 Internal Server Error
 	Incorrect: 200, not found, Server Error (incorrect format or missing status phrase)

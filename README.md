@@ -50,3 +50,7 @@ What does the parser need to have
 6) Status Codes:
 	Correct: 200 OK, 404 Not Found, 500 Internal Server Error
 	Incorrect: 200, not found, Server Error (incorrect format or missing status phrase)
+
+------
+
+7) Content length is optional. GET doesn't have content length, for example

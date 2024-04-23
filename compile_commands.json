@@ -169,5 +169,43 @@
     "directory": "/home/etomiyos/42projetos/webserver",
     "file": "/home/etomiyos/42projetos/webserver/src/parsing/Parser.cpp",
     "output": "/home/etomiyos/42projetos/webserver/build/Parser.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c++98",
+      "-g",
+      "-I",
+      "./src/includes",
+      "-c",
+      "-o",
+      "build/Utils.o",
+      "./src/utils/Utils.cpp"
+    ],
+    "directory": "/home/etomiyos/42projetos/webserver",
+    "file": "/home/etomiyos/42projetos/webserver/src/utils/Utils.cpp",
+    "output": "/home/etomiyos/42projetos/webserver/build/Utils.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c++98",
+      "-g",
+      "-I",
+      "./src/includes",
+      "-c",
+      "-o",
+      "build/File.o",
+      "./src/config/File.cpp"
+    ],
+    "directory": "/home/etomiyos/42projetos/webserver",
+    "file": "/home/etomiyos/42projetos/webserver/src/config/File.cpp",
+    "output": "/home/etomiyos/42projetos/webserver/build/File.o"
   }
 ]

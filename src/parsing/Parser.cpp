@@ -76,7 +76,6 @@ void Parser::parseRequest(const std::string &file)
 
 	//URI validation
 	utils::Utils obj;
-	std::string invalidChars = " \t\n\r\f$|<>";
 	if (_requestURL.at(0) != '/' || obj.hasInvalidURICharacters(_requestURL) || _requestURL.size() > MAX_URI_LENGTH)
 	{
 		throw std::invalid_argument("Invalid URI: " + _requestURL);

@@ -20,9 +20,9 @@ int main(int argc, char *argv[])
 {
 	verify_args(argc, argv);
 
-	// Server server;
-	// server.start();
-	// config_test();
+	Server server;
+	server.start();
+	config_test();
 
 	try {
 

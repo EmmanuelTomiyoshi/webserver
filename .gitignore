@@ -40,3 +40,4 @@ client
 *.idx
 *.json
 example.conf
+.chache

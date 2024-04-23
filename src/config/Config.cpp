@@ -1,10 +1,7 @@
 #include <webserver.hpp>
 
-Config::Config(std::string file_name)
+Config::Config(void)
 {
-	std::ifstream file(file_name.c_str());
-	if (file.bad())
-		throw std::runtime_error("failed to open '" + file_name + "'");
 }
 
 Config::~Config(void)
@@ -93,4 +90,17 @@ void Config::ServerNames::set(std::list<std::string> & values)
 		this->_values.push_back(*it);
 		it++;
 	}
+}
+
+void Config::ServerNames::show(void) const
+{
+	std::list<std::string>::const_iterator it;
+	it = this->_values.begin();
+	std::cout << "ServerNames: ";
+	while (it != this->_values.end())
+	{
+		std::cout << (*it) << " ";
+		it++;
+	}
+	std::cout << std::endl;
 }

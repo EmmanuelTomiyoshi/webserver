@@ -10,6 +10,7 @@ SRC 		=	main.cpp \
 				config_test.cpp \
 				File.cpp \
 				Parser.cpp \
+				Configs.cpp \
 
 VPATH		=	./src \
 				./src/parsing \

@@ -20,6 +20,7 @@ class Config
 			public:
 				std::list<std::string> const & get(void) const;
 				void set(std::list<std::string> & values);
+				void show(void) const;
 		};
 
 		class Ports {
@@ -51,7 +52,7 @@ class Config
 		void analise_words();
 
 	public:
-		Config(std::string file_name);
+		Config(void);
 		~Config(void);
 
 		

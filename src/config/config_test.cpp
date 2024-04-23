@@ -2,8 +2,9 @@
 
 void config_test(void)
 {
-	File file("ws.conf");
-
+	Configs configs("ws.conf");
+	configs.blocks.front().server_names.show();
+	configs.blocks.back().server_names.show();
 	// std::cout << std::endl;
 	// config.routes.set("/janaina");
 	// config.routes.set("/home");

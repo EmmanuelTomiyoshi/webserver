@@ -37,7 +37,6 @@ File::File(std::string file_name) : _file(file_name.c_str())
 	fill_data();
 	extract_blocks();
 	parse_blocks();
-	info();
 }
 
 void File::fill_data(void)
@@ -221,15 +220,15 @@ void File::parse_blocks(void)
 			else
 				throw std::runtime_error("'" + word + "' is invalid");
 		}
-		_confs.push_back(config);
+		confs.push_back(config);
 	}
 }
 
 void File::info(void) const
 {
 	std::list<Conf>::const_iterator it;
-	it = _confs.begin();
-	for (int i = 0; it != _confs.end(); it++)
+	it = confs.begin();
+	for (int i = 0; it != confs.end(); it++)
 	{
 		Conf const & conf = (*it);
 		std::cout << "\n----------------- CONFIG " << i << " ----------------" << std::endl;

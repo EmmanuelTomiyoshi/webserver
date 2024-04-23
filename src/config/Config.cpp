@@ -8,6 +8,15 @@ Config::~Config(void)
 {
 }
 
+void Config::show(void) const
+{
+	std::cout << "\n----------- SERVER CONFIGURATION -----------\n";
+	this->server_names.show();
+	std::cout << "Body Size: " << this->body_size.get() << std::endl;
+	std::cout << "Port: " << this->port.get() << std::endl;
+	std::cout << "Host: " << this->host.get() << std::endl;
+}
+
 //--------------- Host ------------------//
 void Config::Host::set(std::string & value)
 {
@@ -20,33 +29,14 @@ std::string Config::Host::get(void) const
 }
 
 //--------------- Ports ------------------//
-void Config::Ports::set(std::list<std::string> values)
+void Config::Port::set(std::string value)
 {
-	std::list<std::string>::iterator it;
-	it = values.begin();
-	while (it != values.end())
-	{
-		this->_values.push_back(*it);
-		it++;
-	}
+	this->_value = value;
 }
 
-std::list<std::string> Config::Ports::get(void) const
+std::string Config::Port::get(void) const
 {
-	return this->_values;
-}
-
-void Config::Ports::info(void) const
-{
-	std::list<std::string>::const_iterator it;
-	it = this->_values.begin();
-	std::cout << "PORTS: ";
-	while (it != this->_values.end())
-	{
-		std::cout << *it << " ";
-		it++;
-	}
-	std::cout << std::endl;
+	return this->_value;
 }
 
 //--------------- Routes ------------------//

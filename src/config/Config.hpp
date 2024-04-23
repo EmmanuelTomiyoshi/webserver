@@ -23,13 +23,12 @@ class Config
 				void show(void) const;
 		};
 
-		class Ports {
+		class Port {
 			private:
-				std::list<std::string> _values;
+				std::string _value;
 			public:
-				std::list<std::string> get(void) const;
-				void set(std::list<std::string> values);
-				void info(void) const;
+				std::string get(void) const;
+				void set(std::string value);
 		};
 
 		class BodySize {
@@ -48,16 +47,14 @@ class Config
 				void set(std::string info); //pass all the information need to create a route
 		};
 
-		std::string _file_name;
-		void analise_words();
-
 	public:
 		Config(void);
 		~Config(void);
 
+		void show(void) const;
 		
 		Host host;
-		Ports ports;
+		Port port;
 		Routes routes;
 		BodySize body_size;
 		ServerNames server_names;

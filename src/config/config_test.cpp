@@ -6,7 +6,7 @@ void config_test(void)
 	int i = configs.len();
 	while (i--)
 	{
-		configs.next().server_names.show();
+		configs.next().show();
 	}
 
 	// std::cout << std::endl;

@@ -9,6 +9,9 @@ Configs::Configs(std::string config_file) : _file(config_file)
 		File::Conf & conf = (*it);
 		Config config;
 		config.server_names.set(conf._multi_values["server_name"]);
+		config.body_size.set(conf._single_value["body_size"]);
+		config.host.set(conf._single_value["host"]);
+		config.port.set(conf._single_value["port"]);
 		this->_configs.push_back(config);
 	}
 	this->_it = this->_configs.begin();

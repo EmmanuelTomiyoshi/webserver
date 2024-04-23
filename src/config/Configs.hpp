@@ -4,15 +4,17 @@
 
 class Configs {
 	private:
-		int _len;
+		std::list<Config>::iterator _it;
 		File _file;
+		std::list<Config> _configs;
 
 	public:
 		Configs(std::string config_file);
 		~Configs(void);
 
+		Config & next(void);
 		int len(void) const;
-		std::vector<Config> blocks;
+		void reset_iterator(void);
 };
 
 #endif

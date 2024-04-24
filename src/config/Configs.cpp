@@ -15,6 +15,8 @@ Configs::Configs(std::string config_file) : _file(config_file)
 		this->_configs.push_back(config);
 	}
 	this->_it = this->_configs.begin();
+	_file.info(_file.confs);
+	_file.info(_file.routes);
 }
 
 Config & Configs::next(void)

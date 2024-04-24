@@ -20,8 +20,16 @@ class File {
 		static std::string read_stream(std::stringstream & ss);
 		static std::string find(std::string str);
 
-		bool parse_single_value(std::string & block, Conf & conf);
-		bool parse_multi_value(std::string & block, Conf & conf);
+		bool parse_single_value(std::string & block, 
+			std::map<std::string, 
+			std::string> & map
+		);
+	
+		bool parse_multi_value(
+			std::string & block, 
+			std::map<std::string, std::list<std::string> > & map
+		);
+		bool parse_route(std::string & block);
 
 		std::vector<std::string> single_value_keys;
 		std::vector<std::string> multi_value_keys;
@@ -30,8 +38,9 @@ class File {
 		File(std::string file_name);
 		~File(void);
 
-		void info(void) const;
+		void info(std::list<Conf> & confs) const;
 		std::list<Conf> confs;
+		std::list<Conf> routes;
 
 		class Conf {
 			public:

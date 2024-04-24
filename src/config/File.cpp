@@ -20,18 +20,27 @@ File::File(std::string file_name) : _file(file_name.c_str())
 		"host",
 		"body_size",
 		"root",
-		"port"
+		"port",
+
+		"save_files_path",
+		"autoindex",
+		"return"
 	};
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 7; i++)
 		single_value_keys.push_back(aux[i]);
 
 	std::string aux2[] = {
 		"server_name",
-		"try_files"
+		"try_files",
+
+		"methods",
+		"try_files",
+		"cgi_extensions",
+
 	};
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 5; i++)
 		multi_value_keys.push_back(aux2[i]);
  
 	fill_data();
@@ -90,7 +99,7 @@ void File::read_config_block(void)
 	ss >> word;
 	if (word.empty())
 	{
-		_data.erase(0);
+		_data.erase();
 		return ;
 	}
 	if (word != "server")
@@ -151,7 +160,7 @@ void File::extract_blocks(void)
 
 
 
-bool File::parse_single_value(std::string & block, Conf & conf)
+bool File::parse_single_value(std::string & block, std::map<std::string, std::string> & map)
 {
 	std::stringstream ss(block);
 	std::string word;
@@ -160,7 +169,7 @@ bool File::parse_single_value(std::string & block, Conf & conf)
 	std::string line = block.substr(block.find(word) + word.length());
 	line = line.substr(0, line.find_first_of('\n'));
 	std::stringstream ss_line(line);
-	ss_line >> conf._single_value[word];
+	ss_line >> map[word];
 	std::string aux;
 	ss_line >> aux;
 	if (aux.empty() == false)
@@ -176,7 +185,10 @@ bool File::is_inside(std::vector<std::string> & arr, std::string & str)
 	return it != arr.end();
 }
 
-bool File::parse_multi_value(std::string & block, Conf & conf)
+bool File::parse_multi_value(
+	std::string & block, 
+	std::map<std::string, std::list<std::string> > & map
+)
 {
 	std::stringstream ss(block);
 	std::string word;
@@ -192,11 +204,56 @@ bool File::parse_multi_value(std::string & block, Conf & conf)
 		ss_line >> value;
 		if (value.empty())
 			break ;
-		conf._multi_values[word].push_back(value);
+		map[word].push_back(value);
 		value.erase();
 	}
 	block = block.substr(block.find(line) + line.length());
 	return true;
+}
+
+bool File::parse_route(std::string & block)
+{
+	std::stringstream ss(block);
+	std::string word;
+
+	ss >> word;
+	if (word != "location")
+		throw std::runtime_error("'location' not found");
+	ss >> word;
+	if (word == "{")
+		throw std::runtime_error("path not found");
+
+	Conf route;
+	route._single_value["location"] = word;
+	
+	ss >> word;
+	if (word != "{")
+		throw std::runtime_error("'{' not found");
+
+	int start = block.find("{");
+	std::string route_block = block.substr(
+		start + 1,
+		block.find("}") - start - 1
+	);
+
+		while (true)
+		{
+			std::string word;
+			std::stringstream ss(route_block);
+			ss >> word;
+			if (word.empty())
+				break ;
+			if (is_inside(single_value_keys, word))
+				parse_single_value(route_block, route._single_value);
+			else if (is_inside(multi_value_keys, word))
+				parse_multi_value(route_block, route._multi_values);
+			else
+				throw std::runtime_error("'" + word + "' is invalid");
+		}
+		this->routes.push_back(route);
+
+		block = block.substr(block.find("}") + 1);
+		return true;
 }
 
 void File::parse_blocks(void)
@@ -214,17 +271,19 @@ void File::parse_blocks(void)
 			if (word.empty())
 				break ;
 			if (is_inside(single_value_keys, word))
-				parse_single_value(block, config);
+				parse_single_value(block, config._single_value);
 			else if (is_inside(multi_value_keys, word))
-				parse_multi_value(block, config);
+				parse_multi_value(block, config._multi_values);
+			else if (word == "location")
+				parse_route(block);
 			else
 				throw std::runtime_error("'" + word + "' is invalid");
 		}
-		confs.push_back(config);
+		this->confs.push_back(config);
 	}
 }
 
-void File::info(void) const
+void File::info(std::list<Conf> & confs) const
 {
 	std::list<Conf>::const_iterator it;
 	it = confs.begin();

@@ -3,11 +3,12 @@
 void config_test(void)
 {
 	Configs configs("ws.conf");
-	int i = configs.len();
-	while (i--)
-	{
-		configs.next().show();
-	}
+
+	// int i = configs.len();
+	// while (i--)
+	// {
+	// 	configs.next().show();
+	// }
 
 	// std::cout << std::endl;
 	// config.routes.set("/janaina");

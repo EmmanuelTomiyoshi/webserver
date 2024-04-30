@@ -45,13 +45,23 @@ Route & Config::Routes::get(std::string location)
 	return this->_routes.at(location);
 }
 
-void Config::Routes::set(std::string location)
-{
-	Route & route = this->_routes[location];
-	route.location.set(location);
-	route.methods.allow("GET");
-}
+void Config::Routes::set(std::list<File::Conf> & l_routes)
+{	
+	std::list<File::Conf>::iterator it;
+	it = l_routes.begin();
 
+	while (it != l_routes.end())
+	{
+		File::Conf & src = (*it);
+		Route & dst = this->_routes[src._single_value["location"]];
+		dst.location.set(src._single_value["location"]);
+		dst.autoindex.set(src._single_value["autoindex"]);
+		dst.save_files_path.set(src._single_value["save_files_path"]);
+		dst.try_files.set(src._multi_values["try_files"]);
+		dst.methods.set(src._multi_values["methods"]);
+		it++;
+	}
+}
 
 //--------------- BodySize ------------------//
 int Config::BodySize::get(void) const
@@ -93,4 +103,15 @@ void Config::ServerNames::show(void) const
 		it++;
 	}
 	std::cout << std::endl;
+}
+
+/* ----------------- ROOT ------------------ */
+std::string Config::Root::get(void) const
+{
+	return this->_root;
+}
+
+void Config::Root::set(std::string root)
+{
+	this->_root = root;
 }

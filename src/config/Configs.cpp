@@ -12,11 +12,11 @@ Configs::Configs(std::string config_file) : _file(config_file)
 		config.body_size.set(conf._single_value["body_size"]);
 		config.host.set(conf._single_value["host"]);
 		config.port.set(conf._single_value["port"]);
+		config.routes.set(conf._routes);
 		this->_configs.push_back(config);
 	}
 	this->_it = this->_configs.begin();
 	_file.info(_file.confs);
-	_file.info(_file.routes);
 }
 
 Config & Configs::next(void)

@@ -1,6 +1,8 @@
 #ifndef CONFIG_HPP
 # define CONFIG_HPP
 # include <webserver.hpp>
+# include "./File.hpp"
+
 class Config
 {
 	private:
@@ -44,7 +46,15 @@ class Config
 				std::map<std::string, Route> _routes;
 			public:
 				Route & get(std::string);
-				void set(std::string info); //pass all the information need to create a route
+				void set(std::list<File::Conf> & l_routes); //pass all the information need to create a route
+		};
+
+		class Root {
+			private:
+				std::string _root;
+			public:
+				std::string get(void) const;
+				void set(std::string root);
 		};
 
 	public:
@@ -55,6 +65,7 @@ class Config
 		
 		Host host;
 		Port port;
+		Root root;
 		Routes routes;
 		BodySize body_size;
 		ServerNames server_names;

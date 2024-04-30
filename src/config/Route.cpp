@@ -27,17 +27,6 @@ std::string Route::Location::get(void) const
 	return this->_location;
 }
 
-/* ----------------- ROOT ------------------ */
-std::string Route::Root::get(void) const
-{
-	return this->_root;
-}
-
-void Route::Root::set(std::string root)
-{
-	this->_root = root;
-}
-
 /* ---------------- TRY FILES ----------------- */
 Route::TryFiles::TryFiles(void)
 {
@@ -88,17 +77,17 @@ Route::Autoindex::Autoindex(void) : _on(false)
 {
 }
 
-bool Route::Autoindex::on(void) const
+bool Route::Autoindex::get(void) const
 {
 	return this->_on;
 }
 
-void Route::Autoindex::turn_on(void)
+void Route::Autoindex::set(bool value)
 {
-	this->_on = true;
+	this->_on = value;
 }
 
-void Route::Autoindex::turn_off(void)
+void Route::Autoindex::set(std::string value)
 {
-	this->_on = false;
+	this->_on = (value == "on");
 }

@@ -13,14 +13,6 @@ class Route
 				void set(std::string value);
 		};
 
-		class Root {
-			private:
-				std::string _root;
-			public:
-				std::string get(void) const;
-				void set(std::string root);
-		};
-
 		class TryFiles {
 			private:
 				std::list<std::string> _try_files;
@@ -45,9 +37,9 @@ class Route
 				bool _on;
 			public:
 				Autoindex(void);
-				bool on(void) const;
-				void turn_on();
-				void turn_off();
+				bool get(void) const;
+				void set(bool value);
+				void set(std::string value);
 		};
 
 		// cgi_extensions
@@ -57,7 +49,6 @@ class Route
 		~Route(void);
 		Route & operator=(Route const & rhs);
 
-		Root root;
 		Methods methods;
 		Location location;
 		TryFiles try_files;

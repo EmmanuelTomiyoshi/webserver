@@ -29,7 +29,7 @@ class File {
 			std::string & block, 
 			std::map<std::string, std::list<std::string> > & map
 		);
-		bool parse_route(std::string & block);
+		bool parse_route(std::string & block, std::list<Conf> & routes);
 
 		std::vector<std::string> single_value_keys;
 		std::vector<std::string> multi_value_keys;
@@ -40,12 +40,12 @@ class File {
 
 		void info(std::list<Conf> & confs) const;
 		std::list<Conf> confs;
-		std::list<Conf> routes;
 
 		class Conf {
 			public:
 				std::map<std::string, std::string> _single_value;
 				std::map<std::string, std::list<std::string> > _multi_values;
+				std::list<Conf> _routes;
 		};
 };
 

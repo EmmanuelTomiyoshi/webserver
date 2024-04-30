@@ -33,24 +33,25 @@ Methods & Methods::operator=(Methods const & rhs)
 	return (*this);
 }
 
-bool Methods::is_allowed(std::string method) const
+bool Methods::allow(std::string method) const
 {
-	return this->_methods.at(method);
+	try
+	{
+		this->_methods.at(method);
+		return true;
+	}
+	catch (std::exception & e)
+	{
+		return false;
+	}
 }
 
-void Methods::allow(std::string method)
+void Methods::set(std::list<std::string> & methods)
 {
-	bool & m = this->_methods.at(method);
-	m = true;
-}
-
-void Methods::allow(std::vector<std::string> & methods)
-{
-	std::vector<std::string>::iterator it = methods.begin();
+	std::list<std::string>::iterator it = methods.begin();
 	while (it != methods.end())
 	{
-		bool & m = _methods.at(*it);
-		m = true;
+		_methods.at(*it) = true;
 		it++;
 	}
 }

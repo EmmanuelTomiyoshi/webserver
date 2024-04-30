@@ -211,7 +211,7 @@ bool File::parse_multi_value(
 	return true;
 }
 
-bool File::parse_route(std::string & block)
+bool File::parse_route(std::string & block, std::list<Conf> & routes)
 {
 	std::stringstream ss(block);
 	std::string word;
@@ -250,7 +250,7 @@ bool File::parse_route(std::string & block)
 			else
 				throw std::runtime_error("'" + word + "' is invalid");
 		}
-		this->routes.push_back(route);
+		routes.push_back(route);
 
 		block = block.substr(block.find("}") + 1);
 		return true;
@@ -275,7 +275,7 @@ void File::parse_blocks(void)
 			else if (is_inside(multi_value_keys, word))
 				parse_multi_value(block, config._multi_values);
 			else if (word == "location")
-				parse_route(block);
+				parse_route(block, config._routes);
 			else
 				throw std::runtime_error("'" + word + "' is invalid");
 		}

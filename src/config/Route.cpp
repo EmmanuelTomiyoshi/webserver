@@ -38,6 +38,20 @@ std::list<std::string> Route::TryFiles::get(void) const
 	return this->_try_files;
 }
 
+void Route::TryFiles::show(void)
+{
+	std::list<std::string>::iterator it;
+	it = this->_try_files.begin();
+	std::cout << "Try Files: ";
+	while (it != this->_try_files.end())
+	{
+		std::cout << (*it) << " ";
+		it++;
+	}
+	std::cout << std::endl;
+}
+
+
 std::string Route::TryFiles::next(void)
 {
 	if (this->_it == this->_try_files.end())	

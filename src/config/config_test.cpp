@@ -3,7 +3,7 @@
 void config_test(void)
 {
 	Configs configs("ws.conf");
-
+	configs.show();
 	// int i = configs.len();
 	// while (i--)
 	// {

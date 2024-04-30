@@ -22,6 +22,7 @@ class Route
 				std::list<std::string> get(void) const;
 				std::string next(void);
 				void set(std::list<std::string> const & files);
+				void show(void);
 		};
 
 		class SaveFilesPath {

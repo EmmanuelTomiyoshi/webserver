@@ -47,6 +47,7 @@ class Config
 			public:
 				Route & get(std::string);
 				void set(std::list<File::Conf> & l_routes); //pass all the information need to create a route
+				void show(void);
 		};
 
 		class Root {
@@ -61,7 +62,7 @@ class Config
 		Config(void);
 		~Config(void);
 
-		void show(void) const;
+		void show(void);
 		
 		Host host;
 		Port port;

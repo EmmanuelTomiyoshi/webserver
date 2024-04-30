@@ -56,15 +56,16 @@ void Methods::set(std::list<std::string> & methods)
 	}
 }
 
-void Methods::info(void) const
+void Methods::show(void) const
 {
 	std::map<std::string, bool>::const_iterator it;
 	it = _methods.begin();
-	std::cout << "METHODS INFORMATION:\n";
+	std::cout << "METHODS: ";
 	while (it != _methods.end())
 	{
-		std::cout << (*it).first << ": " << ((*it).second ? "true\n" : "false\n");
+		std::cout << ((*it).second ? (*it).first : "") << " ";
 		it++;
 	}
+	std::cout << std::endl;
 }
 

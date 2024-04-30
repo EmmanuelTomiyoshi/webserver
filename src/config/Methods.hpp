@@ -16,7 +16,7 @@ class Methods
 
 		bool allow(std::string method) const;
 		void set(std::list<std::string> & methods);
-		void info(void) const;
+		void show(void) const;
 };
 
 #endif

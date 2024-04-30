@@ -16,7 +16,6 @@ Configs::Configs(std::string config_file) : _file(config_file)
 		this->_configs.push_back(config);
 	}
 	this->_it = this->_configs.begin();
-	_file.info(_file.confs);
 }
 
 Config & Configs::next(void)
@@ -38,6 +37,19 @@ int Configs::len(void) const
 	return _configs.size();
 }
 
+void Configs::show(void)
+{
+	std::list<Config>::iterator it;
+	it = this->_configs.begin();
+	int i = 0;
+	while (it != this->_configs.end())
+	{
+		std::cout << "----------------- SERVER " << i++ << " -----------------\n";
+		(*it).show();
+		std::cout << std::endl;
+		it++;
+	}
+}
 
 Configs::~Configs(void)
 {

@@ -15,6 +15,8 @@ class Configs {
 		Config & next(void);
 		int len(void) const;
 		void reset_iterator(void);
+
+		void show(void);
 };
 
 #endif

@@ -8,13 +8,15 @@ Config::~Config(void)
 {
 }
 
-void Config::show(void) const
+void Config::show(void)
 {
 	std::cout << "\n----------- SERVER CONFIGURATION -----------\n";
 	this->server_names.show();
 	std::cout << "Body Size: " << this->body_size.get() << std::endl;
 	std::cout << "Port: " << this->port.get() << std::endl;
 	std::cout << "Host: " << this->host.get() << std::endl;
+	std::cout << "Root: " << this->root.get() << std::endl;
+	this->routes.show();
 }
 
 //--------------- Host ------------------//
@@ -59,6 +61,25 @@ void Config::Routes::set(std::list<File::Conf> & l_routes)
 		dst.save_files_path.set(src._single_value["save_files_path"]);
 		dst.try_files.set(src._multi_values["try_files"]);
 		dst.methods.set(src._multi_values["methods"]);
+		it++;
+	}
+}
+
+void Config::Routes::show(void)
+{
+	std::map<std::string, Route>::iterator it;
+	it = this->_routes.begin();
+	int i = 0;
+	while (it != this->_routes.end())
+	{
+		Route & r = (*it).second;
+		std::cout << "----- ROUTE "<< i++ << ":\n";
+		std::cout << "Location: " << r.location.get() << std::endl;
+		std::cout << "SaveFilesPath: " << r.save_files_path.get() << std::endl;
+		std::cout << "Autoindex: " << (r.autoindex.get() ? "true" : "false") << std::endl;
+		r.methods.show();
+		r.try_files.show();
+		std::cout << std::endl;
 		it++;
 	}
 }

@@ -13,6 +13,7 @@ Configs::Configs(std::string config_file) : _file(config_file)
 		config.host.set(conf._single_value["host"]);
 		config.port.set(conf._single_value["port"]);
 		config.routes.set(conf._routes);
+		config.root.set(conf._single_value["root"]);
 		this->_configs.push_back(config);
 	}
 	this->_it = this->_configs.begin();

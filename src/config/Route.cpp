@@ -105,3 +105,14 @@ void Route::Autoindex::set(std::string value)
 {
 	this->_on = (value == "on");
 }
+
+/* RETURN Or REDIRECT */
+void Route::Return::set(std::string value)
+{
+	this->_value = value;
+}
+
+std::string Route::Return::get(void) const
+{
+	return this->_value;
+}

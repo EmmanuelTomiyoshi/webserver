@@ -43,6 +43,14 @@ class Route
 				void set(std::string value);
 		};
 
+		class Return {
+			private:
+				std::string _value;
+			public:
+				std::string get(void) const;
+				void set(std::string value);
+		};
+
 		// cgi_extensions
 
 	public:
@@ -51,6 +59,7 @@ class Route
 		Route & operator=(Route const & rhs);
 
 		Methods methods;
+		Return redirect;
 		Location location;
 		TryFiles try_files;
 		Autoindex autoindex;

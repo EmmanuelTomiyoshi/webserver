@@ -158,8 +158,6 @@ void File::extract_blocks(void)
 	}
 }
 
-
-
 bool File::parse_single_value(std::string & block, std::map<std::string, std::string> & map)
 {
 	std::stringstream ss(block);
@@ -168,8 +166,14 @@ bool File::parse_single_value(std::string & block, std::map<std::string, std::st
 	ss >> word;
 	std::string line = block.substr(block.find(word) + word.length());
 	line = line.substr(0, line.find_first_of('\n'));
+
+	if (line[0] != ' ' && line[0] != '\t')
+		throw std::runtime_error("config: expected space");
+
 	std::stringstream ss_line(line);
 	ss_line >> map[word];
+	if (map[word].empty())
+		throw std::runtime_error("config: empty value");
 	std::string aux;
 	ss_line >> aux;
 	if (aux.empty() == false)
@@ -195,17 +199,25 @@ bool File::parse_multi_value(
 
 	ss >> word;
 	std::string line = block.substr(block.find(word) + word.length());
+
+	if (line[0] != ' ' && line[0] != '\t')
+		throw std::runtime_error("expected space");
+
 	line = line.substr(0, line.find_first_of('\n'));
 	std::stringstream ss_line(line);
 	std::string value;
 
+	ss_line >> value;
+	if (value.empty())
+		throw std::runtime_error("config: empty value");
+
 	while (true)
 	{
+		map[word].push_back(value);
+		value.erase();
 		ss_line >> value;
 		if (value.empty())
 			break ;
-		map[word].push_back(value);
-		value.erase();
 	}
 	block = block.substr(block.find(line) + line.length());
 	return true;
@@ -218,7 +230,7 @@ bool File::parse_route(std::string & block, std::list<Conf> & routes)
 
 	ss >> word;
 	if (word != "location")
-		throw std::runtime_error("'location' not found");
+		throw std::runtime_error("'config: location' not found");
 	ss >> word;
 	if (word == "{")
 		throw std::runtime_error("path not found");

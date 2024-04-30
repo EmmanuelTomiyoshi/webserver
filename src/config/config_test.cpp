@@ -2,8 +2,15 @@
 
 void config_test(void)
 {
-	Configs configs("ws.conf");
-	configs.show();
+	try
+	{
+		Configs configs("ws.conf");
+		configs.show();
+	}
+	catch (std::exception & e)
+	{
+		std::cerr << "Error: " << e.what() << std::endl;
+	}
 	// int i = configs.len();
 	// while (i--)
 	// {

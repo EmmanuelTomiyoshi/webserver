@@ -118,9 +118,9 @@ void File::read_config_block(void)
 		{
 			size_t inside_close = _data.find('}', inside);
 			if (inside_close == std::string::npos)
-				throw std::runtime_error("inside close brackets not found");
+				throw std::runtime_error("close brackets not found");
 			if (inside_close < inside_open)
-				break ;
+				throw std::runtime_error("close brackets not found");
 			inside = inside_close + 1;
 			continue ;
 		}

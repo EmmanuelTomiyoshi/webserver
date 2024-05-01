@@ -4,8 +4,8 @@ void config_test(void)
 {
 	try
 	{
-		Configs configs("ws.conf");
-		configs.show();
+			Server server("ws.conf");
+			server.start();
 	}
 	catch (std::exception & e)
 	{

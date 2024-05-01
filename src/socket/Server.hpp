@@ -1,21 +1,23 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
-# include <list>
+# include <webserver.hpp>
 
 class Server
 {
 	private:
 		addrinfo	_addr_hints;
 		addrinfo	*_addr_res[5];
-		int			_socket_fds[5];
+		std::list<int> _socket_fds;
 
 		std::string _domain_name;
 
-		epoll_event	_events[5];
+		epoll_event	_events[20];
 		int			_epfd;
 		int			_timeout_ms;
 
 		std::string	_target;
+
+		Configs _configs;
 
 		void run(void);
 		void send_message(epoll_event & event);
@@ -25,8 +27,7 @@ class Server
 		void setup(void);
 
 	public:
-		Server(void);
-		Server(const Server & rhs);
+		Server(std::string config_file);
 		~Server(void);
 
 		void start(void);

@@ -27,11 +27,11 @@
 
 #include "../parsing/Request.hpp"
 #include "../socket/IPResolver.hpp"
-#include "../socket/Server.hpp"
 #include "../config/Methods.hpp"
 #include "../config/Route.hpp"
 #include "../config/Config.hpp"
 #include "../config/Configs.hpp"
+#include "../socket/Server.hpp"
 #include "../parsing/Parser.hpp"
 
 #include "colors.hpp"

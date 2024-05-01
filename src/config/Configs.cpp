@@ -52,6 +52,12 @@ void Configs::show(void)
 	}
 }
 
+std::list<Config> & Configs::get(void)
+{
+	return this->_configs;
+}
+
+
 Configs::~Configs(void)
 {
 }

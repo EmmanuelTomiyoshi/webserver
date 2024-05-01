@@ -1,17 +1,5 @@
 #include <webserver.hpp>
 
-/* 
-	_server_configs: uma string dessa lista tem o bloco de código 
-					 com todas as configurações pra rodar um server
-
-	1- ler o bloco de codigo todo dentro de uma string e armazenar ela dentro dessa lista
-	2- repetir até ter as configurações de todos os servidores
-	3- iterar na lista criando uma Config a partir de cada string _server_configs
-	4- criar uma classe que roda um servidor com os dados da classe Config
-	5- criar todos os servidores que precisar
-
- */
-
 File::File(std::string file_name) : _file(file_name.c_str())
 {
 	if (this->_file.bad())
@@ -70,25 +58,6 @@ std::string File::read_stream(std::stringstream & ss)
 	return str;
 }
 
-/* 
-
-	size_t index = str.find("server");
-	if (index == std::string::npos)
-		throw std::runtime_error("server not found");
-	if (str.find_first_not_of("server") < index)
-		throw std::runtime_error("server not found");
-	str = str.substr(index + std::string("server").length());
-
-	std::cout << str << std::endl;
-	//find the open brackets
-	open = str.find('{');
-	if (index == std::string::npos)
-		throw std::runtime_error("'{' not found");
-	if (str.find_first_not_of('{') < open)
-		throw std::runtime_error("'{' not found");
-	str = str.substr(open + 1);
- */
-
 void File::read_config_block(void)
 {
 	std::stringstream ss(_data);
@@ -119,8 +88,10 @@ void File::read_config_block(void)
 			size_t inside_close = _data.find('}', inside);
 			if (inside_close == std::string::npos)
 				throw std::runtime_error("close brackets not found");
+			if (_data.find('{', inside_open + 1) < inside_close)
+				throw std::runtime_error("brackets error");
 			if (inside_close < inside_open)
-				throw std::runtime_error("close brackets not found");
+				break ;
 			inside = inside_close + 1;
 			continue ;
 		}
@@ -146,15 +117,7 @@ void File::extract_blocks(void)
 {
 	while (_data.empty() == false)
 	{
-		try
-		{
-			read_config_block();
-		}
-		catch (std::exception & e)
-		{
-			std::cerr << e.what() << std::endl;
-			break ;
-		}
+		read_config_block();
 	}
 }
 
@@ -324,7 +287,6 @@ void File::info(std::list<Conf> & confs) const
 		}
 		i++;
 	}
-
 }
 
 File::~File(void)

@@ -15,7 +15,7 @@ class Configs {
 		Config & next(void);
 		int len(void) const;
 		void reset_iterator(void);
-
+		std::list<Config> & get(void);
 		void show(void);
 };
 

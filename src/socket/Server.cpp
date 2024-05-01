@@ -8,7 +8,7 @@ addrinfo Server::get_hints(void)
 	return hints;
 }
 
-Server::Server(void)
+Server::Server(std::string config_file) : _configs(config_file)
 {
 }
 
@@ -68,13 +68,15 @@ void Server::recv_message(epoll_event & event)
 void	Server::run(void)
 {
 	while (1) {
-		for (int i = 0; i < 5; i++)
+		std::list<int>::iterator it;
+		it = _socket_fds.begin();
+		for (; it != _socket_fds.end(); it++)
 		{
-			int conn_fd = accept(_socket_fds[i], NULL, NULL);
+			int conn_fd = accept((*it), NULL, NULL);
 			if (conn_fd != -1)
 				new_epoll_event(conn_fd, EPOLLIN);
 		}
-		int event_count = epoll_wait(_epfd, _events, 5, _timeout_ms);
+		int event_count = epoll_wait(_epfd, _events, 20, _timeout_ms);
 		for (int i = 0; i < event_count; i++)
 		{
 			recv_message(_events[i]);
@@ -85,31 +87,37 @@ void	Server::run(void)
 
 void Server::setup(void)
 {
-	_domain_name = "localhost";
+
+
 	_addr_hints = get_hints();
 	_epfd = epoll_create1(EPOLL_CLOEXEC);
 	_timeout_ms = 0;
+	addrinfo *addr_res;
 
-	const char	*ports[5] = {"3004", "3005", "3006", "3007", "3008"};
+	std::list<Config>::iterator it;
+	it = _configs.get().begin();
 
-	for (int i = 0; i < 5; i++)
+	for (; it != _configs.get().end(); it++)
 	{
+		Config & config = (*it);
+		_domain_name = config.host.get();
+
 		getaddrinfo(
 			_domain_name.c_str(),
-			ports[i],
+			config.port.get().c_str(),
 			&_addr_hints,
-			&_addr_res[i]
+			&addr_res
 		);
 
-		_socket_fds[i] = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+		_socket_fds.push_back(socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0));
 
 		bind(
-			_socket_fds[i],
-			_addr_res[i]->ai_addr,
-			_addr_res[i]->ai_addrlen
+			_socket_fds.back(),
+			addr_res->ai_addr,
+			addr_res->ai_addrlen
 		);
 
-		listen(_socket_fds[i], 5);
+		listen(_socket_fds.back(), 20);
 	}
 }
 

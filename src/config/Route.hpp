@@ -5,6 +5,8 @@
 class Route
 {
 	private:
+		std::string _root;
+
 		class Location {
 			private:
 				std::string _location;
@@ -64,6 +66,9 @@ class Route
 		TryFiles try_files;
 		Autoindex autoindex;
 		SaveFilesPath save_files_path;
+
+		std::string get_page(void);
+		void set_root(std::string root);
 };
 
 #endif

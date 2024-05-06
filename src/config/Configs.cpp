@@ -12,8 +12,8 @@ Configs::Configs(std::string config_file) : _file(config_file)
 		config.body_size.set(conf._single_value["body_size"]);
 		config.host.set(conf._single_value["host"]);
 		config.port.set(conf._single_value["port"]);
-		config.routes.set(conf._routes);
 		config.root.set(conf._single_value["root"]);
+		config.routes.set(conf._routes);
 		this->_configs.push_back(config);
 	}
 	this->_it = this->_configs.begin();

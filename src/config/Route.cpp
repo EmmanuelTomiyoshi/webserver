@@ -116,3 +116,14 @@ std::string Route::Return::get(void) const
 {
 	return this->_value;
 }
+
+void Route::set_root(std::string root)
+{
+	this->_root = root;
+}
+
+std::string Route::get_page(void)
+{
+	std::cout << "GET_PAGE_ROOT: " << this->_root << std::endl;
+	return "";
+}

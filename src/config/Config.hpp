@@ -44,9 +44,12 @@ class Config
 		class Routes {
 			private:
 				std::map<std::string, Route> _routes;
+				Config *_parent;
 			public:
+				std::string _root;
 				Route & get(std::string);
 				void set(std::list<File::Conf> & l_routes); //pass all the information need to create a route
+				void set_parent(Config *parent);
 				void show(void);
 		};
 

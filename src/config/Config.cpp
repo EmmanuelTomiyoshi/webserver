@@ -2,6 +2,7 @@
 
 Config::Config(void)
 {
+	routes.set_parent(this);
 }
 
 Config::~Config(void)
@@ -42,6 +43,11 @@ std::string Config::Port::get(void) const
 }
 
 //--------------- Routes ------------------//
+void Config::Routes::set_parent(Config *parent)
+{
+	this->_parent = parent;
+}
+
 Route & Config::Routes::get(std::string location)
 {
 	return this->_routes.at(location);
@@ -51,7 +57,6 @@ void Config::Routes::set(std::list<File::Conf> & l_routes)
 {	
 	std::list<File::Conf>::iterator it;
 	it = l_routes.begin();
-
 	while (it != l_routes.end())
 	{
 		File::Conf & src = (*it);
@@ -62,6 +67,7 @@ void Config::Routes::set(std::list<File::Conf> & l_routes)
 		dst.try_files.set(src._multi_values["try_files"]);
 		dst.methods.set(src._multi_values["methods"]);
 		dst.redirect.set(src._single_value["return"]);
+		dst.set_root(this->_parent->root.get());
 		it++;
 	}
 }

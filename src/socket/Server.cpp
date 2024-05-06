@@ -49,20 +49,20 @@ void Server::recv_message(epoll_event & event)
 		return ;
 	char buff[5000];
 	int rsize = recv(event.data.fd, buff, 4999, MSG_DONTWAIT);
-	if (rsize > 0) //parse, get response, send response
+	if (rsize <= 0) //parse, get response, send response
 	{
-		buff[rsize] = '\0';
-		Request http(buff);
-		http.info();
-		_target = http.get_target();
-		event.events = EPOLLOUT;
-		epoll_ctl(_epfd, EPOLL_CTL_MOD, event.data.fd, &event);
-		std::cout << "OUTPUT EVENT CREATED" << std::endl;
+		close(event.data.fd);
+		epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
+		std::cout << "CLOSED CONNECTION: no message" << std::endl;
 		return ;
 	}
-	close(event.data.fd);
-	epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
-	std::cout << "CLOSED CONNECTION: no message" << std::endl;
+	buff[rsize] = '\0';
+	Request http(buff);
+	http.info();
+	_target = http.get_target();
+	event.events = EPOLLOUT;
+	epoll_ctl(_epfd, EPOLL_CTL_MOD, event.data.fd, &event);
+	std::cout << "OUTPUT EVENT CREATED" << std::endl;
 }
 
 void	Server::run(void)
@@ -87,8 +87,6 @@ void	Server::run(void)
 
 void Server::setup(void)
 {
-
-
 	_addr_hints = get_hints();
 	_epfd = epoll_create1(EPOLL_CLOEXEC);
 	_timeout_ms = 0;
@@ -100,6 +98,7 @@ void Server::setup(void)
 	for (; it != _configs.get().end(); it++)
 	{
 		Config & config = (*it);
+		config.routes.get("/").get_page();
 		_domain_name = config.host.get();
 
 		getaddrinfo(

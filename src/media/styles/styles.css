@@ -1,0 +1,159 @@
+*,
+*::before,
+*::after
+{
+	box-sizing: border-box;
+	margin: 0;
+}
+
+html {
+    font-size: 16px;
+}
+
+/* Using rem units */
+body, html {
+    height: 100%;
+    margin: 0;
+}
+
+body
+{
+	background: black;
+	color: white;
+}
+
+.container
+{
+	position: relative;
+	overflow: hidden;
+
+	width: 100%;
+    height: 100%;
+    padding: 4rem; /* 64px / 16px = 4rem */
+    background: #000000;
+    justify-content: center;
+    align-items: center;
+    gap: 4rem; /* 64px / 16px = 4rem */
+    display: flex;
+    box-sizing: border-box;
+	overflow: hidden;
+}
+
+.title
+{
+	font-size: 96px;
+}
+
+.content
+{
+	height: 100vh;
+	display: grid;
+	place-items: center;
+
+    flex: 1;
+    align-self: stretch;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2.5rem; /* 40px / 16px = 2.5rem */
+    display: flex;
+
+	z-index: 5;
+	position: relative;
+}
+
+.Webserv
+{
+	position: absolute;
+	inset: -200%;
+	background-image: url("../images/white_noise.png");
+	opacity: 20%;
+	z-index: 10;
+	pointer-events: none;
+	animation: shift 0.2s linear infinite both;
+}
+
+@keyframes shift
+{
+	0%
+	{
+		transform: translateX(10%) translateY(10%);
+	}
+
+	100%
+	{
+		transform: translateX(-10%) translateY(-10%);
+	}
+}
+
+.Text {
+    width: 100%;
+    align-self: stretch;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1.5rem; /* 24px / 16px = 1.5rem */
+    display: flex;
+}
+
+.Heading {
+    align-self: stretch;
+    color: white;
+    font-size: 3.25rem; /* 52px / 16px = 3.25rem */
+    font-family: Raleway;
+    font-weight: 700;
+    line-height: 120%; /* 62.40px / 16px = 3.9rem */
+    word-wrap: break-word;
+}
+
+.Paragraph {
+    align-self: stretch;
+    color: #999999;
+    font-size: 1.5rem; /* 24px / 16px = 1.5rem */
+    font-family: Open Sans;
+    font-weight: 400;
+    line-height: 160%;
+    word-wrap: break-word;
+}
+
+.Button {
+    padding: 1rem 1.5rem; /* Padding shorthand */
+    background: #7448E4;
+    border-radius: 0.25rem; /* 4px / 16px = 0.25rem */
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem; /* 8px / 16px = 0.5rem */
+    display: flex;
+    color: white;
+    font-size: 1.125rem; /* 18px / 16px = 1.125rem */
+    font-family: Open Sans;
+    font-weight: 600;
+    line-height: 150%; /* 27px / 16px = 1.6875rem */
+    transition: background-color 0.3s ease; /* Smooth transition */
+	filter: saturate(20%);
+}
+
+.Button:hover {
+	filter: saturate(100%);
+    background: #5d38cf; /* Change background color on hover */
+}
+
+.ImageContainer {
+    flex: 1;
+    width: 100%;
+    align-self: stretch;
+    padding: 6rem;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem; /* 8px / 16px = 0.5rem */
+    display: flex;
+}
+
+.Image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1.5rem; /* 24px / 16px = 1.5rem */
+	opacity: 50%;
+	filter: saturate(20%);
+}

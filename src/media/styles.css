@@ -1,0 +1,43 @@
+*,
+*::before,
+*::after
+{
+	box-sizing: border-box;
+	margin: 0;
+}
+
+body
+{
+	font-family: "Manrope", sans-serif;
+	background: black;
+	color: white;
+}
+
+.container
+{
+	position: relative;
+	overflow: hidden;
+}
+
+.title
+{
+	font-size: 96px;
+}
+
+.content
+{
+	height: 100vh;
+	display: grid;
+	place-items: center;
+
+	z-index: 5;
+	position: relative;
+}
+
+.webserv
+{
+	
+}
+
+
+

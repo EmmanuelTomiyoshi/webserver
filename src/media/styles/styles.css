@@ -126,16 +126,17 @@ body
     display: flex;
     color: white;
     font-size: 1.125rem; /* 18px / 16px = 1.125rem */
-    font-family: Open Sans;
+    font-family: Raleway;
     font-weight: 600;
     line-height: 150%; /* 27px / 16px = 1.6875rem */
     transition: background-color 0.3s ease; /* Smooth transition */
-	filter: saturate(20%);
+    user-select: none;
 }
 
 .Button:hover {
-	filter: saturate(100%);
     background: #5d38cf; /* Change background color on hover */
+    cursor: pointer;
+    user-select: none;
 }
 
 .ImageContainer {
@@ -147,6 +148,7 @@ body
     align-items: center;
     gap: 0.5rem; /* 8px / 16px = 0.5rem */
     display: flex;
+    user-select: none;
 }
 
 .Image {
@@ -154,6 +156,14 @@ body
     height: 100%;
     object-fit: cover;
     border-radius: 1.5rem; /* 24px / 16px = 1.5rem */
-	opacity: 50%;
+	opacity: 60%;
 	filter: saturate(20%);
+    user-select: none;
+    transition: opacity 0.3s ease, border-radius 0.3s ease, filter 0.3s ease; /* Smooth transition for opacity, border-radius, and filter */
+}
+
+.Image:hover {
+	opacity: 100%;
+    border-radius: 100%;
+    filter: saturate(100%);
 }

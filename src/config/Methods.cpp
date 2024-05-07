@@ -6,7 +6,6 @@ Methods::Methods(void)
 {
 	_methods_available.push_back("GET");
     _methods_available.push_back("POST");
-    _methods_available.push_back("UPDATE");
     _methods_available.push_back("DELETE");
 
 	std::vector<std::string>::iterator it;

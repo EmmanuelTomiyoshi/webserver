@@ -1,28 +1,31 @@
 #include "webserver.hpp"
 
-void	verify_args(int argc, char **argv)
+void start_server(int argc, char **argv)
 {
-	if (argc != 2)
+	if (argc > 2)
 	{
 		std::cerr << "Wrong arguments number" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
-	std::string str = std::string(argv[1]);
-	if (str.empty())
+	Server *server;
+	try
 	{
-		std::cerr << "Argument must not be empty" << std::endl;
-		exit(EXIT_FAILURE);
+		if (argc == 2)
+			server = new Server(argv[1]);
+		else
+			server = new Server("./conf/ws.conf");
+		server->start();
 	}
+	catch (std::exception & e)
+	{
+		std::cerr << "Error: " << e.what() << std::endl;
+	}
+	delete server;
 }
 
 int main(int argc, char *argv[])
 {
-	verify_args(argc, argv);
-
-	// Server server;
-	// server.start();
-	config_test();
-
+	start_server(argc, argv);
 	return (0);
 }

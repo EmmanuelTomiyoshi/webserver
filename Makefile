@@ -1,4 +1,4 @@
-NAME 		=	webserver
+NAME 		=	webserv
 
 SRC 		=	main.cpp \
 				IPResolver.cpp \
@@ -28,15 +28,9 @@ DEP 		=	$(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.d))
 
 VALGRIND 	=	valgrind -q --leak-check=full --show-leak-kinds=all
 
-NUMBER_SRC_FILES	=	$(words $(SRC))
-PROGRESS			=	0
-
 all: $(NAME)
 
 $(BUILD_DIR)/%.o: %.cpp
-	@echo -n "$(COLOR_YELLOW)Compiling $(NAME) $(COLOR_WHITE)$$(( \
-	$(PROGRESS) * 100 / $(NUMBER_SRC_FILES)))%\r"
-	$(eval PROGRESS=$(shell echo $$(($(PROGRESS)+1))))
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 $(NAME): $(BUILD_DIR) $(OBJ)
@@ -60,7 +54,7 @@ fclean: clean
 re: fclean all
 
 rr: re
-	@./webserver
+	@./$(NAME)
 
 push:
 	git push origin tomatte
@@ -73,4 +67,4 @@ client:
 
 -include $(DEP)
 
-.PHONY: all clean fclean leaks
+.PHONY: all clean fclean leaks re

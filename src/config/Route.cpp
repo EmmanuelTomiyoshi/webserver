@@ -124,6 +124,26 @@ void Route::set_root(std::string root)
 
 std::string Route::get_page(void)
 {
-	std::cout << "GET_PAGE_ROOT: " << this->_root << std::endl;
-	return "";
+	std::string path;
+	path = this->_root + this->location.get();
+
+	std::ifstream file;
+	std::list<std::string> const & file_names = this->try_files.get();
+	std::list<std::string>::const_iterator it;
+	it = file_names.begin();
+	while (it != file_names.end())
+	{
+		path = path + (*it);
+		file.open(path.c_str());
+		if (file.good())
+			break ;
+		it++;
+	}
+	std::cout << "UEEE" << std::endl;
+	if (file.bad())
+		throw std::runtime_error("page not found");
+	std::string content;
+	std::getline(file, content, '\0');
+	file.close();
+	return content;
 }

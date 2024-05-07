@@ -20,11 +20,12 @@
 #include <iostream>
 #include <sys/epoll.h>
 #include <fstream>
+#include <fcntl.h>
+# include "../utils/ft.hpp"
 # include <map>
 # include <vector>
 # include <list>
 # include <algorithm>
-
 #include "../parsing/Request.hpp"
 #include "../socket/IPResolver.hpp"
 #include "../config/Methods.hpp"

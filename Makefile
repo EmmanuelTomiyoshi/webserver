@@ -11,6 +11,9 @@ SRC 		=	main.cpp \
 				File.cpp \
 				Parser.cpp \
 				Configs.cpp \
+				Parser.cpp	\
+				Utils.cpp	\
+				File.cpp
 
 VPATH		=	./src \
 				./src/parsing \

@@ -40,3 +40,8 @@ client
 example.conf
 
 webserv
+.cache
+*.idx
+*.json
+example.conf
+.chache

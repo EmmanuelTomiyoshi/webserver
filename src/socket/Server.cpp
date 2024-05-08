@@ -29,7 +29,7 @@ void	Server::new_epoll_event(int conn_fd, uint32_t operation)
 
 void	Server::send_message(epoll_event & event)
 {
-	std::string msg = this->_res.get();
+	std::string msg = this->_res.process();
 	int sent = send(event.data.fd, msg.c_str(), strlen(msg.c_str()) + 1, MSG_DONTWAIT);
 	epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
 	close(event.data.fd);

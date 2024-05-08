@@ -157,7 +157,7 @@ body
     object-fit: cover;
     border-radius: 1.5rem; /* 24px / 16px = 1.5rem */
 	opacity: 60%;
-	filter: saturate(20%);
+	filter: saturate(0%);
     user-select: none;
     transition: opacity 0.3s ease, border-radius 0.3s ease, filter 0.3s ease; /* Smooth transition for opacity, border-radius, and filter */
 }
@@ -166,4 +166,5 @@ body
 	opacity: 100%;
     border-radius: 100%;
     filter: saturate(100%);
+    z-index: 20;
 }

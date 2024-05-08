@@ -1,4 +1,4 @@
-#include <webserver.hpp>
+#include "Server.hpp"
 
 addrinfo Server::get_hints(void)
 {
@@ -52,7 +52,7 @@ void Server::recv_message(epoll_event & event)
 		return ;
 	}
 	buff[rsize] = '\0';
-	this->_res.init(buff);
+	this->_res.init(buff, _configs._fdconfigs.at(event.data.fd));
 }
 
 void	Server::run(void)
@@ -69,6 +69,9 @@ void	Server::run(void)
 			{
 				std::cout << "new connection" << std::endl;
 				int fd_conn = accept4(_events[i].data.fd, NULL, NULL, SOCK_NONBLOCK);
+				//fd_conn is related to socket_fd that is related to a port that is related to a specific config file
+				//this is why this relationship works and I get the right config file in the line below
+				_configs._fdconfigs[fd_conn] = _configs._fdconfigs[_events[i].data.fd]; 
 				new_epoll_event(fd_conn, EPOLLIN | EPOLLET);
 			}
 			else
@@ -107,6 +110,7 @@ void Server::setup(void)
 
 		const int listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 		_socket_fds.push_back(listen_sock);
+		_configs._fdconfigs[listen_sock] = &(*it); //insert the current config address in fdconfigs map
 
 		bind(
 			listen_sock,

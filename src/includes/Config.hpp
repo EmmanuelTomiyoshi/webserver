@@ -1,7 +1,8 @@
 #ifndef CONFIG_HPP
 # define CONFIG_HPP
-# include <webserver.hpp>
+# include "base.hpp"
 # include "./File.hpp"
+# include "Route.hpp"
 
 class Config
 {

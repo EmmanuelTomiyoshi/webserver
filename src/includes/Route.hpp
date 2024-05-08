@@ -1,6 +1,7 @@
 #ifndef ROUTE_HPP
 # define ROUTE_HPP
-# include <webserver.hpp>
+# include "base.hpp"
+# include "Methods.hpp"
 
 class Route
 {

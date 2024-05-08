@@ -20,6 +20,7 @@ VPATH		=	./src \
 				./src/utils \
 				./src/socket \
 				./src/config \
+				./src/includes \
 
 CXX 		=	c++
 CXXFLAGS 	=	-Wall -Wextra -Werror -std=c++98 -g

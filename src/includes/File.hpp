@@ -1,6 +1,6 @@
 #ifndef FILE_CPP
 # define FILE_HPP
-# include <webserver.hpp>
+# include "base.hpp"
 
 class File {
 	public:

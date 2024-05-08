@@ -5,11 +5,6 @@
 # include "../utils/ft.hpp"
 #include "../parsing/Parser.hpp"
 #include "../socket/IPResolver.hpp"
-#include "../config/Methods.hpp"
-#include "../config/Route.hpp"
-#include "../config/Config.hpp"
-#include "../config/Configs.hpp"
-#include "../socket/Server.hpp"
 #include "../utils/Utils.hpp"
 
 #include "colors.hpp"

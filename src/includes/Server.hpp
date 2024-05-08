@@ -1,7 +1,8 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
-# include <webserver.hpp>
-# include "./Response.hpp"
+# include "Configs.hpp"
+# include "Config.hpp"
+# include "Response.hpp"
 
 class Server
 {

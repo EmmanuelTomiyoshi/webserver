@@ -1,4 +1,5 @@
 #include "webserver.hpp"
+#include "Server.hpp"
 
 void start_server(int argc, char **argv)
 {

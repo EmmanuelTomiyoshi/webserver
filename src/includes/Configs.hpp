@@ -1,6 +1,7 @@
 #ifndef CONFIGS_HPP
 # define CONFIGS_HPP
-# include <webserver.hpp>
+# include "base.hpp"
+# include "Config.hpp"
 
 class Configs {
 	private:
@@ -17,6 +18,8 @@ class Configs {
 		void reset_iterator(void);
 		std::list<Config> & get(void);
 		void show(void);
+		
+		std::map<int, Config*> _fdconfigs;
 };
 
 #endif

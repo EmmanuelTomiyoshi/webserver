@@ -1,8 +1,13 @@
 #include "Request.hpp"
-#include <iostream>
+
 Request::Request(void) {}
 
-
+void Request::init(std::string message)
+{
+	this->_message = message;
+	this->extract_request_line();
+	this->extract_info();
+}
 
 Request::Request(std::string message) {
 	this->_message = message;

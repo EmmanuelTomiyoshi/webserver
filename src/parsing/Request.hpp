@@ -1,7 +1,6 @@
 #ifndef REQUEST_H
 # define REQUEST_H
-# include <string>
-# include <sstream>
+# include "base.hpp"
 
 /*	 MESSAGE FORMAT 
 
@@ -32,6 +31,7 @@ class Request
 		std::string get_method(void) const;
 		std::string get_target(void) const;
 		std::string get_version(void) const;
+		void init(std::string message);
 		void info(void) const;
 		void hello(void);
 };

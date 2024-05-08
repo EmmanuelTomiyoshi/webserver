@@ -13,6 +13,7 @@ SRC 		=	main.cpp \
 				Utils.cpp	\
 				File.cpp \
 				ft.cpp \
+				Response.cpp \
 
 VPATH		=	./src \
 				./src/parsing \

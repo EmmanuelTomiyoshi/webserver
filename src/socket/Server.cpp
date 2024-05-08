@@ -29,7 +29,7 @@ void	Server::new_epoll_event(int conn_fd, uint32_t operation)
 
 void	Server::send_message(epoll_event & event)
 {
-	std::string msg = "HTTP/1.1 200\r\ncontent-type: text/html; charset=utf-8\r\n\r\ndkajlshdgkhjasgdhjkasg";
+	std::string msg = this->_res.get();
 	int sent = send(event.data.fd, msg.c_str(), strlen(msg.c_str()) + 1, MSG_DONTWAIT);
 	epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
 	close(event.data.fd);
@@ -52,9 +52,7 @@ void Server::recv_message(epoll_event & event)
 		return ;
 	}
 	buff[rsize] = '\0';
-	Request http(buff);
-	http.info();
-	_target = http.get_target();
+	this->_res.init(buff);
 }
 
 void	Server::run(void)

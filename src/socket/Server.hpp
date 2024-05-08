@@ -1,6 +1,7 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 # include <webserver.hpp>
+# include "./Response.hpp"
 
 class Server
 {
@@ -18,6 +19,8 @@ class Server
 		std::string	_target;
 
 		Configs _configs;
+		
+		Response _res;
 
 		void run(void);
 		void send_message(epoll_event & event);

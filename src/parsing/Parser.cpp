@@ -32,12 +32,12 @@ Parser &Parser::operator=(const Parser &copy)
 
 void Parser::parseRequest(const std::string &file)
 {
-	std::ifstream inputFile(file.c_str());
+	std::stringstream inputFile(file.c_str());
 
 	//file validation
-	if (!inputFile.is_open())
+	if (inputFile.bad())
 	{
-		throw std::runtime_error("opening the file " + file);
+		throw std::runtime_error("string error " + file);
 	}
 	else if (inputFile.seekg(0, std::ios::end)) //move to the end of the file
 	{

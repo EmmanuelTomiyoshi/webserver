@@ -21,14 +21,12 @@ File::File(std::string file_name) : _file(file_name.c_str())
 	std::string aux2[] = {
 		"server_name",
 		"try_files",
-
 		"methods",
-		"try_files",
 		"cgi_extensions",
 
 	};
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 4; i++)
 		multi_value_keys.push_back(aux2[i]);
  
 	fill_data();

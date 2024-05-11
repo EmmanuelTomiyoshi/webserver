@@ -10,4 +10,25 @@ namespace ft {
         }
         return false;
     }
+
+    std::string read_file(std::ifstream & file)
+    {
+        if (file.bad())
+            return "";
+        
+        std::string content;
+        while (file.eof() == false)
+        {
+            std::string aux;
+            std::getline(file, aux);
+            content += aux;
+        }
+
+        return content;
+    }
+
+    bool has_only_digits(std::string str)
+    {
+        return str.find_first_not_of("0123456789") == std::string::npos;
+    }
 }

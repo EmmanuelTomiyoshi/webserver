@@ -1,5 +1,7 @@
 #include "Response.hpp"
 
+std::string Response::http_version = "HTTP/1.1";
+
 Response::Response(void) : _config(NULL)
 {
 }
@@ -30,9 +32,75 @@ Response::Response(void) : _config(NULL)
 
  */
 
-void Response::GET(void)
+std::string Response::build_response(
+    std::string status_code,
+    std::string body
+)
 {
+    if (status_code.length() != 3)
+        throw std::runtime_error("Status_code needs to be 3 digits. Got: " + status_code.length());
+    if (ft::has_only_digits(status_code) == false)
+        throw std::runtime_error("Status_code needs to have only digits");
 
+    std::string status_line = http_version + " " + status_code + " \r\n";
+    std::string content_type = "Content-Type: text/html; charset=UTF-8\r\n";
+    std::string content_length = "Content-Length: " + body.length() + std::string("\r\n");
+
+    std::string response = 
+        status_line +
+        content_type +
+        content_length +
+        "\r\n" + body;
+
+    return response;
+}
+
+std::string Response::GET(void)
+{
+    Route *route = NULL;
+
+    try
+    {
+        route = &(_config->routes.get(_req.get_target()));
+    }
+    catch (std::exception & e)
+    {
+        //generate a not found error: error(NOT_FOUND)
+        std::cerr << "ROUTE NOT FOUND" << std::endl;
+        return build_response("404", "ROUTE NOT FOUND");
+    }
+
+    if (route->methods.allowed("GET") == false)
+    {
+        //error(METHOD_NOT_ALLOWED)
+        std::cerr << "METHOD_NOT_ALLOWED" << std::endl;
+        return build_response("401", "METHOD NOT ALLOWED");
+    }
+
+    std::list<std::string>::const_iterator it;
+    it = route->try_files.get().begin();
+    std::ifstream file;
+    for (; it != route->try_files.get().end(); it++)
+    {
+        std::string path = route->get_root() + '/' + (*it);
+        file.open(path.c_str());
+        if (file.good())
+            break ;
+    }
+
+    if (it == route->try_files.get().end())
+    {
+        std::cout << "default page not found" << std::endl;
+        //error(DEFAULT_PAGE_NOT_FOUND)
+        return build_response("404", "DEFAULT PAGE NOT FOUND");
+    }
+
+    std::string file_content = ft::read_file(file);
+    std::string response = build_response(
+        "200",
+        file_content
+    );
+    return response;
 }
 
 void Response::POST(void)
@@ -75,7 +143,5 @@ std::string Response::create_response(void)
 
 std::string Response::process(void)
 {
-    std::string msg = "HTTP/1.1 200\r\ncontent-type: text/html; charset=utf-8\r\n\r\n";
-    msg += this->_config->port.get();
-    return msg;
+    return this->GET();
 }

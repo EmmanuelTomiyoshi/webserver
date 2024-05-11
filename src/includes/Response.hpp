@@ -15,11 +15,13 @@ class Response
         std::string get_content(void); //get all the content from the page and close the file
         std::string create_response(void); //create a response: status code, http version and body
 
-        void GET(void);
+        std::string GET(void);
         void POST(void);
         void DELETE(void);
 
         Config *_config;
+
+        static std::string http_version;
 
     public:
         Response(void);
@@ -29,6 +31,11 @@ class Response
         std::string something(void);
 
         std::string process(void);
+
+        static std::string build_response(
+            std::string status_code,
+            std::string body
+        );
 };
 
 #endif

@@ -22,7 +22,7 @@ class Route
 				std::list<std::string>::iterator _it;
 			public:
 				TryFiles(void);
-				std::list<std::string> get(void) const;
+				std::list<std::string> const & get(void) const;
 				std::string next(void);
 				void set(std::list<std::string> const & files);
 				void show(void);
@@ -70,6 +70,7 @@ class Route
 
 		std::string get_page(void);
 		void set_root(std::string root);
+		std::string get_root(void) const;
 };
 
 #endif

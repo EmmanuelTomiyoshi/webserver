@@ -14,7 +14,7 @@ class Methods
 		~Methods(void);
 		Methods & operator=(Methods const & rhs);
 
-		bool allow(std::string method) const;
+		bool allowed(std::string method) const;
 		void set(std::list<std::string> & methods);
 		void show(void) const;
 };

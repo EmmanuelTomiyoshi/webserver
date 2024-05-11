@@ -32,7 +32,7 @@ Methods & Methods::operator=(Methods const & rhs)
 	return (*this);
 }
 
-bool Methods::allow(std::string method) const
+bool Methods::allowed(std::string method) const
 {
 	try
 	{

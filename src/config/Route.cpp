@@ -33,7 +33,7 @@ Route::TryFiles::TryFiles(void)
 	this->_it = this->_try_files.begin();
 }
 
-std::list<std::string> Route::TryFiles::get(void) const
+std::list<std::string> const & Route::TryFiles::get(void) const
 {
 	return this->_try_files;
 }
@@ -56,7 +56,7 @@ std::string Route::TryFiles::next(void)
 {
 	if (this->_it == this->_try_files.end())	
 		return "";
-	std::string & file = *(this->_it);
+	std::string file = *(this->_it);
 	this->_it++;
 	return file;
 }
@@ -120,6 +120,11 @@ std::string Route::Return::get(void) const
 void Route::set_root(std::string root)
 {
 	this->_root = root;
+}
+
+std::string Route::get_root(void) const
+{
+	return this->_root;
 }
 
 std::string Route::get_page(void)

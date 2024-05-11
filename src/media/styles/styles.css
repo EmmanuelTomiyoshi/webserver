@@ -1,9 +1,8 @@
 *,
 *::before,
-*::after
-{
-	box-sizing: border-box;
-	margin: 0;
+*::after {
+    box-sizing: border-box;
+    margin: 0;
 }
 
 html {
@@ -16,155 +15,177 @@ body, html {
     margin: 0;
 }
 
-body
-{
-	background: black;
-	color: white;
+body {
+    background: black;
+    color: white;
 }
 
-.container
-{
-	position: relative;
-	overflow: hidden;
-
-	width: 100%;
+.Website {
+    width: 100%;
     height: 100%;
-    padding: 4rem; /* 64px / 16px = 4rem */
-    background: #000000;
+    padding: 4rem;
+    background: black;
+	position: relative;
     justify-content: center;
     align-items: center;
-    gap: 4rem; /* 64px / 16px = 4rem */
-    display: flex;
-    box-sizing: border-box;
-	overflow: hidden;
+    gap: 4rem;
+    display: inline-flex;
 }
 
-.title
+.Ellipse1
 {
-	font-size: 96px;
+    width: 816px;
+    height: 816px;
+    background: linear-gradient(180deg, #0E7BF8 0%, #0E7BF8 86%);
+    border-radius: 9999px;
+    filter: blur(300px);
+    position: absolute;
+    top: -15%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
-.content
-{
-	height: 100vh;
-	display: grid;
-	place-items: center;
 
-    flex: 1;
-    align-self: stretch;
+
+.Content {
+    flex: 1 1 0;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
-    gap: 2.5rem; /* 40px / 16px = 2.5rem */
-    display: flex;
-
-	z-index: 5;
-	position: relative;
-}
-
-.Webserv
-{
-	position: absolute;
-	inset: -200%;
-	background-image: url("../images/white_noise.png");
-	opacity: 20%;
-	z-index: 10;
-	pointer-events: none;
-	animation: shift 0.2s linear infinite both;
-}
-
-@keyframes shift
-{
-	0%
-	{
-		transform: translateX(10%) translateY(10%);
-	}
-
-	100%
-	{
-		transform: translateX(-10%) translateY(-10%);
-	}
+    align-items: center;
+    gap: 4rem;
+    display: inline-flex;
 }
 
 .Text {
-    width: 100%;
     align-self: stretch;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
-    gap: 1.5rem; /* 24px / 16px = 1.5rem */
+    align-items: center;
+    gap: 1.5rem;
     display: flex;
+	padding-bottom: 2rem;
 }
 
 .Heading {
-    align-self: stretch;
+    text-align: center;
     color: white;
-    font-size: 3.25rem; /* 52px / 16px = 3.25rem */
+    font-size: 6rem;
     font-family: Raleway;
     font-weight: 700;
-    line-height: 120%; /* 62.40px / 16px = 3.9rem */
+    line-height: 6rem;
     word-wrap: break-word;
 }
 
 .Paragraph {
-    align-self: stretch;
-    color: #999999;
-    font-size: 1.5rem; /* 24px / 16px = 1.5rem */
+    text-align: center;
+    color: #A6AAB2;
+    font-size: 1.5rem;
     font-family: Open Sans;
-    font-weight: 400;
-    line-height: 160%;
+    font-weight: 600;
+    line-height: 3rem;
     word-wrap: break-word;
 }
 
-.Button {
-    padding: 1rem 1.5rem; /* Padding shorthand */
-    background: #7448E4;
-    border-radius: 0.25rem; /* 4px / 16px = 0.25rem */
+.Buttons {
+    align-self: stretch;
     justify-content: center;
     align-items: center;
-    gap: 0.5rem; /* 8px / 16px = 0.5rem */
-    display: flex;
-    color: white;
-    font-size: 1.125rem; /* 18px / 16px = 1.125rem */
-    font-family: Raleway;
-    font-weight: 600;
-    line-height: 150%; /* 27px / 16px = 1.6875rem */
-    transition: background-color 0.3s ease; /* Smooth transition */
-    user-select: none;
+    gap: 1.5rem;
+    display: inline-flex;
 }
 
-.Button:hover {
-    background: #5d38cf; /* Change background color on hover */
+.ButtonPrimary,
+.ButtonSecondary {
+    padding: 1.8rem 2.2rem;
+    border-radius: 3rem;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    display: flex;
+	border-style: none;
+}
+
+.ButtonPrimary:hover {
+    box-shadow: 0 0 80px #0A7CFF; /* Modified box-shadow on hover */
+	cursor: pointer;
+}
+
+.ButtonSecondary:hover {
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.12) 100%), radial-gradient(70.71% 70.71% at 0.00% 120.71%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%);
     cursor: pointer;
     user-select: none;
 }
 
-.ImageContainer {
-    flex: 1;
-    width: 100%;
-    align-self: stretch;
-    padding: 6rem;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem; /* 8px / 16px = 0.5rem */
-    display: flex;
-    user-select: none;
+.ButtonPrimary {
+    background: linear-gradient(0deg, #0A7CFF 0%, #0A7CFF 100%), radial-gradient(70.71% 70.71% at 0.00% 120.71%, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0) 100%);
+    box-shadow: 0px 1rem 2rem -0.5rem rgba(10, 124, 255, 0.48);
+	transition: box-shadow 0.3s ease-in-out; /* Updated transition */
 }
 
-.Image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 1.5rem; /* 24px / 16px = 1.5rem */
-	opacity: 60%;
-	filter: saturate(0%);
-    user-select: none;
-    transition: opacity 0.3s ease, border-radius 0.3s ease, filter 0.3s ease; /* Smooth transition for opacity, border-radius, and filter */
+.ButtonSecondary {
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.04) 100%), radial-gradient(70.71% 70.71% at 0.00% 120.71%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%);
+    box-shadow: 0px 0px 0px 0.0625rem rgba(255, 255, 255, 0.06);
 }
 
-.Image:hover {
-	opacity: 100%;
-    border-radius: 100%;
-    filter: saturate(100%);
-    z-index: 20;
+.ReadDocumentation,
+.DiscoverStatusCodes {
+    text-align: center;
+    color: white;
+    font-size: 1.3rem;
+    font-family: Open Sans;
+    font-weight: 600;
+    line-height: 1.5rem;
+    word-wrap: break-word;
+}
+
+.stars1, .stars2
+{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-image: url("../images/stars.png");
+	object-fit: cover;
+	z-index: 10;
+	pointer-events: none;
+}
+
+
+.stars2
+{
+	transform: scaleY(-1); /* Invert the image vertically */
+	animation: shift1 3s ease-in-out infinite alternate;
+}
+
+.stars1 {
+    animation: shift1 5s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes shift1 {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes shift2
+{
+    100% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    0% {
+        opacity: 1;
+    }
 }

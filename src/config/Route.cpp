@@ -152,3 +152,9 @@ std::string Route::get_page(void)
 	file.close();
 	return content;
 }
+
+std::string Route::get_path(void) const
+{
+	std::string path = this->_root + this->location.get();
+	return path;
+}

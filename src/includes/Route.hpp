@@ -71,6 +71,7 @@ class Route
 		std::string get_page(void);
 		void set_root(std::string root);
 		std::string get_root(void) const;
+		std::string get_path(void) const;
 };
 
 #endif

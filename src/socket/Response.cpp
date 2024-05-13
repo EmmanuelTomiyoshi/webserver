@@ -191,14 +191,28 @@ void Response::open_route_file(void)
 void Response::open_file(void)
 {
     if (Response::is_public())
+    {
         open_public_file();
-    else
-        open_route_file();
+        return ;
+    }
+
+    try
+    {
+        _route = &(_config->routes.get(_req.get_target()));
+    }
+    catch (std::exception & e)
+    {
+        //error()
+    }
+    open_route_file();
 }
 
 void Response::GET(void)
 {
-    
+    open_file();
+    std::string something;
+    std::getline(_file, something);
+    std::cout << "line: " << something << std::endl;
 }
 
 void Response::POST(void)
@@ -236,6 +250,7 @@ std::string Response::create_response(void)
 
 std::string Response::process(void)
 {
+    GET();
     return this->_config->port.get();
 }
 

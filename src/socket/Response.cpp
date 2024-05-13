@@ -166,7 +166,6 @@ bool Response::is_public(void) {
 
 void Response::open_public_file(void)
 {
-    this->_path = '.' + _req.get_target();
     this->_file.open(this->_path.c_str());
     if (this->_file.bad())
         throw std::runtime_error("open_file: fail");
@@ -188,28 +187,61 @@ void Response::open_route_file(void)
     //TODO: error();
 }
 
+void Response::set_public_file_info(void)
+{
+    this->_path = '.' + _req.get_target();
+    if (_path.empty())
+    {
+        std::cerr << "error: no path provided" << std::endl;
+        return ;
+    }
+
+    this->_ext = _path.substr(_path.find_last_of('.') + 1);
+    if (_ext.empty())
+    {
+        std::cerr << "error: file without extension" << std::endl;
+        return ;
+    }
+
+    this->_mime = mime_types[_ext];
+    if (_mime.empty())
+    {
+        std::cerr << "error: mime type not allowed" << std::endl;
+        return ;
+    }
+
+    this->_type = _mime.substr(0, _mime.find_first_of('/'));
+}
+
 void Response::open_file(void)
 {
     if (Response::is_public())
     {
+        set_public_file_info();
         open_public_file();
+        std::cout << "public: " << this->_mime << std::endl;
         return ;
     }
 
     try
     {
         _route = &(_config->routes.get(_req.get_target()));
+        open_route_file();
     }
     catch (std::exception & e)
     {
+        std::cerr << "page not found" << std::endl;
+        return ;
         //error()
     }
-    open_route_file();
 }
+
+
 
 void Response::GET(void)
 {
     open_file();
+
     std::string something;
     std::getline(_file, something);
     std::cout << "line: " << something << std::endl;

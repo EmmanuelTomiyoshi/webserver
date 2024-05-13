@@ -38,7 +38,7 @@ class Response
         std::string _ext;
         std::string _mime;
         std::string _type;
-
+        void set_public_file_info(void);
 
         //the body can hold string or binary
         class body

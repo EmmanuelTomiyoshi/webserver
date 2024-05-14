@@ -6,7 +6,9 @@
 #include "Config.hpp"
 
 /* 
-    create setters
+    create setters -> OK
+
+    open file 
 
     read_file:
         if public read from public //read_public
@@ -40,14 +42,22 @@ class Response
         std::string _type;
         void set_public_file_info(void);
 
+        void read_binary(void);
+        void read_text(void);
+
+        void fill_body(void);
+
         //the body can hold string or binary
-        class body
+        class Body
         {
             public:
+                Body(void);
+                ~Body(void);
                 char *data;
                 size_t size;
-                void set(char *data, size_t size);
         };
+
+        Body _body;
 
         std::string get_content(void); //get all the content from the page and close the file
         std::string create_response(void); //create a response: status code, http version and body
@@ -64,7 +74,7 @@ class Response
 
 
     public:
-        Response(void);
+        Response(char *buff, Config *config);
 
         void init(char *buff, Config *config);
 

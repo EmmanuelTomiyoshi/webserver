@@ -11,20 +11,32 @@ namespace ft {
         return false;
     }
 
-    std::string read_file(std::ifstream & file)
+    std::streamsize get_file_size(std::ifstream & file)
+    {
+        file.seekg(0, std::ios::end);
+        std::streamsize file_size = file.tellg();
+        file.seekg(0, std::ios::beg);
+        return file_size;
+    }
+
+    void *read_binary(std::ifstream & file, std::streamsize size)
+    {
+        if (file.bad() || size == 0)
+            return NULL;
+
+        char *data = new char[size];
+        file.read(data, size);
+        return data;
+    }
+
+    std::string read_text(std::ifstream & file)
     {
         if (file.bad())
-            return "";
-        
-        std::string content;
-        while (file.eof() == false)
-        {
-            std::string aux;
-            std::getline(file, aux);
-            content += aux;
-        }
+            throw std::runtime_error("fail: read_text: file.bad");
 
-        return content;
+        std::string text;
+        std::getline(file, text, '\0');
+        return text;
     }
 
     bool has_only_digits(std::string str)

@@ -21,7 +21,7 @@ class Server
 
 		Configs _configs;
 		
-		Response _res;
+		Response *_response;
 
 		void run(void);
 		void send_message(epoll_event & event);

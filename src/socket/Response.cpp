@@ -4,8 +4,10 @@ std::string Response::http_version = "HTTP/1.1";
 
 std::map<std::string, std::string> Response::mime_types;
 
-Response::Response(void) : _config(NULL)
+Response::Response(char *buff, Config *config) : _config(config)
 {
+    this->_req.init(buff);
+
     mime_types["js"] = "application/javascript";
     mime_types["json"] = "application/json";
     mime_types["pdf"] = "application/pdf";
@@ -166,7 +168,11 @@ bool Response::is_public(void) {
 
 void Response::open_public_file(void)
 {
-    this->_file.open(this->_path.c_str());
+    if (this->_type == "image")
+        this->_file.open(this->_path.c_str(), std::ios::binary);
+    else
+        this->_file.open(this->_path.c_str());
+
     if (this->_file.bad())
         throw std::runtime_error("open_file: fail");
     std::cout << "opened public file" << std::endl;
@@ -236,15 +242,57 @@ void Response::open_file(void)
     }
 }
 
+Response::Body::Body(void)
+{
+    this->data = NULL;
+}
 
+Response::Body::~Body(void)
+{
+    if (this->data)
+        delete this->data;
+}
+
+void Response::read_binary(void)
+{
+    if (_file.bad())
+        return ;
+
+    std::streamsize size = ft::get_file_size(_file);
+    std::streambuf *buff = _file.rdbuf();
+    char *data = new char[size];
+    buff->sgetn(data, size);
+    _body.data = data;
+    _body.size = size;
+}
+
+void Response::read_text(void)
+{
+    if (_file.bad())
+        return ;
+    
+    std::string text = ft::read_text(_file);
+    size_t size = text.size() + 1;
+    char *data = new char[size];
+    std::memcpy(data, text.c_str(), size);
+    _body.data = data;
+    _body.size = size;
+}
+
+void Response::fill_body(void)
+{
+    if (_type == "image")
+        read_binary();
+    else
+        read_text();
+    std::cout << "size: " << _body.size << std::endl;
+}
 
 void Response::GET(void)
 {
     open_file();
-
-    std::string something;
-    std::getline(_file, something);
-    std::cout << "line: " << something << std::endl;
+    fill_body();
+    std::cout << _body.data << std::endl;
 }
 
 void Response::POST(void)

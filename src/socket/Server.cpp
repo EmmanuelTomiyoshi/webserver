@@ -29,10 +29,11 @@ void	Server::new_epoll_event(int conn_fd, uint32_t operation)
 
 void	Server::send_message(epoll_event & event)
 {
-	std::string msg = this->_res.process();
+	std::string msg = this->_response->process();
 	int sent = send(event.data.fd, msg.c_str(), strlen(msg.c_str()) + 1, MSG_DONTWAIT);
 	epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
 	close(event.data.fd);
+	delete this->_response;
 	if (sent != -1)
 		std::cout << "MESSAGE SENT SUCCESSFULY" << std::endl;
 	else
@@ -52,7 +53,10 @@ void Server::recv_message(epoll_event & event)
 		return ;
 	}
 	buff[rsize] = '\0';
-	this->_res.init(buff, _configs._fdconfigs.at(event.data.fd));
+	this->_response = new Response(
+		buff,
+		_configs._fdconfigs.at(event.data.fd)
+	);
 }
 
 void	Server::run(void)

@@ -10,10 +10,12 @@ namespace ft {
 
     //returns all the content in the file
     void *read_binary(std::ifstream & file, std::streamsize size);
-    std::string read_text(std::ifstream & file);
+    // char *read_text(std::ifstream & file);
 
     //has only digits
     bool has_only_digits(std::string str);
+
+    std::string int_to_str(size_t num);
 
 }
 

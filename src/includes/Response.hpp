@@ -41,11 +41,15 @@ class Response
         std::string _mime;
         std::string _type;
         void set_public_file_info(void);
+        void show_file_info(void);
 
         void read_binary(void);
         void read_text(void);
-
         void fill_body(void);
+
+        char *_http_response;
+        size_t _http_response_size;
+        void create_response(void);
 
         //the body can hold string or binary
         class Body
@@ -60,7 +64,6 @@ class Response
         Body _body;
 
         std::string get_content(void); //get all the content from the page and close the file
-        std::string create_response(void); //create a response: status code, http version and body
 
         void GET(void);
         void POST(void);
@@ -81,6 +84,7 @@ class Response
         std::string something(void);
 
         std::string process(void);
+        ssize_t send_response(int fd);
 
         static std::string build_response(
             std::string status_code,

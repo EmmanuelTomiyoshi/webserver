@@ -4,7 +4,7 @@ std::string Response::http_version = "HTTP/1.1";
 
 std::map<std::string, std::string> Response::mime_types;
 
-Response::Response(char *buff, Config *config) : _config(config)
+Response::Response(char *buff, Config *config) : _http_response(NULL), _config(config)
 {
     this->_req.init(buff);
 
@@ -175,7 +175,6 @@ void Response::open_public_file(void)
 
     if (this->_file.bad())
         throw std::runtime_error("open_file: fail");
-    std::cout << "opened public file" << std::endl;
 }
 
 void Response::open_route_file(void)
@@ -189,7 +188,6 @@ void Response::open_route_file(void)
         if (_file.good())
             return ;
     }
-    std::cout << "opened route file" << std::endl;
     //TODO: error();
 }
 
@@ -219,13 +217,21 @@ void Response::set_public_file_info(void)
     this->_type = _mime.substr(0, _mime.find_first_of('/'));
 }
 
+void Response::show_file_info(void)
+{
+    std::cout << "----- FILE INFO ------\n";
+    std::cout << "ext: " << this->_ext << std::endl;
+    std::cout << "mime: " << this->_mime << std::endl;
+    std::cout << "path: " << this->_path << std::endl;
+    std::cout << "type: " << this->_type << std::endl;
+}
+
 void Response::open_file(void)
 {
     if (Response::is_public())
     {
         set_public_file_info();
         open_public_file();
-        std::cout << "public: " << this->_mime << std::endl;
         return ;
     }
 
@@ -250,7 +256,7 @@ Response::Body::Body(void)
 Response::Body::~Body(void)
 {
     if (this->data)
-        delete this->data;
+        delete[] this->data;
 }
 
 void Response::read_binary(void)
@@ -268,15 +274,15 @@ void Response::read_binary(void)
 
 void Response::read_text(void)
 {
-    if (_file.bad())
-        return ;
+    if (!_file)
+        throw std::runtime_error("read_text: bad_file");
     
-    std::string text = ft::read_text(_file);
-    size_t size = text.size() + 1;
-    char *data = new char[size];
-    std::memcpy(data, text.c_str(), size);
-    _body.data = data;
-    _body.size = size;
+    std::string text((std::istreambuf_iterator<char>(_file)),
+                     std::istreambuf_iterator<char>());
+
+    _body.size = text.size() + 1;
+    _body.data = new char[_body.size];
+    std::memmove(_body.data, text.c_str(), _body.size);
 }
 
 void Response::fill_body(void)
@@ -285,14 +291,52 @@ void Response::fill_body(void)
         read_binary();
     else
         read_text();
-    std::cout << "size: " << _body.size << std::endl;
+}
+
+/* TODO:
+    try to do all the standar operations
+    if anything in the process goes wrong throw an error with a code
+    get the code and send an error response
+
+    try
+    {
+        operations()
+    }
+    catch ()
+    {
+        build_response_error()
+    }
+
+    send_response(_http_response);
+ */
+
+void Response::create_response(void)
+{
+    std::string status_code("200");
+    std::string status_line = http_version + " " + status_code + " \r\n";
+    std::string content_type = "Content-Type: " + _mime + "\r\n";
+    std::string content_length = "Content-Length: " + 
+        ft::int_to_str(_body.size) + "\r\n";
+
+    std::string response = status_line + 
+        content_type + 
+        content_length +
+        "\r\n";
+    
+    //obs: should or shouldn't put '\0' after the response data (before the body data)?
+    size_t size = response.size();
+    size += _body.size;
+    _http_response = new char[size];
+    _http_response_size = size;
+    std::memmove(_http_response, response.c_str(), response.size());
+    std::memmove(_http_response + response.size(), _body.data, _body.size);
 }
 
 void Response::GET(void)
 {
     open_file();
     fill_body();
-    std::cout << _body.data << std::endl;
+    create_response();
 }
 
 void Response::POST(void)
@@ -321,12 +365,16 @@ std::string Response::get_content(void)
     return "";
 }
 
-std::string Response::create_response(void)
+ssize_t Response::send_response(int fd)
 {
-    return "";
-} 
-
-
+    GET();
+    return send(
+        fd, 
+        _http_response, 
+        _http_response_size,
+        MSG_DONTWAIT
+    );
+}
 
 std::string Response::process(void)
 {

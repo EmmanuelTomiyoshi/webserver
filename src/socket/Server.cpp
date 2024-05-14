@@ -29,16 +29,14 @@ void	Server::new_epoll_event(int conn_fd, uint32_t operation)
 
 void	Server::send_message(epoll_event & event)
 {
-	std::string msg = this->_response->process();
-	int sent = send(event.data.fd, msg.c_str(), strlen(msg.c_str()) + 1, MSG_DONTWAIT);
+	ssize_t sent = this->_response->send_response(event.data.fd);
 	epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
 	close(event.data.fd);
 	delete this->_response;
-	if (sent != -1)
-		std::cout << "MESSAGE SENT SUCCESSFULY" << std::endl;
-	else
+	if (sent == -1)
 		std::cout << "FAILED TO SEND MESSAGE" << std::endl;
-	std::cout << "CONNECTION CLOSED" << std::endl;
+	else
+		std::cout << "MESSAGE SENT SUCCESSFULY" << std::endl;
 }
 
 void Server::recv_message(epoll_event & event)

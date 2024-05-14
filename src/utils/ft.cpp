@@ -29,18 +29,26 @@ namespace ft {
         return data;
     }
 
-    std::string read_text(std::ifstream & file)
-    {
-        if (file.bad())
-            throw std::runtime_error("fail: read_text: file.bad");
+    // char *read_text(std::ifstream & file)
+    // {
+    //     if (file.bad())
+    //         throw std::runtime_error("fail: read_text: file.bad");
 
-        std::string text;
-        std::getline(file, text, '\0');
-        return text;
-    }
+    //     std::streamsize size = ft::get_file_size(file);
+    //     char *buff = new char[size];
+    //     file.read(buff, size);
+    //     return buff;
+    // }
 
     bool has_only_digits(std::string str)
     {
         return str.find_first_not_of("0123456789") == std::string::npos;
+    }
+
+    std::string int_to_str(size_t num)
+    {
+        std::ostringstream oss;
+        oss << num;
+        return oss.str();
     }
 }

@@ -22,6 +22,7 @@
 #include <sys/epoll.h>
 #include <fstream>
 #include <fcntl.h>
+#include <iterator>
 
 # include <map>
 # include <vector>

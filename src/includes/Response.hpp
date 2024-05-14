@@ -4,6 +4,7 @@
 #include "../parsing/Request.hpp"
 #include "Configs.hpp"
 #include "Config.hpp"
+#include "error_codes.hpp"
 
 /* 
     create setters -> OK
@@ -31,6 +32,7 @@ class Response
         Route *_route;
 
         //set_path will verify if its public or not and create the right path
+        std::string _status;
         std::string _path;
         std::ifstream _file;
         void open_file(void);
@@ -51,7 +53,7 @@ class Response
         size_t _http_response_size;
         void create_response(void);
 
-        void error_response(std::string code);
+        void build_error(std::string code);
 
         //the body can hold string or binary
         class Body

@@ -4,7 +4,8 @@ std::string Response::http_version = "HTTP/1.1";
 
 std::map<std::string, std::string> Response::mime_types;
 
-Response::Response(char *buff, Config *config) : _http_response(NULL), _config(config)
+Response::Response(char *buff, Config *config) : 
+_status("200"), _http_response(NULL), _config(config)
 {
     this->_req.init(buff);
 
@@ -62,7 +63,7 @@ void Response::open_public_file(void)
         this->_file.open(this->_path.c_str());
 
     if (this->_file.bad())
-        throw std::runtime_error("open_file: fail");
+        throw std::runtime_error(HTTP_INTERNAL_SERVER_ERROR);
 }
 
 void Response::open_route_file(void)
@@ -130,9 +131,7 @@ void Response::open_file(void)
     }
     catch (std::exception & e)
     {
-        std::cerr << "page not found" << std::endl;
-        return ;
-        //error()
+        throw std::runtime_error(HTTP_NOT_FOUND);
     }
 }
 
@@ -149,7 +148,7 @@ Response::Body::~Body(void)
 
 void Response::read_binary(void)
 {
-    if (_file.bad())
+    if (!_file)
         return ;
 
     std::streamsize size = ft::get_file_size(_file);
@@ -163,7 +162,7 @@ void Response::read_binary(void)
 void Response::read_text(void)
 {
     if (!_file)
-        throw std::runtime_error("read_text: bad_file");
+        throw std::runtime_error(HTTP_INTERNAL_SERVER_ERROR);
     
     std::string text((std::istreambuf_iterator<char>(_file)),
                      std::istreambuf_iterator<char>());
@@ -198,15 +197,21 @@ void Response::fill_body(void)
     send_response(_http_response);
  */
 
-void Response::error_response(std::string code)
+void Response::build_error(std::string code)
 {
-
+    _status = code;
+    _mime = this->mime_types["txt"];
+    this->_ext = "txt";
+    this->_type = "text";
+    std::string err = "ERROR " + code;
+    _body.size = err.size() + 1;
+    _body.data = new char[_body.size];
+    std::memmove(_body.data, err.c_str(), _body.size);
 }
 
 void Response::create_response(void)
 {
-    std::string status_code("200");
-    std::string status_line = http_version + " " + status_code + " \r\n";
+    std::string status_line = http_version + " " + _status + " \r\n";
     std::string content_type = "Content-Type: " + _mime + "\r\n";
     std::string content_length = "Content-Length: " + 
         ft::int_to_str(_body.size) + "\r\n";
@@ -227,8 +232,16 @@ void Response::create_response(void)
 
 void Response::GET(void)
 {
-    open_file();
-    fill_body();
+    try
+    {
+        open_file();
+        fill_body();
+    }
+    catch (std::exception & e)
+    {
+        build_error(e.what());
+    }
+
     create_response();
 }
 

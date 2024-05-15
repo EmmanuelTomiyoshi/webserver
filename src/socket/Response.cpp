@@ -62,7 +62,7 @@ void Response::open_public_file(void)
     else
         this->_file.open(this->_path.c_str());
 
-    if (this->_file.bad())
+    if (!_file)
         throw std::runtime_error(HTTP_INTERNAL_SERVER_ERROR);
 }
 
@@ -200,13 +200,10 @@ void Response::fill_body(void)
 void Response::build_error(std::string code)
 {
     _status = code;
-    _mime = this->mime_types["txt"];
-    this->_ext = "txt";
-    this->_type = "text";
-    std::string err = "ERROR " + code;
-    _body.size = err.size() + 1;
-    _body.data = new char[_body.size];
-    std::memmove(_body.data, err.c_str(), _body.size);
+    _ext = "html";
+    _mime = this->mime_types[_ext];
+    _type = "html";
+    _path = "./public/pages/errors/" + code + ".html";
 }
 
 void Response::create_response(void)
@@ -235,13 +232,13 @@ void Response::GET(void)
     try
     {
         open_file();
-        fill_body();
     }
     catch (std::exception & e)
     {
         build_error(e.what());
+        open_public_file();
     }
-
+    fill_body();
     create_response();
 }
 

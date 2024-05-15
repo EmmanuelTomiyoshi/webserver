@@ -17,6 +17,11 @@ namespace ft {
 
     std::string int_to_str(size_t num);
 
+    char *cgi(
+        char *content_type, 
+        char *request_method, 
+        char *script_name
+    );
 }
 
 #endif

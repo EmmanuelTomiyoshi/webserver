@@ -214,6 +214,7 @@ void Response::create_response(void)
         ft::int_to_str(_body.size) + "\r\n";
 
     std::string response = status_line + 
+        "Connection: close\r\n" +
         content_type + 
         content_length +
         "\r\n";

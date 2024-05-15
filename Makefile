@@ -14,6 +14,7 @@ SRC 		=	main.cpp \
 				File.cpp \
 				ft.cpp \
 				Response.cpp \
+				CGI.cpp \
 
 VPATH		=	./src \
 				./src/parsing \

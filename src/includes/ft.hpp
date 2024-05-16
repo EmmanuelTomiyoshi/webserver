@@ -22,6 +22,9 @@ namespace ft {
         char *request_method, 
         char *script_name
     );
+
+    size_t str_to_int(std::string str);
+
 }
 
 #endif

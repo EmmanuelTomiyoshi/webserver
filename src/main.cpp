@@ -1,6 +1,6 @@
 #include "webserver.hpp"
 #include "Server.hpp"
-#include "./utils/ft.hpp"
+#include "ft.hpp"
 
 void cgi(void)
 {

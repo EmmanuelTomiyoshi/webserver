@@ -40,16 +40,12 @@ void start_server(int argc, char **argv)
 	delete server;
 }
 
-#include "CGI.hpp"
+void temp(void);
+
 int main(int argc, char *argv[])
 {
-	CGI cgi;
-	cgi.set_content_type("text/html");
-	cgi.set_request_method("GET");
-	cgi.set_script_name("./cgi-bin/hello.py");
-	cgi.info();
-	cgi.execute();
-	exit(0);
+	temp();
 	start_server(argc, argv);
 	return (0);
 }
+

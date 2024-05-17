@@ -3,7 +3,7 @@
 # include "base.hpp"
 # include "ft.hpp"
 
-# define CGI_PROGRAM "/bin/python3"
+// # define CGI_PROGRAM "/bin/python3"
 # define gateway_interface "GATEWAY_INTERFACE=CGI/1.1"
 # define server_protocol "SERVER_PROTOCOL=HTTP/1.1"
 # define query_s "QUERY_STRING="

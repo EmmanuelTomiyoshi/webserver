@@ -87,12 +87,11 @@ void CGI::set_query_string(std::string value)
 
 void CGI::set_script_name(std::string value)
 {
-    _script_name = "SCRIPT_NAME=" + value;
+    _script_name = "SCRIPT_FILENAME=" + value;
     _script_name_raw = value;
     add_env(_script_name.c_str());
-    _argv[0] = CGI_PROGRAM;
-    _argv[1] = _script_name_raw.c_str();
-    _argv[2] = NULL;
+    _argv[0] = _script_name_raw.c_str();
+    _argv[1] = NULL;
 }
 
 void CGI::set_body(char *value)
@@ -169,6 +168,7 @@ void CGI::write_body(void)
     if (_request_method_raw != "POST")
         return ;
     size_t size = ft::str_to_int(_content_length_raw);
+    std::cerr << "body_size_raw: " << size << std::endl;
     write(_pfds_a[1], _body, size);
 }
 
@@ -195,6 +195,7 @@ void CGI::execute(void)
         std::cerr << "CGI ERROR: fail to execute cgi script" << std::endl;
         exit(0);
     }
+    write_body();
     wait(NULL);
     read_response();
     close(_pfds_a[0]);

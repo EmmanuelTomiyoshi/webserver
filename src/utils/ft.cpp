@@ -48,4 +48,17 @@ namespace ft {
         ss >> n;
         return n;
     }
+
+    char *get_body_position(char *data)
+    {
+        while (*data)
+        {
+            if (std::strncmp(data, "\n\n", 2) == 0)
+            {
+                return data + 2;
+            }
+            data++;
+        }
+        return data;
+    }
 }

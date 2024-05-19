@@ -1,5 +1,6 @@
 #include "CGI.hpp"
 #include "base.hpp"
+#include "./parsing/Request.hpp"
 
 void set_post(CGI & cgi)
 {
@@ -20,11 +21,26 @@ void set_get(CGI & cgi)
 	cgi.set_script_name("./cgi-bin/hello.pl");
 }
 
+
+
+void test(void)
+{
+    char data[20000];
+    int pid = open("../headers", O_RDONLY);
+	read(pid, data, 20000);
+	Request req;
+	req.init(data);
+	req.info();
+	std::string body = req.get_body();
+	std::cout << "body: " << body << std::endl;
+}
+
 void temp(void)
 {
-	CGI cgi;
-    set_get(cgi);
-	cgi.info();
-	cgi.execute();
+    test();
+	// CGI cgi;
+    // set_get(cgi);
+	// cgi.info();
+	// cgi.execute();
 	exit(0);
 }

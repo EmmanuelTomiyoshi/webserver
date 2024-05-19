@@ -44,7 +44,6 @@ void temp(void);
 
 int main(int argc, char *argv[])
 {
-	temp();
 	start_server(argc, argv);
 	return (0);
 }

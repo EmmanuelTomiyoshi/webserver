@@ -1,12 +1,19 @@
 #include "Response.hpp"
+#include "../parsing/Request2.hpp"
 
 std::string Response::http_version = "HTTP/1.1";
 
 std::map<std::string, std::string> Response::mime_types;
 
+void test_new_request(char *buff)
+{
+    Request2 request2(buff);
+}
+
 Response::Response(char *buff, Config *config) : 
 _status("200"), _http_response(NULL), _config(config)
 {
+    test_new_request(buff);
     this->_req.init(buff);
 
     mime_types["js"] = "application/javascript";

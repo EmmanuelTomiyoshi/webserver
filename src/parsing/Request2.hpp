@@ -17,6 +17,7 @@ class Request2
 		char *_buff;
 		char *_body;
 		void separate_info(void);
+        void extract_request_line(void);
 
 		std::string _method;
 		std::string _http_version;
@@ -26,6 +27,8 @@ class Request2
 
 	public:
 		Request2(char *buff);
+
+        void info(void);
 };
 
 #endif

@@ -81,6 +81,7 @@ class Response
         bool is_public(void);
 
         void execute(void);
+        void execute_error(std::string code);
 
     public:
         Response(char *buff, Config *config);

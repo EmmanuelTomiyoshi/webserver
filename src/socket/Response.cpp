@@ -50,7 +50,7 @@ _buff(buff), _status("200"), _http_response(NULL), _config(config)
  */
 
 bool Response::is_public(void) {
-    std::string str = _req.get_target();
+    std::string str = _request.get_target();
     str = str.substr(0, std::string("/public").length());
     return str == "/public";
 }
@@ -82,7 +82,7 @@ void Response::open_route_file(void)
 
 void Response::set_public_file_info(void)
 {
-    this->_path = '.' + _req.get_target();
+    this->_path = '.' + _request.get_target();
     if (_path.empty())
     {
         std::cerr << "error: no path provided" << std::endl;
@@ -126,7 +126,7 @@ void Response::open_file(void)
 
     try
     {
-        _route = &(_config->routes.get(_req.get_target()));
+        _route = &(_config->routes.get(_request.get_target()));
         open_route_file();
     }
     catch (std::exception & e)
@@ -230,10 +230,9 @@ void Response::create_response(void)
 
 void Response::GET(void)
 {
-    throw std::runtime_error(HTTP_SERVICE_UNAVAILABLE);
-    // open_file();
-    // fill_body();
-    // create_response();
+    open_file();
+    fill_body();
+    create_response();
 }
 
 void Response::POST(void)
@@ -255,7 +254,16 @@ void Response::execute(void)
         POST();
     else if (method == "DELETE")
         DELETE();
-    throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
+    else
+        throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
+}
+
+void Response::execute_error(std::string code)
+{
+    build_error(code);
+    open_public_file();
+    fill_body();
+    create_response();
 }
 
 ssize_t Response::send_response(int fd)
@@ -267,10 +275,7 @@ ssize_t Response::send_response(int fd)
     }
     catch(const std::exception& e)
     {
-        build_error(e.what());
-        open_public_file();
-        fill_body();
-        create_response();
+        execute_error(e.what());
     }
 
     return send(

@@ -50,6 +50,26 @@ void Request2::extract_headers(void)
     }
 }
 
+std::string Request2::get_header(std::string key) const
+{
+    return _headers.at(key);
+}
+
+std::string Request2::get_method(void)
+{
+    return this->_method;
+}
+
+std::string Request2::get_target(void)
+{
+    return this->_target;
+}
+
+std::string Request2::get_version(void)
+{
+    return this->_http_version;
+}
+
 void Request2::info(void)
 {
     std::cout << "----- Request2 INFO----\n" << _info << std::endl;

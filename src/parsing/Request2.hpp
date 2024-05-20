@@ -29,6 +29,10 @@ class Request2
 	public:
 		Request2(char *buff);
 
+		std::string get_header(std::string key) const;
+		std::string get_method(void);
+		std::string get_target(void);
+		std::string get_version(void);
         void info(void);
 };
 

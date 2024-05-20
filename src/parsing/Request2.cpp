@@ -4,6 +4,7 @@ Request2::Request2(char *buff) : _buff(buff), _body(NULL)
 {
 	separate_info();
     extract_request_line();
+    extract_headers();
     info();
 }
 
@@ -30,11 +31,33 @@ void Request2::extract_request_line(void)
     _info = _info.substr(_info.find_first_of('\n') + 1);
 }
 
+void Request2::extract_headers(void)
+{
+    while (1)
+    {
+        size_t key_end = _info.find_first_of(':');
+        if (key_end == std::string::npos)
+            return ;
+        std::string key = _info.substr(0, key_end);
+
+        size_t value_end = _info.find_first_of('\n');
+        if (value_end == std::string::npos)
+            return ;
+        std::string value = _info.substr(key_end + 2, value_end - key_end - 2);
+
+        _info = _info.substr(value_end + 1);
+        _headers[key] = value;
+    }
+}
+
 void Request2::info(void)
 {
     std::cout << "----- Request2 INFO----\n" << _info << std::endl;
     std::cout << "Method: " << _method << std::endl;
     std::cout << "Target: " << _target << std::endl;
     std::cout << "Version: " << _http_version << std::endl;
-    std::cout << "----- INFO AGAIN -----\n" << _info << std::endl;
+    std::cout << "----- HEADERS -----\n" << std::endl;
+    std::map<std::string, std::string>::iterator it;
+    for (it = _headers.begin(); it != _headers.end(); it++)
+        std::cout << (*it).first << " -> " << (*it).second << std::endl;
 }

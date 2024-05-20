@@ -18,6 +18,7 @@ class Request2
 		char *_body;
 		void separate_info(void);
         void extract_request_line(void);
+		void extract_headers(void);
 
 		std::string _method;
 		std::string _http_version;

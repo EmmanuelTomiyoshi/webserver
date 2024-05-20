@@ -29,6 +29,13 @@ void Request2::extract_request_line(void)
     ss >> _target;
     ss >> _http_version;
 
+    if (_method.empty() || _target.empty())
+        throw std::runtime_error(HTTP_BAD_REQUEST);
+    if (_http_version != "HTTP/1.1")
+        throw std::runtime_error(HTTP_BAD_REQUEST);
+    if (_method != "GET" && _method != "POST" && _method != "DELETE")
+        throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
+
     _info = _info.substr(_info.find_first_of('\n') + 1);
 }
 
@@ -60,6 +67,9 @@ void Request2::extract_body_size(void)
     }
     catch (std::exception & e)
     {
+        //Method POST requires a Content-Length header
+        if (_method == "POST")
+            throw std::runtime_error(HTTP_BAD_REQUEST);
         _body_size = 0;
         _body = NULL;
     }

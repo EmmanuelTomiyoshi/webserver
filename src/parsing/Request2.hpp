@@ -2,6 +2,7 @@
 # define REQUEST2_H
 # include "base.hpp"
 # include "ft.hpp"
+# include "error_codes.hpp"
 
 /*	 MESSAGE FORMAT 
 

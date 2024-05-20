@@ -5,6 +5,7 @@ Request2::Request2(char *buff) : _buff(buff), _body(NULL)
 	separate_info();
     extract_request_line();
     extract_headers();
+    extract_body_size();
     info();
 }
 
@@ -48,6 +49,30 @@ void Request2::extract_headers(void)
         _info = _info.substr(value_end + 1);
         _headers[key] = value;
     }
+}
+
+void Request2::extract_body_size(void)
+{
+    try
+    {
+        std::string & length = _headers.at("Content-Length");
+        _body_size = ft::str_to_int(length);
+    }
+    catch (std::exception & e)
+    {
+        _body_size = 0;
+        _body = NULL;
+    }
+}
+
+char *Request2::get_body(void)
+{
+    return _body;
+}
+
+size_t Request2::get_body_size(void)
+{
+    return _body_size;
 }
 
 std::string Request2::get_header(std::string key) const

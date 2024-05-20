@@ -1,20 +1,13 @@
 #include "Response.hpp"
-#include "../parsing/Request2.hpp"
 
 std::string Response::http_version = "HTTP/1.1";
 
 std::map<std::string, std::string> Response::mime_types;
 
-void test_new_request(char *buff)
-{
-    Request2 request2(buff);
-}
-
 Response::Response(char *buff, Config *config) : 
-_status("200"), _http_response(NULL), _config(config)
+_buff(buff), _status("200"), _http_response(NULL), _config(config)
 {
-    test_new_request(buff);
-    this->_req.init(buff);
+    //this->_req.init(buff);
 
     mime_types["js"] = "application/javascript";
     mime_types["json"] = "application/json";
@@ -237,32 +230,49 @@ void Response::create_response(void)
 
 void Response::GET(void)
 {
-    try
-    {
-        open_file();
-    }
-    catch (std::exception & e)
-    {
-        build_error(e.what());
-        open_public_file();
-    }
-    fill_body();
-    create_response();
+    throw std::runtime_error(HTTP_SERVICE_UNAVAILABLE);
+    // open_file();
+    // fill_body();
+    // create_response();
 }
 
 void Response::POST(void)
 {
-
+    throw std::runtime_error(HTTP_SERVICE_UNAVAILABLE);
 }
 
 void Response::DELETE(void)
 {
+    throw std::runtime_error(HTTP_SERVICE_UNAVAILABLE);
+}
 
+void Response::execute(void)
+{
+    std::string method = _request.get_method();
+    if (method == "GET")
+        GET();
+    else if (method == "POST")
+        POST();
+    else if (method == "DELETE")
+        DELETE();
+    throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
 }
 
 ssize_t Response::send_response(int fd)
 {
-    GET();
+    try
+    {
+        _request.init(_buff);
+        this->execute();
+    }
+    catch(const std::exception& e)
+    {
+        build_error(e.what());
+        open_public_file();
+        fill_body();
+        create_response();
+    }
+
     return send(
         fd, 
         _http_response, 

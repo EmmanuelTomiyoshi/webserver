@@ -29,9 +29,12 @@ class Request2
 
 		std::map<std::string, std::string> _headers;
 
-	public:
-		Request2(char *buff);
+		void verify_initialization(void) const;
 
+	public:
+		Request2(void);
+
+		void init(char *buff);
 		std::string get_header(std::string key) const;
 		std::string get_method(void);
 		std::string get_target(void);

@@ -1,12 +1,26 @@
 #include "Request2.hpp"
 
-Request2::Request2(char *buff) : _buff(buff), _body(NULL)
+Request2::Request2(void) : _buff(NULL), _body(NULL)
 {
+}
+
+void Request2::init(char *buff)
+{
+    _buff = buff;
 	separate_info();
     extract_request_line();
     extract_headers();
     extract_body_size();
     info();
+}
+
+void Request2::verify_initialization(void) const
+{
+    if (_buff == NULL)
+    {
+        std::cerr << "Request2 not initialized" << std::endl;
+        throw std::runtime_error("Request2 not initialized");
+    }
 }
 
 void Request2::separate_info(void)
@@ -77,36 +91,43 @@ void Request2::extract_body_size(void)
 
 char *Request2::get_body(void)
 {
+    verify_initialization();
     return _body;
 }
 
 size_t Request2::get_body_size(void)
 {
+    verify_initialization();
     return _body_size;
 }
 
 std::string Request2::get_header(std::string key) const
 {
+    verify_initialization();
     return _headers.at(key);
 }
 
 std::string Request2::get_method(void)
 {
+    verify_initialization();
     return this->_method;
 }
 
 std::string Request2::get_target(void)
 {
+    verify_initialization();
     return this->_target;
 }
 
 std::string Request2::get_version(void)
 {
+    verify_initialization();
     return this->_http_version;
 }
 
 void Request2::info(void)
 {
+    verify_initialization();
     std::cout << "----- Request2 INFO----\n" << _info << std::endl;
     std::cout << "Method: " << _method << std::endl;
     std::cout << "Target: " << _target << std::endl;

@@ -5,6 +5,7 @@
 #include "Configs.hpp"
 #include "Config.hpp"
 #include "error_codes.hpp"
+#include "Request2.hpp"
 
 /* 
     create setters -> OK
@@ -28,6 +29,8 @@ class Response
 {
     private:
         Request _req;
+        Request2 _request;
+        char *_buff;
 
         Route *_route;
 
@@ -77,6 +80,7 @@ class Response
 
         bool is_public(void);
 
+        void execute(void);
 
     public:
         Response(char *buff, Config *config);

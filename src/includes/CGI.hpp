@@ -2,6 +2,7 @@
 # define CGI_HPP
 # include "base.hpp"
 # include "ft.hpp"
+# include "error_codes.hpp"
 
 // # define CGI_PROGRAM "/bin/python3"
 # define gateway_interface "GATEWAY_INTERFACE=CGI/1.1"
@@ -12,6 +13,14 @@
 
 class CGI
 {
+    public:
+        class ResponseData {
+            public:
+                char *body;
+                size_t body_size;
+                std::string content_type;
+        };
+
     private:
         std::string _request_method;
         std::string _request_method_raw;
@@ -47,6 +56,16 @@ class CGI
         int _pfds_b[2];
         int _pid;
 
+        void execute_cgi_script(void);
+
+        void extract_response_data(void);
+        void extract_content_type(size_t header_size);
+
+        //calculate content length
+        //get cgi Content-Type
+        //get only body from the rest
+        //create a response with the appropriate headers
+
     public:
         CGI(void);
 
@@ -61,6 +80,9 @@ class CGI
         void info(void);
         char *get_response(void);
         size_t get_response_size(void);
+
+        ResponseData _response_data;
+
 };
 
 #endif

@@ -26,6 +26,7 @@ namespace ft {
     size_t str_to_int(std::string str);
 
     char *get_body_position(char *data);
+    char *get_body_position(char *response, size_t response_size);
 }
 
 #endif

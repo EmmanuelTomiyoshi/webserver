@@ -61,4 +61,20 @@ namespace ft {
         }
         return data;
     }
+
+    char *get_body_position(char *response, size_t response_size)
+    {
+        for (size_t i = 0; i < response_size; i++)
+        {
+            if (response_size - i >= 2 && std::strncmp("\n\n", &response[i], 2) == 0)
+                return  &response[i + 2];
+            if (response_size - i >= 4 && std::strncmp("\r\n\r\n", &response[i], 4) == 0)
+                return  &response[i + 4];
+            if (response_size - i >= 3 && std::strncmp("\r\n\n", &response[i], 3) == 0)
+                return  &response[i + 3];
+            if (response_size - i >= 3 && std::strncmp("\n\r\n", &response[i], 3) == 0)
+                return  &response[i + 3];
+        }
+        return NULL;
+    }
 }

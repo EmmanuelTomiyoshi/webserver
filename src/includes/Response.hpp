@@ -6,6 +6,7 @@
 #include "Config.hpp"
 #include "error_codes.hpp"
 #include "Request2.hpp"
+#include "CGI.hpp"
 
 /* 
     create setters -> OK

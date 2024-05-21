@@ -180,12 +180,9 @@ void CGI::read_response(void)
     std::memmove(_response, buff, _response_size);
 }
 
-void CGI::execute(void)
+void CGI::execute_cgi_script(void)
 {
-    if (this->error())
-        return ;
-
-    pipe(_pfds_a);
+    pipe2(_pfds_a, O_NONBLOCK);
     pipe(_pfds_b);
     _pid = fork();
     if (_pid == 0)
@@ -202,8 +199,51 @@ void CGI::execute(void)
     close(_pfds_b[0]);
     close(_pfds_a[1]);
     close(_pfds_b[1]);
-    write(1, _response, _response_size);
-    std::cout << std::endl;
+}
+
+void CGI::extract_content_type(size_t header_size)
+{
+    char str[] = "Content-Type: ";
+    size_t pos;
+    for (size_t i = 0; i < header_size; i++)
+    {
+        if (header_size - i < std::strlen(str))
+            return ;
+        if (std::strncmp(str, &_response[i], std::strlen(str)))
+        {
+            pos = i + std::strlen(str) - 1;
+            break ;
+        }
+    }
+    char *content = &_response[pos];
+    char *end = std::strchr(content, '\n');
+    size_t size = end - content;
+    char *content_type = new char[size + 1];
+    std::memmove(content_type, content, size);
+    content_type[size] = '\n';
+    _response_data.content_type = content_type;
+    delete [] content_type;
+}
+
+void CGI::extract_response_data(void)
+{
+    char *body = ft::get_body_position(_response, _response_size);
+    if (body == NULL)
+        throw std::runtime_error(HTTP_SERVICE_UNAVAILABLE);
+    size_t header_size = body - _response;
+    size_t body_size = _response_size - header_size;
+    _response_data.body = body;
+    _response_data.body_size = body_size;
+    extract_content_type(header_size);
+}
+
+void CGI::execute(void)
+{
+    if (this->error())
+        return ;
+
+    execute_cgi_script();
+    extract_response_data();
 }
 
 char *CGI::get_response(void)

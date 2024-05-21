@@ -235,9 +235,33 @@ void Response::GET(void)
     create_response();
 }
 
+char *find_str_pos(const char *str, char *src)
+{
+    while (*src)
+    {
+        if (std::strncmp(str, src, std::strlen(str)) == 0)
+            return src;
+        src++;
+    }
+    return NULL;
+}
+
 void Response::POST(void)
 {
-    throw std::runtime_error(HTTP_SERVICE_UNAVAILABLE);
+    CGI cgi;
+    cgi.set_request_method("POST");
+    cgi.set_body(_request.get_body());
+    cgi.set_content_length(_request.get_header("Content-Length"));
+    cgi.set_content_type(_request.get_header("Content-Type"));
+    cgi.set_script_name("./cgi-bin/perl_test.pl");
+    cgi.execute();
+
+    _http_response = cgi.get_response();
+    _http_response_size = cgi.get_response_size();
+
+    std::cout << "------------- response -------------\n\n";
+    write(1, _http_response, _http_response_size);
+    std::cout << "\n\n------------- response -------------\n";
 }
 
 void Response::DELETE(void)

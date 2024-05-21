@@ -10,8 +10,8 @@ use File::Basename;
 my $cgi = CGI->new;
 
 # Retrieve form data (additional fields if necessary)
-my $name = $cgi->param('name');
-my $age = $cgi->param('age');
+# my $name = $cgi->param('name');
+# my $age = $cgi->param('age');
 
 # Retrieve the uploaded file
 my $filename = $cgi->param('image');
@@ -48,11 +48,6 @@ if ($upload_filehandle) {
 # Send the HTTP header and start the HTML response
 print $cgi->header('text/html');
 print $cgi->start_html('Form Submission');
-
-# Print the received form data
-print $cgi->h1('Form Data Received');
-print $cgi->p("Name: $name");
-print $cgi->p("Age: $age");
 
 # Print the file upload result
 if ($upload_filehandle) {

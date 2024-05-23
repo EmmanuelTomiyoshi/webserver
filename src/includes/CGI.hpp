@@ -19,6 +19,9 @@ class CGI
                 char *body;
                 size_t body_size;
                 std::string content_type;
+
+                char *http_response;
+                size_t http_response_size;
         };
 
     private:
@@ -58,6 +61,10 @@ class CGI
         void extract_response_data(void);
         void extract_content_type(size_t header_size);
 
+        void format_http_response(void);
+
+        ResponseData _response_data;
+
     public:
         CGI(void);
 
@@ -73,7 +80,6 @@ class CGI
         char *get_response(void);
         size_t get_response_size(void);
 
-        ResponseData _response_data;
 
 };
 

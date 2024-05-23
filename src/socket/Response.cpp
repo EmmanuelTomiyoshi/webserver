@@ -258,10 +258,6 @@ void Response::POST(void)
 
     _http_response = cgi.get_response();
     _http_response_size = cgi.get_response_size();
-
-    std::cout << "------------- response -------------\n\n";
-    write(1, _http_response, _http_response_size);
-    std::cout << "\n\n------------- response -------------\n";
 }
 
 void Response::DELETE(void)

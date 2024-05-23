@@ -191,6 +191,32 @@ void CGI::extract_response_data(void)
     extract_content_type(header_size);
 }
 
+void CGI::format_http_response(void)
+{
+    std::string status_line = "HTTP/1.1 200 OK\n";
+    std::string h1 = "Content-Length: " +
+        ft::int_to_str(_response_data.body_size) + 
+        "\n";
+    std::string h2 = "Content-Type: " + 
+        _response_data.content_type +
+        "\n\n";
+    
+
+    std::string aux = status_line + h1 + h2;
+
+    size_t size = aux.length() + _response_data.body_size;
+    char *http_response = new char[size];
+    std::memmove(http_response, aux.c_str(), aux.length());
+    std::memmove(
+        http_response + aux.length(),
+        _response_data.body,
+        _response_data.body_size
+    );
+
+    _response_data.http_response = http_response;
+    _response_data.http_response_size = size;
+}
+
 void CGI::execute(void)
 {
     if (this->error())
@@ -198,14 +224,15 @@ void CGI::execute(void)
 
     execute_cgi_script();
     extract_response_data();
+    format_http_response();
 }
 
 char *CGI::get_response(void)
 {
-    return _response;
+    return _response_data.http_response;
 }
 
 size_t CGI::get_response_size(void)
 {
-    return _response_size;
+    return _response_data.http_response_size;
 }

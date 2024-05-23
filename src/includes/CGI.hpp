@@ -44,9 +44,6 @@ class CGI
         void create_envp(void);
         void create_argv(void);
 
-        void execute_get(void);
-        void execute_post(void);
-
         void dup_pfds(void);
 
         void write_body(void);
@@ -60,11 +57,6 @@ class CGI
 
         void extract_response_data(void);
         void extract_content_type(size_t header_size);
-
-        //calculate content length
-        //get cgi Content-Type
-        //get only body from the rest
-        //create a response with the appropriate headers
 
     public:
         CGI(void);

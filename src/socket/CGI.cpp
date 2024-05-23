@@ -1,41 +1,5 @@
 #include "CGI.hpp"
 
-// static void execute_script(char **argv, char **envs)
-// {
-//     int pid = fork();
-//     if (pid == 0)
-//     {
-//         execve(argv[0], argv, envs);
-//         exit(0);
-//     }
-//     wait(NULL);
-// }
-
-// char *cgi(
-//     char *content_type, 
-//     char *request_method, 
-//     char *script_name
-// )
-// {
-//     char *argv[] = {
-//         cgi_program,
-//         script_name,
-//         NULL
-//     };
-
-//     char *envs[] = {
-//         gateway_interface,
-//         server_protocol,
-//         "CONTENT_TYPE=text/html",
-//         // "CONTENT_LENGTH=200",
-//         "REQUEST_METHOD=GET",
-//         "SCRIPT_NAME=./cgi-bin/hello.py",
-//         NULL
-//     };
-
-//     execute_script(argv, envs);
-// }
-
 CGI::CGI(void) : _body(NULL), _response_size(0)
 {
     for (int i = 0; i < ENVS_SIZE; i++)
@@ -141,16 +105,6 @@ void CGI::info(void)
     {
         std::cout << _argv[i] << std::endl;
     }
-}
-
-void CGI::execute_get(void)
-{
-    
-}
-
-void CGI::execute_post(void)
-{
-
 }
 
 void CGI::dup_pfds(void)

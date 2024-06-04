@@ -53,10 +53,14 @@ namespace ft {
     {
         while (*data)
         {
-            if (std::strncmp(data, "\n\n", 2) == 0)
-            {
-                return data + 2;
-            }
+            if (std::strncmp("\n\n", data, 2) == 0)
+                return  data + 2;
+            if (std::strncmp("\r\n\r\n", data, 4) == 0)
+                return  data + 4;
+            if (std::strncmp("\r\n\n", data, 3) == 0)
+                return  data + 3;
+            if (std::strncmp("\n\r\n", data, 3) == 0)
+                return  data + 3;
             data++;
         }
         return data;
@@ -76,5 +80,30 @@ namespace ft {
                 return  &response[i + 3];
         }
         return NULL;
+    }
+
+    void debug_file(std::string filename, char *buff, size_t size)
+    {
+        int fd = open(filename.c_str(), O_TRUNC | O_CREAT | O_RDWR, 00666);
+        write(fd, buff, size);
+        close(fd);
+    }
+
+    void print_char_array(const char *arr, size_t size)
+    {
+        for (size_t i = 0; i < size; i++)
+        {
+            std::cout << int(arr[i]) << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    void print_char_array(const char *arr)
+    {
+        for (; *arr; arr++)
+        {
+            std::cout << int(*arr) << " ";
+        }
+        std::cout << std::endl;
     }
 }

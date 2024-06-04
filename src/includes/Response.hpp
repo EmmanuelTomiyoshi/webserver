@@ -32,6 +32,7 @@ class Response
         Request _req;
         Request2 _request;
         char *_buff;
+        size_t _buff_size;
 
         Route *_route;
 
@@ -85,7 +86,7 @@ class Response
         void execute_error(std::string code);
 
     public:
-        Response(char *buff, Config *config);
+        Response(char *buff, size_t size, Config *config);
 
         ssize_t send_response(int fd);
 

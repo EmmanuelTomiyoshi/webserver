@@ -41,8 +41,11 @@ void	Server::send_message(epoll_event & event)
 
 void Server::recv_message(epoll_event & event)
 {
-	char buff[5000];
-	int rsize = recv(event.data.fd, buff, 4999, MSG_WAITALL);
+	char buff[20000];
+	int rsize = recv(event.data.fd, buff, 20000, MSG_WAITALL);
+	if (rsize > 1000) {
+		ft::debug_file("./debug2", buff, rsize);
+	}
 	if (rsize < 0) //parse, get response, send response
 	{
 		close(event.data.fd);
@@ -50,9 +53,9 @@ void Server::recv_message(epoll_event & event)
 		std::cout << "CLOSED CONNECTION ERROR: no message" << std::endl;
 		return ;
 	}
-	buff[rsize] = '\0';
 	this->_response = new Response(
 		buff,
+		rsize,
 		_configs._fdconfigs.at(event.data.fd)
 	);
 }

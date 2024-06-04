@@ -45,3 +45,5 @@ webserv
 example.conf
 .chache
 test_form.html
+debug*
+front/uploads/*

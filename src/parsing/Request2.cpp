@@ -4,9 +4,10 @@ Request2::Request2(void) : _buff(NULL), _body(NULL)
 {
 }
 
-void Request2::init(char *buff)
+void Request2::init(char *buff, size_t size)
 {
     _buff = buff;
+    _buff_size = size;
 	separate_info();
     extract_request_line();
     extract_headers();
@@ -25,13 +26,15 @@ void Request2::verify_initialization(void) const
 
 void Request2::separate_info(void)
 {
-	_body = ft::get_body_position(_buff);
+	_body = ft::get_body_position(_buff, _buff_size);
 	size_t size_info = _body - _buff;
 	char *info = new char[size_info + 1];
 	std::memmove(info, _buff, size_info);
 	info[size_info] = '\0';
-	_info = info;
-	delete [] info;
+
+    _info = info;
+
+    ft::debug_file("./debug4_headers", info, size_info);
 }
 
 void Request2::extract_request_line(void)
@@ -67,6 +70,10 @@ void Request2::extract_headers(void)
             return ;
         std::string value = _info.substr(key_end + 2, value_end - key_end - 2);
 
+        //remove '\r':
+        if (value.find_first_of('\r') != std::string::npos)
+            value = value.substr(0, value.find_first_of('\r'));
+
         _info = _info.substr(value_end + 1);
         _headers[key] = value;
     }
@@ -78,6 +85,12 @@ void Request2::extract_body_size(void)
     {
         std::string & length = _headers.at("Content-Length");
         _body_size = ft::str_to_int(length);
+
+        _body = new char[_body_size];
+        std::memmove(_body, ft::get_body_position(_buff, _buff_size), _body_size);
+
+        std::cout << "**Body size: " << _body_size << std::endl;
+        ft::debug_file("./debug4", _body, _body_size);
     }
     catch (std::exception & e)
     {

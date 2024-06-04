@@ -35,12 +35,83 @@ void test(void)
 	std::cout << "body: " << body << std::endl;
 }
 
+void test2(void)
+{
+	char something[] = "123456789";
+
+	char *test = something + 5;
+
+	std::cout << something << std::endl;
+	std::cout << test << std::endl;
+	int info_size = (test - something);
+	std::cout << "info_size: " << info_size << std::endl;
+	std::cout << "body_size: " << (std::strlen(something) - info_size) << std::endl;
+}
+
+void test_php(void)
+{
+	const char *argv[] = { "/bin/php", "./cgi-bin/test.php", NULL };
+	execve("/bin/php", (char *const *) argv, NULL);
+	perror(NULL);
+	std::cout << "error executing\n";
+}
+
+/* 
+
+GATEWAY_INTERFACE=CGI/1.1
+SERVER_PROTOCOL=HTTP/1.1
+REDIRECT_STATUS=200
+REQUEST_METHOD=POST
+CONTENT_LENGTH=247
+CONTENT_TYPE=multipart/form-data; boundary=---------------------------120183001110947073403483897981
+SCRIPT_FILENAME=./cgi-bin/upload_debug.pl
+ */
+
+void test_perl(void)
+{
+	int fd = open("./debug", O_RDONLY);
+	char buff[20000];
+	size_t bytes = read(fd, buff, 20000);
+	close(fd);
+
+	std::cout << "content----:" << std::endl;
+	write(1, buff, bytes);
+	std::cout << "end content----:\n" << std::endl;
+
+	const char *argv[] = { "/bin/perl", "./cgi-bin/upload_debug.pl", NULL };
+    const char *envp[] = {
+        "GATEWAY_INTERFACE=CGI/1.1",
+        "SERVER_PROTOCOL=HTTP/1.1",
+        "REDIRECT_STATUS=200",
+        "REQUEST_METHOD=POST",
+        "CONTENT_LENGTH=247",
+        "CONTENT_TYPE=multipart/form-data; boundary=---------------------------120183001110947073403483897981",
+        "SCRIPT_FILENAME=./cgi-bin/upload_debug.pl",
+        NULL // Terminate the array with a null pointer
+    };
+
+	int pfds[2];
+	pipe(pfds);
+
+	int pid = fork();
+	if (pid == 0)
+	{
+		write(pfds[1], buff, bytes);
+		dup2(pfds[0], 0);
+		close(pfds[0]);
+		close(pfds[1]);
+		execve("/bin/perl", (char *const *) argv, (char *const *) envp);
+		perror(NULL);
+		std::cout << "error executing\n";
+		exit(0);
+	}
+	wait(NULL);
+	close(pfds[0]);
+	close(pfds[1]);
+}
+
 void temp(void)
 {
-    test();
-	// CGI cgi;
-    // set_get(cgi);
-	// cgi.info();
-	// cgi.execute();
-	exit(0);
+	// test_perl();
+	// exit(0);
 }

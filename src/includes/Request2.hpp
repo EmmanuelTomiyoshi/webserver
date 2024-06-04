@@ -16,6 +16,7 @@ class Request2
 	private:
 		std::string _info;
 		char *_buff;
+		size_t _buff_size;
 		char *_body;
 		size_t _body_size;
 		void separate_info(void);
@@ -34,7 +35,7 @@ class Request2
 	public:
 		Request2(void);
 
-		void init(char *buff);
+		void init(char *buff, size_t size);
 		std::string get_header(std::string key) const;
 		std::string get_method(void);
 		std::string get_target(void);

@@ -8,8 +8,11 @@
 # define gateway_interface "GATEWAY_INTERFACE=CGI/1.1"
 # define server_protocol "SERVER_PROTOCOL=HTTP/1.1"
 # define query_s "QUERY_STRING="
-# define ENVS_SIZE 10
-# define ARGV_SIZE 3 
+# define ENVS_SIZE 20
+# define ARGV_SIZE 3
+# define CGI_BIN "/bin/perl"
+# define W 1
+# define R 0
 
 class CGI
 {
@@ -33,11 +36,14 @@ class CGI
         std::string _query_string;
         std::string _script_name;
         std::string _script_name_raw;
+        static std::string _gateway_interface;
+        static std::string _server_protocol;
 
         const char *_envs[ENVS_SIZE];
         const char *_argv[ARGV_SIZE];
 
         char *_body;
+        size_t _body_size;
 
         char *_response;
         size_t _response_size;
@@ -74,6 +80,7 @@ class CGI
         void set_query_string(std::string value);
         void set_script_name(std::string value);
         void set_body(char *value);
+        void set_body_size(size_t value);
 
         void execute(void);
         void info(void);

@@ -4,8 +4,8 @@ std::string Response::http_version = "HTTP/1.1";
 
 std::map<std::string, std::string> Response::mime_types;
 
-Response::Response(char *buff, Config *config) : 
-_buff(buff), _status("200"), _http_response(NULL), _config(config)
+Response::Response(char *buff, size_t size, Config *config) : 
+_buff(buff), _buff_size(size), _status("200"), _http_response(NULL), _config(config)
 {
     //this->_req.init(buff);
 
@@ -248,13 +248,54 @@ char *find_str_pos(const char *str, char *src)
 
 void Response::POST(void)
 {
+    std::flush(std::cout);
+    // std::string type1(_request.get_header("Content-Type").c_str());
+    // std::string type11(type1);
+    // std::string type111(type11.c_str());
+
+    // std::cout << "char array:\n";
+    // ft::print_char_array(_request.get_header("Content-Type").c_str());
+
+    // std::string type2("multipart/form-data; boundary=---------------------------249111313135973723844026122453");
+    // std::cout << std::endl;
+    // std::cout << "content_type1: *" << type1 << "*<" << std::endl;
+    // std::cout << "content_typea: *" << type11 << "*<<" << std::endl;
+    // std::cout << "content_typeb: *" << type111 << "*" << std::endl;
+    // std::cout << "content_type2: *" << type2 << "*" << std::endl;
+    // std::cout << type1 << std::endl;
+    // std::cout << type2 << std::endl;
+    // ft::debug_file("./debug6", _request.get_body(), _request.get_body_size());
+
     CGI cgi;
     cgi.set_request_method("POST");
     cgi.set_body(_request.get_body());
     cgi.set_content_length(_request.get_header("Content-Length"));
+    cgi.set_body_size(_request.get_body_size());
     cgi.set_content_type(_request.get_header("Content-Type"));
-    cgi.set_script_name("./cgi-bin/perl_test.pl");
+    cgi.set_script_name("./cgi-bin/upload_debug.pl");
+    cgi.info();
     cgi.execute();
+
+
+    // CGI cgi;
+    // int fd = open("./debug7", O_RDONLY);
+    // char mbody[15000];
+    // size_t bytes = read(fd, mbody, 15000);
+    // close(fd);
+
+    // std::cout << "\nmbody::::\n*";
+    // std::flush(std::cout);
+    // std::cout << mbody;
+    // std::cout << "*\n" << "bytes: " << bytes << "\nsize: " << std::string(mbody).size() << std::endl;
+
+    // cgi.set_request_method("POST");
+    // cgi.set_body(mbody);
+    // cgi.set_content_length(ft::int_to_str(bytes));
+    // cgi.set_content_type("multipart/form-data; boundary=---------------------------249111313135973723844026122453");
+    // cgi.set_script_name("./cgi-bin/upload_debug.pl");
+    // cgi.set_body_size(bytes);
+    // cgi.info();
+    // cgi.execute();
 
     _http_response = cgi.get_response();
     _http_response_size = cgi.get_response_size();
@@ -290,7 +331,7 @@ ssize_t Response::send_response(int fd)
 {
     try
     {
-        _request.init(_buff);
+        _request.init(_buff, _buff_size);
         this->execute();
     }
     catch(const std::exception& e)

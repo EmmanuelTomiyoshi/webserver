@@ -42,18 +42,12 @@ void	Server::send_message(epoll_event & event)
 
 void Server::recv_message(epoll_event & event)
 {
-	char buff[20000]; //FIXME: change this to a dynamic buffer
-	int rsize = recv(event.data.fd, buff, 20000, MSG_WAITALL);
-	if (rsize < 0)
-	{
-		close(event.data.fd);
-		epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
-		std::cout << "CLOSED CONNECTION ERROR: no message" << std::endl;
-		return ;
-	}
+	char *buff = NULL;
+	int buff_size = ft::recv_all(event.data.fd, &buff);
+	std::cout << "buff_size: " << buff_size << std::endl;
 	this->_response = new Response(
 		buff,
-		rsize,
+		buff_size,
 		_configs._fdconfigs.at(event.data.fd)
 	);
 }

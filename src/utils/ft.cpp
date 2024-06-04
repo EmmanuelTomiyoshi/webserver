@@ -106,4 +106,43 @@ namespace ft {
         }
         std::cout << std::endl;
     }
+
+    ssize_t recv_all(int fd, char **buff)
+    {
+        char *data = NULL;
+        ssize_t total_size = 0;
+        const ssize_t tmp_size = 5000;
+        char tmp[tmp_size];
+        while (1)
+        {
+            ssize_t bytes = recv(fd, tmp, tmp_size, MSG_WAITALL);
+            if (bytes <= 0)
+                break;
+            total_size += bytes;
+            data = (char *)realloc(data, total_size);
+            std::memmove(data + total_size - bytes, tmp, bytes);
+        }
+        *buff = data;
+        return total_size;
+    }
+
+    ssize_t write_all(int fd, char *buff, ssize_t size)
+    {
+        ssize_t const max_write = 10000;
+        ssize_t total = 0;
+        while (total < size)
+        {
+            if (size - total <= max_write)
+            {
+                ssize_t bytes = write(fd, buff, size - total);
+                total += bytes;
+                break ;
+            }
+            ssize_t bytes = write(fd, buff + total, max_write);
+            total += bytes;
+            if (bytes <= 0)
+                break ;
+        }
+        return total;
+    }
 }

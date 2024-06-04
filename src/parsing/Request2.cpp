@@ -4,10 +4,15 @@ Request2::Request2(void) : _buff(NULL), _body(NULL)
 {
 }
 
-void Request2::init(char *buff, size_t size)
+void Request2::init(char *buff, ssize_t size)
 {
     _buff = buff;
     _buff_size = size;
+    if (size <= 0)
+    {
+        std::cerr << "ERROR: Empty request" << std::endl;
+        throw std::runtime_error(HTTP_BAD_REQUEST);
+    }
 	separate_info();
     extract_request_line();
     extract_headers();
@@ -86,6 +91,7 @@ void Request2::extract_body_size(void)
 
         _body = new char[_body_size];
         std::memmove(_body, ft::get_body_position(_buff, _buff_size), _body_size);
+        ft::debug_file("./debug", _body, _body_size);
     }
     catch (std::exception & e)
     {

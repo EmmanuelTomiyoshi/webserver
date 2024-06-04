@@ -35,7 +35,7 @@ class Request2
 	public:
 		Request2(void);
 
-		void init(char *buff, size_t size);
+		void init(char *buff, ssize_t size);
 		std::string get_header(std::string key) const;
 		std::string get_method(void);
 		std::string get_target(void);

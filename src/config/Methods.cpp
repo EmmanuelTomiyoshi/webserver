@@ -12,7 +12,6 @@ Methods::Methods(void)
 
 	for (it = _methods_available.begin(); it != _methods_available.end(); it++)
 		_methods[*it] = false;
-	std::cout << "Methods created\n";
 }
 
 Methods::~Methods(void) { }

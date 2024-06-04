@@ -142,8 +142,8 @@ void CGI::write_body(void)
 //FIXME: hardcoded number
 void CGI::read_response(void)
 {
-    char buff[6000];
-    _response_size = read(_pfds_b[R], buff, 6000);
+    char buff[20000];
+    _response_size = read(_pfds_b[R], buff, 20000);
     _response = new char[_response_size];
     std::memmove(_response, buff, _response_size);
 }
@@ -156,7 +156,6 @@ void CGI::execute_cgi_script(void)
 
     if (_pid == 0)
     {
-        write(_pfds_a[W], _body, _body_size);
         dup2(_pfds_a[R], STDIN_FILENO);
         dup2(_pfds_b[W], STDOUT_FILENO);
 
@@ -169,6 +168,8 @@ void CGI::execute_cgi_script(void)
         std::cerr << "CGI ERROR: fail to execute cgi script" << std::endl;
         exit(0);
     }
+
+    write(_pfds_a[W], _body, _body_size);
     wait(NULL);
     read_response();
     close(_pfds_a[W]);

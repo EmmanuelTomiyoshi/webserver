@@ -32,6 +32,10 @@ namespace ft {
 
     void print_char_array(const char *arr, size_t size);
     void print_char_array(const char *arr);
+
+    ssize_t recv_all(int fd, char **buff);
+
+    ssize_t write_all(int fd, char *buff, ssize_t size);
 }
 
 #endif

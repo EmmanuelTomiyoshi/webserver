@@ -36,6 +36,7 @@ namespace ft {
     ssize_t recv_all(int fd, char **buff);
 
     ssize_t write_all(int fd, char *buff, ssize_t size);
+    void close_pipes(int *pfds1, int *pfds2);
 }
 
 #endif

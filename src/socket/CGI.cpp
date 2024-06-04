@@ -148,6 +148,7 @@ void CGI::read_response(void)
     std::memmove(_response, buff, _response_size);
 }
 
+
 void CGI::execute_cgi_script(void)
 {
     pipe(_pfds_a);
@@ -159,10 +160,7 @@ void CGI::execute_cgi_script(void)
         dup2(_pfds_a[R], STDIN_FILENO);
         dup2(_pfds_b[W], STDOUT_FILENO);
 
-        close(_pfds_a[W]); //TODO: create function to close all
-        close(_pfds_a[R]);
-        close(_pfds_b[W]);
-        close(_pfds_b[R]);
+        ft::close_pipes(_pfds_a, _pfds_b);
 
         execve(_argv[0], (char * const *) _argv, (char * const *) _envs);
         std::cerr << "CGI ERROR: fail to execute cgi script" << std::endl;
@@ -172,10 +170,7 @@ void CGI::execute_cgi_script(void)
     write(_pfds_a[W], _body, _body_size);
     wait(NULL);
     read_response();
-    close(_pfds_a[W]);
-    close(_pfds_a[R]);
-    close(_pfds_b[W]);
-    close(_pfds_b[R]);
+    ft::close_pipes(_pfds_a, _pfds_b);
 }
 
 void CGI::extract_content_type(size_t header_size)

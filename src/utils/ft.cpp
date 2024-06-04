@@ -145,4 +145,12 @@ namespace ft {
         }
         return total;
     }
+
+    void close_pipes(int *pfds1, int *pfds2)
+    {
+        close(pfds1[0]);
+        close(pfds1[1]);
+        close(pfds2[0]);
+        close(pfds2[1]);
+    }
 }

@@ -8,24 +8,6 @@
 #include "Request2.hpp"
 #include "CGI.hpp"
 
-/* 
-    create setters -> OK
-
-    open file 
-
-    read_file:
-        if public read from public //read_public
-        else read from root + location //read_route
-        return file
-
-    //build_response() using the properties
-    //send_response() public method must be called
-
-
-    implement char *ft::read_file(std::string path)
-    implement error function
- */
-
 class Response
 {
     private:

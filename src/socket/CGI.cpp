@@ -139,15 +139,13 @@ void CGI::write_body(void)
     close(_pfds_a[W]);
 }
 
+//FIXME: hardcoded number
 void CGI::read_response(void)
 {
     char buff[6000];
     _response_size = read(_pfds_b[R], buff, 6000);
     _response = new char[_response_size];
     std::memmove(_response, buff, _response_size);
-    std::cout << "-------- cgi raw response --------" << std::endl;
-    write(1, _response, _response_size);
-    std::cout << "\n-------- cgi raw response --------" << std::endl;
 }
 
 void CGI::execute_cgi_script(void)
@@ -159,11 +157,10 @@ void CGI::execute_cgi_script(void)
     if (_pid == 0)
     {
         write(_pfds_a[W], _body, _body_size);
-        ft::debug_file("./debug", _body, _body_size);
         dup2(_pfds_a[R], STDIN_FILENO);
         dup2(_pfds_b[W], STDOUT_FILENO);
 
-        close(_pfds_a[W]);
+        close(_pfds_a[W]); //TODO: create function to close all
         close(_pfds_a[R]);
         close(_pfds_b[W]);
         close(_pfds_b[R]);

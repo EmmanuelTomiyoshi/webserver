@@ -1,10 +1,9 @@
 # webserver
 
-## TO-DO
- - criar classe Server que encapsulará toda a complexidade de configurar socket e iniciar listen
- - estudar as funções do pdf
- - definir logica pra escutar em várias portas
-
+## THINGS TO-DO:
+	- TODO: delete method
+	- TODO: verify if any exception or error could crash the server
+	- TODO: handle signals
 ---
 
 ## NOTES

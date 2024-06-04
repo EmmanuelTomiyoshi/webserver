@@ -15,6 +15,7 @@ Server::Server(std::string config_file) : _configs(config_file)
 Server::~Server(void)
 {
 	close(_epfd);
+	//TODO: verify what memories to free
 	// if (_addr_res != NULL)
 	// 	freeaddrinfo(_addr_res);
 }
@@ -41,12 +42,9 @@ void	Server::send_message(epoll_event & event)
 
 void Server::recv_message(epoll_event & event)
 {
-	char buff[20000];
+	char buff[20000]; //FIXME: change this to a dynamic buffer
 	int rsize = recv(event.data.fd, buff, 20000, MSG_WAITALL);
-	if (rsize > 1000) {
-		ft::debug_file("./debug2", buff, rsize);
-	}
-	if (rsize < 0) //parse, get response, send response
+	if (rsize < 0)
 	{
 		close(event.data.fd);
 		epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);

@@ -33,8 +33,6 @@ void Request2::separate_info(void)
 	info[size_info] = '\0';
 
     _info = info;
-
-    ft::debug_file("./debug4_headers", info, size_info);
 }
 
 void Request2::extract_request_line(void)
@@ -88,9 +86,6 @@ void Request2::extract_body_size(void)
 
         _body = new char[_body_size];
         std::memmove(_body, ft::get_body_position(_buff, _buff_size), _body_size);
-
-        std::cout << "**Body size: " << _body_size << std::endl;
-        ft::debug_file("./debug4", _body, _body_size);
     }
     catch (std::exception & e)
     {

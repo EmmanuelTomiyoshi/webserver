@@ -126,6 +126,25 @@ namespace ft {
         return total_size;
     }
 
+    ssize_t read_all(int fd, char **buff)
+    {
+        char *data = NULL;
+        ssize_t total_size = 0;
+        const ssize_t tmp_size = 10000;
+        char tmp[tmp_size];
+        while (1)
+        {
+            ssize_t bytes = read(fd, tmp, tmp_size);
+            if (bytes <= 0)
+                break;
+            total_size += bytes;
+            data = (char *)realloc(data, total_size);
+            std::memmove(data + total_size - bytes, tmp, bytes);
+        }
+        *buff = data;
+        return total_size;
+    }
+
     ssize_t write_all(int fd, char *buff, ssize_t size)
     {
         ssize_t const max_write = 10000;

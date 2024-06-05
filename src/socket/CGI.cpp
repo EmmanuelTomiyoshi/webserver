@@ -139,15 +139,10 @@ void CGI::write_body(void)
     close(_pfds_a[W]);
 }
 
-//FIXME: hardcoded number
 void CGI::read_response(void)
 {
-    char buff[20000];
-    _response_size = read(_pfds_b[R], buff, 20000);
-    _response = new char[_response_size];
-    std::memmove(_response, buff, _response_size);
+    _response_size = ft::read_all(_pfds_b[R], &_response);
 }
-
 
 void CGI::execute_cgi_script(void)
 {

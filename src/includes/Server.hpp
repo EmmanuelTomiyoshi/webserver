@@ -26,7 +26,7 @@ class Server
 		void run(void);
 		void send_message(epoll_event & event);
 		void recv_message(epoll_event & event);
-		void new_epoll_event(int conn_fd, uint32_t operation);
+		void new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type);
 		static addrinfo get_hints(void);
 		void setup(void);
 

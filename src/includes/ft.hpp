@@ -3,6 +3,20 @@
 #include "base.hpp"
 
 namespace ft {
+
+    enum EventType
+    {
+        SOCK,
+        CONN,
+        CGI
+    };
+
+    typedef struct CustomData
+    {
+        int fd;
+        EventType type;
+    } CustomData;
+
     bool number_is_in(int value, int *arr, int size);
 
     std::streamsize get_file_size(std::ifstream & file);
@@ -37,6 +51,8 @@ namespace ft {
 
     ssize_t write_all(int fd, char *buff, ssize_t size);
     void close_pipes(int *pfds1, int *pfds2);
+
+    ssize_t read_all(int fd, char **buff);
 }
 
 #endif

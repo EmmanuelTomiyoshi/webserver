@@ -23,6 +23,7 @@
 #include <fstream>
 #include <fcntl.h>
 #include <iterator>
+#include "sys/wait.h"
 
 # include <map>
 # include <vector>

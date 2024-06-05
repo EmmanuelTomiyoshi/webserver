@@ -9,6 +9,18 @@ void Request::init(std::string message)
 	this->extract_info();
 }
 
+void Request::init(char *buff)
+{
+	_body = ft::get_body_position(buff);
+	size_t size = _body - buff;
+	char *info = new char[size];
+	std::memmove(info, buff, size);
+	info[size] = '\0';
+	this->_message = info;
+	this->extract_request_line();
+	this->extract_info();
+}
+
 Request::Request(std::string message) {
 	this->_message = message;
 	this->extract_request_line();
@@ -33,6 +45,11 @@ std::string Request::get_target(void) const {
 
 std::string Request::get_version(void) const {
 	return this->_version;
+}
+
+char *Request::get_body(void)
+{
+	return this->_body;
 }
 
 void Request::info(void) const {

@@ -1,5 +1,20 @@
 #include "webserver.hpp"
 #include "Server.hpp"
+#include "ft.hpp"
+
+void cgi(void)
+{
+	int pid = fork();
+
+	if (pid == 0)
+	{
+		char python[] = "/bin/python3";
+		char script[] = "./cgi-bin/hello.py";
+		char *argv[] = {python, script, NULL};
+		execv(python, argv);
+	}
+	
+}
 
 void start_server(int argc, char **argv)
 {
@@ -25,8 +40,12 @@ void start_server(int argc, char **argv)
 	delete server;
 }
 
+void temp(void);
+
 int main(int argc, char *argv[])
 {
+	temp();
 	start_server(argc, argv);
 	return (0);
 }
+

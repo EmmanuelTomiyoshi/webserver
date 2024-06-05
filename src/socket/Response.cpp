@@ -4,10 +4,10 @@ std::string Response::http_version = "HTTP/1.1";
 
 std::map<std::string, std::string> Response::mime_types;
 
-Response::Response(char *buff, Config *config) : 
-_status("200"), _http_response(NULL), _config(config)
+Response::Response(char *buff, size_t size, Config *config) : 
+_buff(buff), _buff_size(size), _status("200"), _http_response(NULL), _config(config)
 {
-    this->_req.init(buff);
+    //this->_req.init(buff);
 
     mime_types["js"] = "application/javascript";
     mime_types["json"] = "application/json";
@@ -50,7 +50,7 @@ _status("200"), _http_response(NULL), _config(config)
  */
 
 bool Response::is_public(void) {
-    std::string str = _req.get_target();
+    std::string str = _request.get_target();
     str = str.substr(0, std::string("/public").length());
     return str == "/public";
 }
@@ -62,7 +62,7 @@ void Response::open_public_file(void)
     else
         this->_file.open(this->_path.c_str());
 
-    if (this->_file.bad())
+    if (!_file)
         throw std::runtime_error(HTTP_INTERNAL_SERVER_ERROR);
 }
 
@@ -82,7 +82,7 @@ void Response::open_route_file(void)
 
 void Response::set_public_file_info(void)
 {
-    this->_path = '.' + _req.get_target();
+    this->_path = '.' + _request.get_target();
     if (_path.empty())
     {
         std::cerr << "error: no path provided" << std::endl;
@@ -126,7 +126,7 @@ void Response::open_file(void)
 
     try
     {
-        _route = &(_config->routes.get(_req.get_target()));
+        _route = &(_config->routes.get(_request.get_target()));
         open_route_file();
     }
     catch (std::exception & e)
@@ -180,33 +180,13 @@ void Response::fill_body(void)
         read_text();
 }
 
-/* TODO:
-    try to do all the standar operations
-    if anything in the process goes wrong throw an error with a code
-    get the code and send an error response
-
-    try
-    {
-        operations()
-    }
-    catch ()
-    {
-        build_response_error()
-    }
-
-    send_response(_http_response);
- */
-
 void Response::build_error(std::string code)
 {
     _status = code;
-    _mime = this->mime_types["txt"];
-    this->_ext = "txt";
-    this->_type = "text";
-    std::string err = "ERROR " + code;
-    _body.size = err.size() + 1;
-    _body.data = new char[_body.size];
-    std::memmove(_body.data, err.c_str(), _body.size);
+    _ext = "html";
+    _mime = this->mime_types[_ext];
+    _type = "html";
+    _path = "./public/pages/errors/" + code + ".html";
 }
 
 void Response::create_response(void)
@@ -217,6 +197,7 @@ void Response::create_response(void)
         ft::int_to_str(_body.size) + "\r\n";
 
     std::string response = status_line + 
+        "Connection: close\r\n" +
         content_type + 
         content_length +
         "\r\n";
@@ -232,32 +213,76 @@ void Response::create_response(void)
 
 void Response::GET(void)
 {
-    try
-    {
-        open_file();
-        fill_body();
-    }
-    catch (std::exception & e)
-    {
-        build_error(e.what());
-    }
-
+    open_file();
+    fill_body();
     create_response();
+}
+
+char *find_str_pos(const char *str, char *src)
+{
+    while (*src)
+    {
+        if (std::strncmp(str, src, std::strlen(str)) == 0)
+            return src;
+        src++;
+    }
+    return NULL;
 }
 
 void Response::POST(void)
 {
+    CGI cgi;
+    cgi.set_request_method("POST");
+    cgi.set_body(_request.get_body());
+    cgi.set_content_length(_request.get_header("Content-Length"));
+    cgi.set_body_size(_request.get_body_size());
+    cgi.set_content_type(_request.get_header("Content-Type"));
+    cgi.set_script_name("./cgi-bin/upload_debug.pl");
+    cgi.info();
+    cgi.execute();
 
+    _http_response = cgi.get_response();
+    _http_response_size = cgi.get_response_size();
 }
 
 void Response::DELETE(void)
 {
+    throw std::runtime_error(HTTP_SERVICE_UNAVAILABLE);
+}
 
+void Response::execute(void)
+{
+    std::string method = _request.get_method();
+    if (method == "GET")
+        GET();
+    else if (method == "POST")
+        POST();
+    else if (method == "DELETE")
+        DELETE();
+    else
+        throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
+}
+
+void Response::execute_error(std::string code)
+{
+    build_error(code);
+    open_public_file();
+    fill_body();
+    create_response();
 }
 
 ssize_t Response::send_response(int fd)
 {
-    GET();
+    try
+    {
+        _request.init(_buff, _buff_size);
+        this->execute();
+    }
+    catch(const std::exception& e)
+    {
+        execute_error(e.what());
+    }
+
     return send(
         fd, 
         _http_response, 

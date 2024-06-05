@@ -15,6 +15,7 @@ Server::Server(std::string config_file) : _configs(config_file)
 Server::~Server(void)
 {
 	close(_epfd);
+	//TODO: verify what memories to free
 	// if (_addr_res != NULL)
 	// 	freeaddrinfo(_addr_res);
 }
@@ -41,18 +42,12 @@ void	Server::send_message(epoll_event & event)
 
 void Server::recv_message(epoll_event & event)
 {
-	char buff[5000];
-	int rsize = recv(event.data.fd, buff, 4999, MSG_WAITALL);
-	if (rsize < 0) //parse, get response, send response
-	{
-		close(event.data.fd);
-		epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
-		std::cout << "CLOSED CONNECTION ERROR: no message" << std::endl;
-		return ;
-	}
-	buff[rsize] = '\0';
+	char *buff = NULL;
+	int buff_size = ft::recv_all(event.data.fd, &buff);
+	std::cout << "buff_size: " << buff_size << std::endl;
 	this->_response = new Response(
 		buff,
+		buff_size,
 		_configs._fdconfigs.at(event.data.fd)
 	);
 }

@@ -5,29 +5,16 @@
 #include "Configs.hpp"
 #include "Config.hpp"
 #include "error_codes.hpp"
-
-/* 
-    create setters -> OK
-
-    open file 
-
-    read_file:
-        if public read from public //read_public
-        else read from root + location //read_route
-        return file
-
-    //build_response() using the properties
-    //send_response() public method must be called
-
-
-    implement char *ft::read_file(std::string path)
-    implement error function
- */
+#include "Request2.hpp"
+#include "CGI.hpp"
 
 class Response
 {
     private:
         Request _req;
+        Request2 _request;
+        char *_buff;
+        size_t _buff_size;
 
         Route *_route;
 
@@ -77,9 +64,11 @@ class Response
 
         bool is_public(void);
 
+        void execute(void);
+        void execute_error(std::string code);
 
     public:
-        Response(char *buff, Config *config);
+        Response(char *buff, size_t size, Config *config);
 
         ssize_t send_response(int fd);
 

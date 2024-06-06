@@ -19,6 +19,14 @@ namespace ft {
         EventType type;
     } CustomData;
 
+    typedef struct TimeoutData
+    {
+        int start_time;
+        CustomData *data;
+        int pid;
+        int timeout;
+    } TimeoutData;
+
     bool number_is_in(int value, int *arr, int size);
 
     std::streamsize get_file_size(std::ifstream & file);

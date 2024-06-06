@@ -110,8 +110,14 @@ void test_perl(void)
 	close(pfds[1]);
 }
 
+#include "./utils/Timeout.hpp"
+void timeout_test(void)
+{
+	Timeout timeout(1000);
+}
+
 void temp(void)
 {
-	// test_perl();
-	// exit(0);
+	timeout_test();
+	exit(0);
 }

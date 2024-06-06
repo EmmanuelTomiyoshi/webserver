@@ -17,6 +17,7 @@ SRC 		=	main.cpp \
 				CGI.cpp \
 				temp.cpp \
 				Request2.cpp \
+				Timeout.cpp \
 
 VPATH		=	./src \
 				./src/parsing \

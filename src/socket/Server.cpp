@@ -1,5 +1,4 @@
 #include "Server.hpp"
-#include <stdio.h>
 
 addrinfo Server::get_hints(void)
 {

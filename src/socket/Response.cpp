@@ -4,8 +4,9 @@ std::string Response::http_version = "HTTP/1.1";
 
 std::map<std::string, std::string> Response::mime_types;
 
-Response::Response(char *buff, size_t size, Config *config) : 
-_buff(buff), _buff_size(size), _status("200"), _http_response(NULL), _config(config)
+Response::Response(char *buff, size_t size, Config *config, Timeout & timeout) : 
+_buff(buff), _buff_size(size), _status("200"), _http_response(NULL),
+_config(config), _timeout(timeout)
 {
     //this->_req.init(buff);
 
@@ -237,6 +238,7 @@ void Response::POST(void)
     cgi.set_content_length(_request.get_header("Content-Length"));
     cgi.set_body_size(_request.get_body_size());
     cgi.set_content_type(_request.get_header("Content-Type"));
+    cgi.set_timeout(&_timeout);
 
     static int i = 0;
     i++;
@@ -296,6 +298,8 @@ ssize_t Response::send_response(epoll_event & event)
         execute_error(e.what());
     }
 
+	epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, &event);
+
     if (_request.get_method() == "POST")
     {
         std::cout << "*********JAMALAICACA" << std::endl;
@@ -309,7 +313,6 @@ ssize_t Response::send_response(epoll_event & event)
         MSG_DONTWAIT
     );
 
-	epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, &event);
 	close(event_data->fd);
 
     return bytes;

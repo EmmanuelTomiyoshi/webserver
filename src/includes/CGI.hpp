@@ -3,6 +3,7 @@
 # include "base.hpp"
 # include "ft.hpp"
 # include "error_codes.hpp"
+# include "Timeout.hpp"
 
 // # define CGI_PROGRAM "/bin/python3"
 # define gateway_interface "GATEWAY_INTERFACE=CGI/1.1"
@@ -73,6 +74,8 @@ class CGI
 
         ResponseData _response_data;
 
+        Timeout *_timeout;
+
     public:
         CGI(void);
 
@@ -84,6 +87,7 @@ class CGI
         void set_body(char *value);
         void set_body_size(size_t value);
         void set_event(struct epoll_event *event);
+        void set_timeout(Timeout *timeout);
 
         void execute(void);
         void info(void);

@@ -53,7 +53,8 @@ void Server::recv_message(epoll_event & event)
 	this->_response = new Response(
 		buff,
 		buff_size,
-		_configs._fdconfigs.at(event_data->fd)
+		_configs._fdconfigs.at(event_data->fd),
+		_timeout
 	);
 }
 
@@ -61,11 +62,9 @@ void Server::process_cgi_response(epoll_event & event)
 {
 	ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
 	char *buff = NULL;
+	_timeout.remove(&event);
+	epoll_ctl(_epfd, EPOLL_CTL_DEL, event_data->fd, &event);
 	int buff_size = ft::read_all(event_data->fd, &buff);
-
-	// std::cout << "---- CGI RESPONSE ----" << std::endl;
-	// write(1, line.c_str(), line.size());
-	// std::cout << "\n---- CGI RESPONSE ----" << std::endl;
 
 	CGI cgi;
 	cgi.process_response(buff, buff_size);
@@ -76,9 +75,6 @@ void Server::process_cgi_response(epoll_event & event)
 
 	close(event_data->cgi_fd);
 	close(event_data->fd);
-	epoll_ctl(_epfd, EPOLL_CTL_DEL, event_data->fd, &event);
-
-	//this->_response->send_response(event);
 }
 
 void Server::process_request(epoll_event & event)
@@ -100,7 +96,8 @@ void	Server::run(void)
 {
 	while (1)
 	{
-		int nfds = epoll_wait(this->_epfd, this->_events, 20, 10000);
+		_timeout.verify();
+		int nfds = epoll_wait(this->_epfd, this->_events, 20, 0);
 		for (int i = 0; i < nfds; i++)
 		{
 			ft::CustomData *event_data = (ft::CustomData *) _events[i].data.ptr;
@@ -115,10 +112,12 @@ void	Server::run(void)
 			}
 			else if (event_data->type == ft::CONN)
 			{
+				std::cout << "request processed" << std::endl;
 				process_request(_events[i]);
 			}
-			else
+			else if (event_data->type == ft::CGI)
 			{
+				std::cout << "cgi response processed" << std::endl;
 				process_cgi_response(_events[i]);
 			}
 		}

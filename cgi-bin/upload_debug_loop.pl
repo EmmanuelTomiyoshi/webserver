@@ -13,7 +13,7 @@ my $upload_dir = "./front/uploads";
 #     print STDERR $_;
 # }
 
-print STDERR "CGI: executing...\n";
+print STDERR "\n-----------\nCGI: executing...\n-----------\n";
 # Create a CGI object
 my $cgi = CGI->new;
 
@@ -57,5 +57,5 @@ if ($filehandle) {
           $cgi->end_html;
 }
 
-print STDERR "CGI: executed\n";
+print STDERR "\n-----------\nCGI: executed\n-----------\n";
 

@@ -7,6 +7,7 @@
 #include "error_codes.hpp"
 #include "Request2.hpp"
 #include "CGI.hpp"
+#include "Timeout.hpp"
 
 class Response
 {
@@ -60,6 +61,7 @@ class Response
 
         Config *_config;
         epoll_event *_event;
+        Timeout &_timeout;
 
         static std::string http_version;
 
@@ -69,7 +71,7 @@ class Response
         void execute_error(std::string code);
 
     public:
-        Response(char *buff, size_t size, Config *config);
+        Response(char *buff, size_t size, Config *config, Timeout & timeout);
 
         ssize_t send_response(epoll_event & event);
 

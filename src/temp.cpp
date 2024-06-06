@@ -110,10 +110,10 @@ void test_perl(void)
 	close(pfds[1]);
 }
 
-#include "./utils/Timeout.hpp"
+#include "Timeout.hpp"
 void timeout_test(void)
 {
-	Timeout timeout(1000);
+	Timeout timeout;
 
 	epoll_event *event = new epoll_event;
 	ft::CustomData *data = new ft::CustomData;

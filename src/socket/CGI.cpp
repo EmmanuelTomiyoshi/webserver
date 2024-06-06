@@ -3,7 +3,7 @@
 std::string CGI::_gateway_interface("GATEWAY_INTERFACE=CGI/1.1");
 std::string CGI::_server_protocol("SERVER_PROTOCOL=HTTP/1.1");
 
-CGI::CGI(void) : _body(NULL), _response_size(0)
+CGI::CGI(void) : _body(NULL), _response_size(0), _timeout(NULL)
 {
     for (int i = 0; i < ENVS_SIZE; i++)
         _envs[i] = NULL;
@@ -81,6 +81,11 @@ void CGI::set_event(struct epoll_event *event)
     _event = event;
 }
 
+void CGI::set_timeout(Timeout *timeout)
+{
+    _timeout = timeout;
+}
+
 bool CGI::error(void)
 {
     if (_argv[0] == NULL)
@@ -105,6 +110,11 @@ bool CGI::error(void)
             std::cerr << "CGI ERROR: content_length empty" << std::endl;
             return true;
         }
+    }
+    if (_timeout == NULL)
+    {
+        std::cerr << "CGI ERROR: timeout empty" << std::endl;
+        return true;
     }
 
     return false;
@@ -157,17 +167,26 @@ void CGI::execute_cgi_script(void)
 
     if (_pid != 0)
     {
-        ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
-        event_data->cgi_fd = event_data->fd;
+        ft::CustomData *old_event_data = (ft::CustomData *) _event->data.ptr;
+        epoll_ctl(old_event_data->epfd, EPOLL_CTL_DEL, old_event_data->fd, _event);
+
+        old_event_data->type = ft::TIMEOUT;
+
+        ft::CustomData *event_data = new ft::CustomData;
+        event_data->cgi_fd = old_event_data->fd;
         event_data->fd = _pfds_b[R];
         event_data->type = ft::CGI;
-        event_data->epfd = event_data->epfd;
+        event_data->epfd = old_event_data->epfd;
+        event_data->timeout = 5;
+        event_data->start_time = time(NULL);
+        event_data->pid = _pid;
 
         epoll_event *event = new epoll_event;
         event->events = EPOLLIN | EPOLLET;
         event->data.ptr = (void *) event_data;
 
         epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
+        _timeout->add(event);
         close(_pfds_a[R]);
         close(_pfds_a[W]);
         close(_pfds_b[W]);

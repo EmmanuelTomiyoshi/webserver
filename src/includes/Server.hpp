@@ -4,6 +4,7 @@
 # include "Config.hpp"
 # include "Response.hpp"
 # include "ft.hpp"
+# include "Timeout.hpp"
 
 class Server
 {
@@ -23,6 +24,8 @@ class Server
 		Configs _configs;
 		
 		Response *_response;
+
+		Timeout _timeout;
 
 		void run(void);
 		void send_message(epoll_event & event);

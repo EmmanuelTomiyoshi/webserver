@@ -237,7 +237,17 @@ void Response::POST(void)
     cgi.set_content_length(_request.get_header("Content-Length"));
     cgi.set_body_size(_request.get_body_size());
     cgi.set_content_type(_request.get_header("Content-Type"));
-    cgi.set_script_name("./cgi-bin/upload_debug.pl");
+
+    static int i = 0;
+    i++;
+    std::cout << "---> i: " << i << std::endl;
+    if (i % 2 == 0)
+        cgi.set_script_name("./cgi-bin/upload_debug.pl");
+    else
+        cgi.set_script_name("./cgi-bin/upload_debug_loop.pl");
+    
+    
+    cgi.set_event(_event);
     cgi.info();
     cgi.execute();
 
@@ -271,8 +281,11 @@ void Response::execute_error(std::string code)
     create_response();
 }
 
-ssize_t Response::send_response(int fd)
+ssize_t Response::send_response(epoll_event & event)
 {
+    ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
+    _event = &event;
+
     try
     {
         _request.init(_buff, _buff_size);
@@ -283,10 +296,21 @@ ssize_t Response::send_response(int fd)
         execute_error(e.what());
     }
 
-    return send(
-        fd, 
+    if (_request.get_method() == "POST")
+    {
+        std::cout << "*********JAMALAICACA" << std::endl;
+        return 1;
+    }
+
+    ssize_t bytes = send(
+        event_data->fd,
         _http_response, 
         _http_response_size,
         MSG_DONTWAIT
     );
+
+	epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, &event);
+	close(event_data->fd);
+
+    return bytes;
 }

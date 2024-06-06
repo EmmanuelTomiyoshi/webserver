@@ -3,6 +3,7 @@
 # include "Configs.hpp"
 # include "Config.hpp"
 # include "Response.hpp"
+# include "ft.hpp"
 
 class Server
 {
@@ -26,7 +27,10 @@ class Server
 		void run(void);
 		void send_message(epoll_event & event);
 		void recv_message(epoll_event & event);
-		void new_epoll_event(int conn_fd, uint32_t operation);
+
+		void process_cgi_response(epoll_event & event);
+		void process_request(epoll_event & event);
+
 		static addrinfo get_hints(void);
 		void setup(void);
 
@@ -35,6 +39,7 @@ class Server
 		~Server(void);
 
 		void start(void);
+		void new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type);
 };
 
 #endif

@@ -44,6 +44,6 @@ webserv
 *.idx
 example.conf
 .chache
-test_form.html
+test_form*
 debug*
 front/uploads/*

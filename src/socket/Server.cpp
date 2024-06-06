@@ -26,25 +26,21 @@ void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type
 	ft::CustomData *event_data = new ft::CustomData;
 	event_data->fd = conn_fd;
 	event_data->type = type;
+	event_data->epfd = _epfd;
 
-	epoll_event event;
-	event.events = operation;
-	event.data.ptr = (void *) event_data;
+	epoll_event *event = new epoll_event;
+	event->events = operation;
+	event->data.ptr = (void *) event_data;
 
-	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, &event);
+	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, event);
 }
 
 void	Server::send_message(epoll_event & event)
 {
-	ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
-	ssize_t sent = this->_response->send_response(event_data->fd);
-	epoll_ctl(_epfd, EPOLL_CTL_DEL, event_data->fd, &event);
-	close(event_data->fd);
+	ssize_t sent = this->_response->send_response(event);
 	delete this->_response;
-	if (sent == -1)
-		std::cout << "FAILED TO SEND MESSAGE" << std::endl;
-	else
-		std::cout << "MESSAGE SENT SUCCESSFULY" << std::endl;
+	if (sent <= 0)
+		throw std::runtime_error("empty response");
 }
 
 void Server::recv_message(epoll_event & event)
@@ -52,6 +48,8 @@ void Server::recv_message(epoll_event & event)
 	ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
 	char *buff = NULL;
 	int buff_size = ft::recv_all(event_data->fd, &buff);
+	if (buff_size <= 0)
+		throw std::runtime_error("empty request");
 	std::cout << "buff_size: " << buff_size << std::endl;
 	this->_response = new Response(
 		buff,
@@ -60,11 +58,49 @@ void Server::recv_message(epoll_event & event)
 	);
 }
 
+void Server::process_cgi_response(epoll_event & event)
+{
+	ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
+	char *buff = NULL;
+	int buff_size = ft::read_all(event_data->fd, &buff);
+	close(event_data->fd);
+	close(event_data->cgi_fd);
+	epoll_ctl(_epfd, EPOLL_CTL_DEL, event_data->fd, &event);
+	
+	std::cout << "---- CGI RESPONSE ----" << std::endl;
+	write(1, buff, buff_size);
+	std::cout << "\n---- CGI RESPONSE ----" << std::endl;
+	
+	std::string res = "HTTP/1.1 200 OK\r\nContent-Length: " + ft::int_to_str(buff_size) + "\r\n\r\nvai se foder";
+
+	send(event_data->cgi_fd, res.c_str(), res.size(), MSG_DONTWAIT);
+
+	close(event_data->cgi_fd);
+	epoll_ctl(_epfd, EPOLL_CTL_DEL, event_data->fd, &event);
+
+	//this->_response->send_response(event);
+}
+
+void Server::process_request(epoll_event & event)
+{
+	try
+	{
+		recv_message(event);
+		send_message(event);
+	}
+	catch (std::exception & e)
+	{
+		epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
+		close(event.data.fd);
+		std::cerr << "REQUEST FAILED: " << e.what() << std::endl;
+	}
+}
+
 void	Server::run(void)
 {
 	while (1)
 	{
-		int nfds = epoll_wait(this->_epfd, this->_events, 20, -1);
+		int nfds = epoll_wait(this->_epfd, this->_events, 20, 10000);
 		for (int i = 0; i < nfds; i++)
 		{
 			ft::CustomData *event_data = (ft::CustomData *) _events[i].data.ptr;
@@ -79,8 +115,11 @@ void	Server::run(void)
 			}
 			else if (event_data->type == ft::CONN)
 			{
-				recv_message(_events[i]);
-				send_message(_events[i]);
+				process_request(_events[i]);
+			}
+			else
+			{
+				process_cgi_response(_events[i]);
 			}
 		}
 	}

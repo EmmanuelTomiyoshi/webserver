@@ -48,6 +48,8 @@ class CGI
         char *_response;
         size_t _response_size;
 
+        struct epoll_event *_event;
+
         bool error(void);
         void add_env(const char *value);
         void create_envp(void);
@@ -81,6 +83,7 @@ class CGI
         void set_script_name(std::string value);
         void set_body(char *value);
         void set_body_size(size_t value);
+        void set_event(struct epoll_event *event);
 
         void execute(void);
         void info(void);

@@ -14,6 +14,8 @@ namespace ft {
     typedef struct CustomData
     {
         int fd;
+        int cgi_fd;
+        int epfd;
         EventType type;
     } CustomData;
 

@@ -17,6 +17,11 @@ print STDERR "\nEXECUTING CGI...\n";
 # Create a CGI object
 my $cgi = CGI->new;
 
+while (1)
+{
+    
+}
+
 # Get the uploaded file handle
 my $filehandle = $cgi->upload('image');
 

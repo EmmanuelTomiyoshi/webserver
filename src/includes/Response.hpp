@@ -59,6 +59,7 @@ class Response
         void DELETE(void);
 
         Config *_config;
+        epoll_event *_event;
 
         static std::string http_version;
 
@@ -70,7 +71,7 @@ class Response
     public:
         Response(char *buff, size_t size, Config *config);
 
-        ssize_t send_response(int fd);
+        ssize_t send_response(epoll_event & event);
 
         static std::map<std::string, std::string> mime_types;
 };

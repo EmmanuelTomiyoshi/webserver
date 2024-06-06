@@ -76,6 +76,11 @@ void CGI::set_body_size(size_t value)
     _body_size = value;
 }
 
+void CGI::set_event(struct epoll_event *event)
+{
+    _event = event;
+}
+
 bool CGI::error(void)
 {
     if (_argv[0] == NULL)
@@ -150,11 +155,29 @@ void CGI::execute_cgi_script(void)
     pipe(_pfds_b);
     _pid = fork();
 
+    if (_pid != 0)
+    {
+        ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+        event_data->cgi_fd = event_data->fd;
+        event_data->fd = _pfds_b[R];
+        event_data->type = ft::CGI;
+        event_data->epfd = event_data->epfd;
+
+        epoll_event *event = new epoll_event;
+        event->events = EPOLLIN | EPOLLET;
+        event->data.ptr = (void *) event_data;
+
+        epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
+        close(_pfds_a[R]);
+        close(_pfds_a[W]);
+        close(_pfds_b[W]);
+    }
+
     if (_pid == 0)
     {
         dup2(_pfds_a[R], STDIN_FILENO);
         dup2(_pfds_b[W], STDOUT_FILENO);
-
+        write(_pfds_a[W], _body, _body_size);
         ft::close_pipes(_pfds_a, _pfds_b);
 
         execve(_argv[0], (char * const *) _argv, (char * const *) _envs);
@@ -162,10 +185,7 @@ void CGI::execute_cgi_script(void)
         exit(0);
     }
 
-    write(_pfds_a[W], _body, _body_size);
-    wait(NULL);
-    read_response();
-    ft::close_pipes(_pfds_a, _pfds_b);
+    
 }
 
 void CGI::extract_content_type(size_t header_size)

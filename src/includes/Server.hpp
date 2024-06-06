@@ -3,6 +3,7 @@
 # include "Configs.hpp"
 # include "Config.hpp"
 # include "Response.hpp"
+# include "ft.hpp"
 
 class Server
 {

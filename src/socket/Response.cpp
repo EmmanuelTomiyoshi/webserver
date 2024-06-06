@@ -237,7 +237,16 @@ void Response::POST(void)
     cgi.set_content_length(_request.get_header("Content-Length"));
     cgi.set_body_size(_request.get_body_size());
     cgi.set_content_type(_request.get_header("Content-Type"));
-    cgi.set_script_name("./cgi-bin/upload_debug.pl");
+
+    static int i = 0;
+    i++;
+    std::cout << "---> i: " << i << std::endl;
+    if (i % 2 == 0)
+        cgi.set_script_name("./cgi-bin/upload_debug.pl");
+    else
+        cgi.set_script_name("./cgi-bin/upload_debug_loop.pl");
+    
+    
     cgi.set_event(_event);
     cgi.info();
     cgi.execute();
@@ -288,7 +297,10 @@ ssize_t Response::send_response(epoll_event & event)
     }
 
     if (_request.get_method() == "POST")
+    {
+        std::cout << "*********JAMALAICACA" << std::endl;
         return 1;
+    }
 
     ssize_t bytes = send(
         event_data->fd,

@@ -13,14 +13,14 @@ my $upload_dir = "./front/uploads";
 #     print STDERR $_;
 # }
 
-print STDERR "\nCGI: executing...\n";
+print STDERR "CGI: executing...\n";
 # Create a CGI object
 my $cgi = CGI->new;
 
-# while (1)
-# {
+while (1)
+{
 
-# }
+}
 
 # Get the uploaded file handle
 my $filehandle = $cgi->upload('image');
@@ -58,3 +58,4 @@ if ($filehandle) {
 }
 
 print STDERR "CGI: executed\n";
+

@@ -63,19 +63,20 @@ void Server::process_cgi_response(epoll_event & event)
 	ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
 	char *buff = NULL;
 	int buff_size = ft::read_all(event_data->fd, &buff);
+
+	// std::cout << "---- CGI RESPONSE ----" << std::endl;
+	// write(1, line.c_str(), line.size());
+	// std::cout << "\n---- CGI RESPONSE ----" << std::endl;
+
+	CGI cgi;
+	cgi.process_response(buff, buff_size);
+	char *response = cgi.get_response();
+	ssize_t response_size = cgi.get_response_size();
+
+	send(event_data->cgi_fd, response, response_size, MSG_DONTWAIT);
+
+	close(event_data->cgi_fd);
 	close(event_data->fd);
-	close(event_data->cgi_fd);
-	epoll_ctl(_epfd, EPOLL_CTL_DEL, event_data->fd, &event);
-	
-	std::cout << "---- CGI RESPONSE ----" << std::endl;
-	write(1, buff, buff_size);
-	std::cout << "\n---- CGI RESPONSE ----" << std::endl;
-	
-	std::string res = "HTTP/1.1 200 OK\r\nContent-Length: " + ft::int_to_str(buff_size) + "\r\n\r\nvai se foder";
-
-	send(event_data->cgi_fd, res.c_str(), res.size(), MSG_DONTWAIT);
-
-	close(event_data->cgi_fd);
 	epoll_ctl(_epfd, EPOLL_CTL_DEL, event_data->fd, &event);
 
 	//this->_response->send_response(event);

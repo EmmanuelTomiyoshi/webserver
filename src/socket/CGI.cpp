@@ -184,11 +184,9 @@ void CGI::execute_cgi_script(void)
         std::cerr << "CGI ERROR: fail to execute cgi script" << std::endl;
         exit(0);
     }
-
-    
 }
 
-void CGI::extract_content_type(size_t header_size)
+void CGI::extract_content_type(char *response, size_t header_size)
 {
     char str[] = "Content-Type: ";
     size_t pos;
@@ -196,13 +194,13 @@ void CGI::extract_content_type(size_t header_size)
     {
         if (header_size - i < std::strlen(str))
             return ;
-        if (std::strncmp(str, &_response[i], std::strlen(str)))
+        if (std::strncmp(str, &response[i], std::strlen(str)))
         {
             pos = i + std::strlen(str) - 1;
             break ;
         }
     }
-    char *content = &_response[pos];
+    char *content = &response[pos];
     char *end = std::strchr(content, '\n');
     size_t size = end - content;
     char *content_type = new char[size + 1];
@@ -212,16 +210,16 @@ void CGI::extract_content_type(size_t header_size)
     delete [] content_type;
 }
 
-void CGI::extract_response_data(void)
+void CGI::extract_response_data(char *response, ssize_t response_size)
 {
-    char *body = ft::get_body_position(_response, _response_size);
+    char *body = ft::get_body_position(response, response_size);
     if (body == NULL)
         throw std::runtime_error(HTTP_SERVICE_UNAVAILABLE);
-    size_t header_size = body - _response;
-    size_t body_size = _response_size - header_size;
+    size_t header_size = body - response;
+    size_t body_size = response_size - header_size;
     _response_data.body = body;
     _response_data.body_size = body_size;
-    extract_content_type(header_size);
+    extract_content_type(response, header_size);
 }
 
 void CGI::format_http_response(void)
@@ -250,14 +248,19 @@ void CGI::format_http_response(void)
     _response_data.http_response_size = size;
 }
 
+void CGI::process_response(char *response, ssize_t response_size)
+{
+    extract_response_data(response, response_size);
+    format_http_response();
+}
+
+
 void CGI::execute(void)
 {
     if (this->error())
         return ;
 
     execute_cgi_script();
-    extract_response_data();
-    format_http_response();
 }
 
 char *CGI::get_response(void)

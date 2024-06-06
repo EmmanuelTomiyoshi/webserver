@@ -66,8 +66,8 @@ class CGI
 
         void execute_cgi_script(void);
 
-        void extract_response_data(void);
-        void extract_content_type(size_t header_size);
+        void extract_response_data(char *response, ssize_t response_size);
+        void extract_content_type(char *response, size_t header_size);
 
         void format_http_response(void);
 
@@ -87,6 +87,8 @@ class CGI
 
         void execute(void);
         void info(void);
+
+        void process_response(char *response, ssize_t response_size);
         char *get_response(void);
         size_t get_response_size(void);
 

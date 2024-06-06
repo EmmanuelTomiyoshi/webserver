@@ -16,16 +16,11 @@ namespace ft {
         int fd;
         int cgi_fd;
         int epfd;
+        time_t start_time;
+        time_t timeout;
+        int pid;
         EventType type;
     } CustomData;
-
-    typedef struct TimeoutData
-    {
-        int start_time;
-        CustomData *data;
-        int pid;
-        int timeout;
-    } TimeoutData;
 
     bool number_is_in(int value, int *arr, int size);
 

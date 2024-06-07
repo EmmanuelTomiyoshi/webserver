@@ -42,7 +42,7 @@ std::string Config::Port::get(void) const
 	return this->_value;
 }
 
-//--------------- Routes ------------------//
+//--------------- Routes ------------------//''
 void Config::Routes::set_parent(Config *parent)
 {
 	this->_parent = parent;
@@ -50,7 +50,18 @@ void Config::Routes::set_parent(Config *parent)
 
 Route & Config::Routes::get(std::string location)
 {
-	return this->_routes.at(location);
+	std::cout << "LOCATION -> " << location << std::endl;
+	if (ft::is_file(location) == false)
+		return this->_routes.at(location);
+	
+	Route & r = this->_routes.at(ft::remove_file(location));
+	if (r.cgi_mode.get() == true)
+	{
+		r.set_cgi_path(location);
+		std::cout << "CGI PATH: " << location << std::endl;
+		return r;
+	}
+	throw std::runtime_error("Route is not a CGI route");
 }
 
 void Config::Routes::set(std::list<File::Conf> & l_routes)
@@ -67,7 +78,11 @@ void Config::Routes::set(std::list<File::Conf> & l_routes)
 		dst.try_files.set(src._multi_values["try_files"]);
 		dst.methods.set(src._multi_values["methods"]);
 		dst.redirect.set(src._single_value["return"]);
-		dst.set_root(this->_parent->root.get());
+		if (src._single_value["root"].empty())
+			dst.set_root(this->_parent->root.get());
+		else
+			dst.set_root(src._single_value["root"]);
+		dst.cgi_mode.set(src._single_value["cgi_mode"]);
 		it++;
 	}
 }
@@ -85,6 +100,10 @@ void Config::Routes::show(void)
 		std::cout << "SaveFilesPath: " << r.save_files_path.get() << std::endl;
 		std::cout << "Autoindex: " << (r.autoindex.get() ? "true" : "false") << std::endl;
 		std::cout << "Return: " << r.redirect.get() << std::endl;
+		std::cout << "CGI_MODE: " << (r.cgi_mode.get() ? "true" : "false") << std::endl;
+		std::cout << "Root: " << r.get_root() << std::endl;
+		std::cout << "Page: " << r.get_page() << std::endl;
+		std::cout << "Path" << r.get_path() << std::endl;
 		r.methods.show();
 		r.try_files.show();
 		std::cout << std::endl;

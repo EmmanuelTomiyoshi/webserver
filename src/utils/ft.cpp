@@ -172,4 +172,23 @@ namespace ft {
         close(pfds2[0]);
         close(pfds2[1]);
     }
+
+    bool is_file(std::string str)
+    {
+        if (str.find_last_of('/') != std::string::npos)
+            str = str.substr(str.find_last_of('/') + 1);
+        return str.find('.') != std::string::npos;
+    }
+
+    std::string remove_file(std::string str)
+    {
+        if (str.find_last_of('/') != std::string::npos &&
+            str.find('.') != std::string::npos)
+        {
+            str = str.substr(0, str.find_last_of('/'));
+            if (str.empty())
+                return "/";
+        }
+        return str;
+    }
 }

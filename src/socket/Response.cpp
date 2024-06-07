@@ -52,8 +52,15 @@ _config(config), _timeout(timeout)
 
 bool Response::is_public(void) {
     std::string str = _request.get_target();
-    str = str.substr(0, std::string("/public").length());
-    return str == "/public";
+    if (ft::is_file(str) == false)
+        return false;
+    
+    size_t pos = str.find("/public");
+    if (pos == std::string::npos)
+        return false;
+    
+    _path = "." + str.substr(pos);
+    return true;
 }
 
 void Response::open_public_file(void)
@@ -83,7 +90,6 @@ void Response::open_route_file(void)
 
 void Response::set_public_file_info(void)
 {
-    this->_path = '.' + _request.get_target();
     if (_path.empty())
     {
         std::cerr << "error: no path provided" << std::endl;

@@ -9,13 +9,13 @@ File::File(std::string file_name) : _file(file_name.c_str())
 		"body_size",
 		"root",
 		"port",
-
+		"cgi_mode",
 		"save_files_path",
 		"autoindex",
 		"return"
 	};
 
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < 8; i++)
 		single_value_keys.push_back(aux[i]);
 
 	std::string aux2[] = {

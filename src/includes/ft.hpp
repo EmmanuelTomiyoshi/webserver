@@ -60,6 +60,10 @@ namespace ft {
     void close_pipes(int *pfds1, int *pfds2);
 
     ssize_t read_all(int fd, char **buff);
+
+    bool is_file(std::string str);
+
+    std::string remove_file(std::string str);
 }
 
 #endif

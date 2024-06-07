@@ -7,6 +7,7 @@ class Route
 {
 	private:
 		std::string _root;
+		std::string _cgi_path;
 
 		class Location {
 			private:
@@ -46,6 +47,16 @@ class Route
 				void set(std::string value);
 		};
 
+		class CGI_Mode {
+			private:
+				bool _value;
+			public:
+				CGI_Mode(void);
+				bool get(void) const;
+				void set(bool value);
+				void set(std::string value);
+		};
+
 		class Return {
 			private:
 				std::string _value;
@@ -54,7 +65,9 @@ class Route
 				void set(std::string value);
 		};
 
-		// cgi_extensions
+		std::string get_normal_page(void);
+		std::string get_cgi_page(void);
+
 
 	public:
 		Route(void);
@@ -65,13 +78,17 @@ class Route
 		Return redirect;
 		Location location;
 		TryFiles try_files;
+		CGI_Mode cgi_mode;
 		Autoindex autoindex;
 		SaveFilesPath save_files_path;
 
 		std::string get_page(void);
 		void set_root(std::string root);
+		void set_cgi_path(std::string path);
 		std::string get_root(void) const;
 		std::string get_path(void) const;
+		void show(void);
+
 };
 
 #endif

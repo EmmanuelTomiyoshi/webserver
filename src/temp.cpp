@@ -175,8 +175,28 @@ void timeout_test(void)
 	}
 }
 
+void dynamic_cgi(void)
+{
+	std::string location("hello.pl");
+
+	std::string aux = location.substr(location.find_last_of(".") + 1);
+	std::cout << "aux: " << aux << std::endl;
+}
+
+void test_ft(void)
+{
+
+	std::cout << ft::remove_file("/home/user/file.txt") << std::endl;
+	std::cout << ft::remove_file("/home/user") << std::endl;
+	std::cout << ft::remove_file("/cgi.pl") << std::endl;
+	std::cout << ft::remove_file("text.tt") << std::endl;
+	std::cout << "is_file: " << ft::is_file("/users/hello.pl") << std::endl;
+	std::cout << "is_file: " << ft::is_file("/users") << std::endl;
+}
+
 void temp(void)
 {
+	// test_ft();
 	// timeout_test();
 	// exit(0);
 }

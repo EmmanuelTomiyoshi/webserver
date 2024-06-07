@@ -31,5 +31,6 @@
 # include <list>
 # include <algorithm>
 # include <ctime>
+# include "error_codes.hpp"
 
 #endif

@@ -146,68 +146,40 @@ std::string Route::get_root(void) const
 	return this->_root;
 }
 
-std::string Route::get_normal_page(void)
-{
-	std::string path;
-	path = this->_root + this->location.get();
-
-	std::ifstream file;
-	std::list<std::string> const & file_names = this->try_files.get();
-	std::list<std::string>::const_iterator it;
-	it = file_names.begin();
-	while (it != file_names.end())
-	{
-		path = path + (*it);
-		file.open(path.c_str());
-		if (file.good())
-			break ;
-		it++;
-	}
-	std::cout << "UEEE" << std::endl;
-	if (file.bad())
-		throw std::runtime_error("page not found");
-	std::string content;
-	std::getline(file, content, '\0');
-	file.close();
-	return content;
-}
-
-std::string Route::get_cgi_page(void)
-{
-	std::string path;
-	path = this->_root + this->location.get();
-
-	std::ifstream file;
-	std::list<std::string> const & file_names = this->try_files.get();
-	std::list<std::string>::const_iterator it;
-	it = file_names.begin();
-	while (it != file_names.end())
-	{
-		path = path + (*it);
-		file.open(path.c_str());
-		if (file.good())
-			break ;
-		it++;
-	}
-	std::cout << "UEEE" << std::endl;
-	if (file.bad())
-		throw std::runtime_error("page not found");
-	std::string content;
-	std::getline(file, content, '\0');
-	file.close();
-	return content;
-}
-
 void Route::set_cgi_path(std::string path)
 {
 	this->_cgi_path = path;
 }
 
+std::string Route::get_cgi_path(void) const
+{
+	std::string path = _cgi_path.substr(_cgi_path.find_last_of('/'));
+	return this->_root + path;
+}
+
 std::string Route::get_page(void)
 {
-	if (this->cgi_mode.get())
-		return this->get_cgi_page();
-	return this->get_normal_page();
+	std::string path;
+	path = this->_root + this->location.get();
+
+	std::ifstream file;
+	std::list<std::string> const & file_names = this->try_files.get();
+	std::list<std::string>::const_iterator it;
+	it = file_names.begin();
+	while (it != file_names.end())
+	{
+		path = path + (*it);
+		file.open(path.c_str());
+		if (file.good())
+			break ;
+		it++;
+	}
+	if (file.bad())
+		throw std::runtime_error("page not found");
+	std::string content;
+	std::getline(file, content, '\0'); //TODO: change to a more reliable way of reading an entire page
+	file.close();
+	return content;
 }
 
 std::string Route::get_path(void) const

@@ -2,6 +2,7 @@
 # define ROUTE_HPP
 # include "base.hpp"
 # include "Methods.hpp"
+# include "error_codes.hpp"
 
 class Route
 {
@@ -87,6 +88,7 @@ class Route
 		void set_cgi_path(std::string path);
 		std::string get_root(void) const;
 		std::string get_path(void) const;
+		std::string get_cgi_path(void) const;
 		void show(void);
 
 };

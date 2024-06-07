@@ -48,7 +48,7 @@ void Config::Routes::set_parent(Config *parent)
 	this->_parent = parent;
 }
 
-void remove_last_slash(std::string & location)
+static void remove_last_slash(std::string & location)
 {
 	if (location.size() > 2 && location.at(location.size() - 1) == '/')
 		location = location.substr(0, location.size() - 1);

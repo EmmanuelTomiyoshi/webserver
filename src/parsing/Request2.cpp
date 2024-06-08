@@ -120,7 +120,14 @@ size_t Request2::get_body_size(void)
 std::string Request2::get_header(std::string key) const
 {
     verify_initialization();
-    return _headers.at(key);
+    try
+    {
+        return _headers.at(key);
+    }
+    catch (std::exception & e)
+    {
+        throw std::runtime_error(HTTP_BAD_REQUEST);
+    }
 }
 
 std::string Request2::get_method(void)

@@ -159,7 +159,7 @@ void CGI::read_response(void)
     _response_size = ft::read_all(_pfds_b[R], &_response);
 }
 
-void CGI::execute_cgi_script(void)
+void CGI::execute_cgi_post(void)
 {
     pipe(_pfds_a);
     pipe(_pfds_b);
@@ -201,6 +201,48 @@ void CGI::execute_cgi_script(void)
 
         execve(_argv[0], (char * const *) _argv, (char * const *) _envs);
         std::cerr << "CGI ERROR: fail to execute cgi script" << std::endl;
+        exit(0);
+    }
+}
+
+void CGI::execute_cgi_get(void)
+{
+    pipe(_pfds_b);
+    _pid = fork();
+    
+    if (_pid != 0)
+    {
+        ft::CustomData *old_event_data = (ft::CustomData *) _event->data.ptr;
+        epoll_ctl(old_event_data->epfd, EPOLL_CTL_DEL, old_event_data->fd, _event);
+
+        old_event_data->type = ft::TIMEOUT;
+
+        ft::CustomData *event_data = new ft::CustomData;
+        event_data->cgi_fd = old_event_data->fd;
+        event_data->fd = _pfds_b[R];
+        event_data->type = ft::CGI;
+        event_data->epfd = old_event_data->epfd;
+        event_data->timeout = 5;
+        event_data->start_time = time(NULL);
+        event_data->pid = _pid;
+
+        epoll_event *event = new epoll_event;
+        event->events = EPOLLIN | EPOLLET;
+        event->data.ptr = (void *) event_data;
+
+        epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
+        _timeout->add(event);
+        close(_pfds_b[W]);
+    }
+
+    if (_pid == 0)
+    {
+        dup2(_pfds_b[W], STDOUT_FILENO);
+        close(_pfds_b[W]);
+        close(_pfds_b[R]);
+
+        execve(_argv[0], (char * const *) _argv, (char * const *) _envs);
+        std::cerr << "CGI ERROR: fail to execute cgi GET script" << std::endl;
         exit(0);
     }
 }
@@ -273,13 +315,28 @@ void CGI::process_response(char *response, ssize_t response_size)
     format_http_response();
 }
 
+void CGI::debug_pfds_b(void)
+{
+    char *buff;
+    ssize_t bytes = ft::read_all(_pfds_b[R], &buff);
+    std::cout << "\n-------- CGI DEBUG_PFDS_B --------" << std::endl;
+    write(1, buff, bytes);
+}
+
+ssize_t CGI::read_pfds_b(char **buff)
+{
+    return ft::read_all(_pfds_b[R], buff);
+}
 
 void CGI::execute(void)
 {
     if (this->error())
         return ;
 
-    execute_cgi_script();
+    if (_request_method_raw == "POST")
+         execute_cgi_post();
+    else if (_request_method_raw == "GET")
+        execute_cgi_get();
 }
 
 char *CGI::get_response(void)

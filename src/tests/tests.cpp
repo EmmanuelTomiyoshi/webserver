@@ -1,5 +1,9 @@
 #include "tests.hpp"
 
+Request2 _request;
+Timeout _timeout;
+Configs configs("./conf/ws.conf");
+
 ssize_t read_debug(size_t index, char **buff)
 {
     std::string file("./src/tests/requests/request_test_");
@@ -11,32 +15,56 @@ ssize_t read_debug(size_t index, char **buff)
     return bytes;
 }
 
-void test_config(void)
+static void test_config(void)
 {
-    Configs configs("./conf/ws.conf");
-
-    Config & config = configs.next();
+    Config & config = *(configs.get().begin());
     config.show();
 }
 
-void test_request(void)
+static void test_request(void)
 {
     std::cout << "****TEST_REQUEST****" << std::endl;
-    Request2 request;
 
     char *buff;
     ssize_t bytes = read_debug(0, &buff);
     write(1, buff, bytes);
-    request.init(buff, bytes);
-    request.info();
+    _request.init(buff, bytes);
+    _request.info();
 }
 
+static void test_cgi(void)
+{
+    Config & config = configs.next();
+    std::cout << "\n------- CGI DEBUGGING --------" << std::endl;
+    struct epoll_event event;
+    CGI cgi;
+    cgi.set_request_method("GET");
+    cgi.set_body(_request.get_body());
+    cgi.set_body_size(_request.get_body_size());
+    cgi.set_timeout(&_timeout);
+    std::string script = config.routes.get(_request.get_route()).get_path();
+    script += "/" + _request.get_file();
+    std::cout << "Script path: " << script << std::endl;
+    cgi.set_script_name(script);
+    cgi.set_event(&event);
+    cgi.execute();
+    char *buff;
+    ssize_t bytes = cgi.read_pfds_b(&buff);
+    cgi.process_response(buff, bytes);
+    ft::debug_file(
+        "./src/tests/requests/index.html", 
+        cgi.get_response(), 
+        cgi.get_response_size()
+    );
+}
 
 static void execute_tests(void)
 {
     std::cout << "------------ EXECUTING TESTS ------------\n\n" << std::endl;
     test_request();
     test_config();
+    test_cgi();
+
 }
 
 void tests(int argc, char **argv)

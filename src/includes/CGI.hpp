@@ -65,6 +65,8 @@ class CGI
         int _pfds_b[2];
         int _pid;
 
+        void execute_cgi_post(void);
+        void execute_cgi_get(void);
         void execute_cgi_script(void);
 
         void extract_response_data(char *response, ssize_t response_size);
@@ -96,6 +98,8 @@ class CGI
         char *get_response(void);
         size_t get_response_size(void);
 
+        void debug_pfds_b(void);
+        ssize_t read_pfds_b(char **buff);
 
 };
 

@@ -6,5 +6,7 @@
 #include "ft.hpp"
 #include "save_request.hpp"
 #include "Configs.hpp"
+#include "CGI.hpp"
+#include "Timeout.hpp"
 
 #endif

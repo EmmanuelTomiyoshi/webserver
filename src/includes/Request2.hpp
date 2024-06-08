@@ -35,8 +35,10 @@ class Request2
 		bool _is_cgi;
 		std::string _file;
 		std::string _route;
+		std::string _query;
 		void extract_route(void);
 		void extract_file(void);
+		void extract_query(void);
 
 	public:
 		Request2(void);
@@ -52,6 +54,7 @@ class Request2
 
 		std::string get_file(void);
 		std::string get_route(void);
+		std::string get_query(void);
 		bool is_cgi(void);
 };
 

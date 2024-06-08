@@ -41,6 +41,7 @@ static void test_cgi(void)
     cgi.set_request_method("GET");
     cgi.set_body(_request.get_body());
     cgi.set_body_size(_request.get_body_size());
+    cgi.set_query_string(_request.get_query());
     cgi.set_timeout(&_timeout);
     std::string script = config.routes.get(_request.get_route()).get_path();
     script += "/" + _request.get_file();
@@ -51,10 +52,19 @@ static void test_cgi(void)
     char *buff;
     ssize_t bytes = cgi.read_pfds_b(&buff);
     cgi.process_response(buff, bytes);
+
     ft::debug_file(
-        "./src/tests/requests/index.html", 
+        "./src/tests/requests/debug_cgi_response", 
         cgi.get_response(), 
         cgi.get_response_size()
+    );
+
+    char *body = ft::get_body_position(cgi.get_response());
+    ssize_t body_size = cgi.get_response_size() - (body - cgi.get_response());
+    ft::debug_file(
+        "./src/tests/requests/debug_index.html", 
+        body,
+        body_size
     );
 }
 

@@ -19,6 +19,7 @@ void Request2::init(char *buff, ssize_t size)
     extract_body_size();
     extract_route();
     extract_file();
+    extract_query();
     info();
 }
 
@@ -157,6 +158,7 @@ void Request2::info(void)
     std::cout << "Version: " << _http_version << std::endl;
     std::cout << "Route: " << _route << std::endl;
     std::cout << "File: " << _file << std::endl;
+    std::cout << "Query: " << _query << std::endl;
     std::cout << "Is CGI: " << (_is_cgi ? "true" : "false") << std::endl;
     std::cout << "----- HEADERS -----\n" << std::endl;
     std::map<std::string, std::string>::iterator it;
@@ -224,4 +226,16 @@ bool Request2::is_cgi(void)
 {
     verify_initialization();
     return _is_cgi;
+}
+
+void Request2::extract_query(void)
+{
+    if (_target.find('?') == std::string::npos)
+        return ;
+    _query = _target.substr(_target.find_first_of('?') + 1);
+}
+
+std::string Request2::get_query(void)
+{
+    return _query;
 }

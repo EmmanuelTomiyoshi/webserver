@@ -6,6 +6,7 @@
 class Route
 {
 	private:
+		std::string _parent_root;
 		std::string _root;
 
 		class Location {
@@ -70,6 +71,7 @@ class Route
 
 		std::string get_page(void);
 		void set_root(std::string root);
+		void set_parent_root(std::string root);
 		std::string get_root(void) const;
 		std::string get_path(void) const;
 		void show(void);

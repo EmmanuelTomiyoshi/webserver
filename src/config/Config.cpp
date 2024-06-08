@@ -74,10 +74,8 @@ void Config::Routes::set(std::list<File::Conf> & l_routes)
 		dst.try_files.set(src._multi_values["try_files"]);
 		dst.methods.set(src._multi_values["methods"]);
 		dst.redirect.set(src._single_value["return"]);
-		if (src._single_value["root"].empty())
-			dst.set_root(this->_parent->root.get());
-		else
-			dst.set_root(src._single_value["root"]);
+		dst.set_parent_root(this->_parent->root.get());
+		dst.set_root(src._single_value["root"]);
 		it++;
 	}
 }

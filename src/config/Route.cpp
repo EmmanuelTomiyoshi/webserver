@@ -121,6 +121,11 @@ void Route::set_root(std::string root)
 	this->_root = root;
 }
 
+void Route::set_parent_root(std::string root)
+{
+	this->_parent_root = root;
+}
+
 std::string Route::get_root(void) const
 {
 	return this->_root;
@@ -143,7 +148,6 @@ std::string Route::get_page(void)
 			break ;
 		it++;
 	}
-	std::cout << "UEEE" << std::endl;
 	if (file.bad())
 		throw std::runtime_error("page not found");
 	std::string content;
@@ -154,8 +158,13 @@ std::string Route::get_page(void)
 
 std::string Route::get_path(void) const
 {
-	std::string path = this->_root + this->location.get();
-	return path;
+	if (_root.empty() == false)
+		return _root;
+
+	if (location.get() == "/")
+		return _parent_root;
+	
+	return this->_parent_root + this->location.get();
 }
 
 void Route::show(void)

@@ -4,7 +4,7 @@ std::string Response::http_version = "HTTP/1.1";
 
 std::map<std::string, std::string> Response::mime_types;
 
-Response::Response(char *buff, size_t size, Config *config, Timeout & timeout) : 
+Response::Response(char *buff, size_t size, Config *config, Timeout *timeout) : 
 _buff(buff), _buff_size(size), _status("200"), _http_response(NULL),
 _config(config), _timeout(timeout)
 {
@@ -20,6 +20,10 @@ _config(config), _timeout(timeout)
     mime_types["gif"] = "image/gif";
     mime_types["bmp"] = "image/bmp";
     mime_types["svg"] = "image/svg+xml";
+}
+
+Response::Response(void)
+{
 }
 
 /* 
@@ -232,7 +236,7 @@ void Response::GET_cgi(void)
     cgi.set_body(_request.get_body());
     cgi.set_body_size(_request.get_body_size());
     cgi.set_query_string(_request.get_query());
-    cgi.set_timeout(&_timeout);
+    cgi.set_timeout(_timeout);
     std::string script = _route->get_path();
     script += "/" + _request.get_file();
     cgi.set_script_name(script);
@@ -270,7 +274,7 @@ void Response::POST(void)
     cgi.set_content_length(_request.get_header("Content-Length"));
     cgi.set_body_size(_request.get_body_size());
     cgi.set_content_type(_request.get_header("Content-Type"));
-    cgi.set_timeout(&_timeout);
+    cgi.set_timeout(_timeout);
 
     static int i = 0;
     i++;
@@ -354,4 +358,20 @@ ssize_t Response::send_response(epoll_event & event)
         return 1;
     }
     return 1;
+}
+
+void Response::process_error(std::string code)
+{
+    build_error(code);
+    open_public_file();
+    fill_body();
+    create_response();
+}
+char *Response::get_response(void)
+{
+    return _http_response;
+}
+ssize_t Response::get_response_size(void)
+{
+    return _http_response_size;
 }

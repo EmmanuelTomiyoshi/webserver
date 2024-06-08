@@ -63,7 +63,7 @@ class Response
 
         Config *_config;
         epoll_event *_event;
-        Timeout &_timeout;
+        Timeout *_timeout;
 
         static std::string http_version;
 
@@ -73,11 +73,16 @@ class Response
         void execute_error(std::string code);
 
     public:
-        Response(char *buff, size_t size, Config *config, Timeout & timeout);
+        Response(void);
+        Response(char *buff, size_t size, Config *config, Timeout *timeout);
 
         ssize_t send_response(epoll_event & event);
 
         static std::map<std::string, std::string> mime_types;
+
+        void process_error(std::string code);
+        char *get_response(void);
+        ssize_t get_response_size(void);
 };
 
 #endif

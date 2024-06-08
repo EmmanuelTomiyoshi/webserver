@@ -55,7 +55,7 @@ void Server::recv_message(epoll_event & event)
 		buff,
 		buff_size,
 		_configs._fdconfigs.at(event_data->fd),
-		_timeout
+		&_timeout
 	);
 }
 
@@ -67,15 +67,30 @@ void Server::process_cgi_response(epoll_event & event)
 	epoll_ctl(_epfd, EPOLL_CTL_DEL, event_data->fd, &event);
 	int buff_size = ft::read_all(event_data->fd, &buff);
 
-	CGI cgi;
-	cgi.process_response(buff, buff_size);
-	char *response = cgi.get_response();
-	ssize_t response_size = cgi.get_response_size();
+	try
+	{
+		CGI cgi;
+		cgi.process_response(buff, buff_size);
+		char *response = cgi.get_response();
+		ssize_t response_size = cgi.get_response_size();
 
-	send(event_data->cgi_fd, response, response_size, MSG_DONTWAIT);
+		send(event_data->cgi_fd, response, response_size, MSG_DONTWAIT);
 
-	close(event_data->cgi_fd);
-	close(event_data->fd);
+		close(event_data->cgi_fd);
+		close(event_data->fd);
+	}
+	catch (std::exception & e)
+	{
+		Response response;
+		response.process_error(e.what());
+		send(
+			event_data->cgi_fd,
+			response.get_response(),
+			response.get_response_size(),
+			MSG_DONTWAIT
+		);
+	}
+
 }
 
 void Server::process_request(epoll_event & event)

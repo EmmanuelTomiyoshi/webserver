@@ -63,7 +63,7 @@ class Route
 				bool _value;
 			public:
 				CGI_Route(void);
-				bool get(void) const;
+				bool is_true(void) const;
 				void set(bool value);
 				void set(std::string value);
 		};

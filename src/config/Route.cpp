@@ -72,6 +72,48 @@ void Route::TryFiles::set(std::list<std::string> const & files)
 	this->_it = this->_try_files.begin();
 }
 
+/* ---------------- CGI_EXTENSIONS ----------------- */
+Route::CGI_Extensions::CGI_Extensions(void)
+{
+}
+
+std::list<std::string> const & Route::CGI_Extensions::get(void) const
+{
+	return this->_values;
+}
+
+void Route::CGI_Extensions::show(void)
+{
+	std::list<std::string>::iterator it;
+	it = this->_values.begin();
+	std::cout << "CGI_Extensions: ";
+	while (it != this->_values.end())
+	{
+		std::cout << (*it) << " ";
+		it++;
+	}
+	std::cout << std::endl;
+}
+
+void Route::CGI_Extensions::set(std::list<std::string> const & values) 
+{
+	std::list<std::string>::const_iterator it;
+	it = values.begin();
+	while (it != values.end())
+	{
+		this->_values.push_back(*it);
+		it++;
+	}
+}
+
+bool Route::CGI_Extensions::is_allowed(std::string ext) const
+{
+	return std::find(
+		this->_values.begin(), 
+		this->_values.end(), 
+		ext
+	) != this->_values.end();
+}
 
 /* ---------------- SAVE FILES PATH ----------------- */
 std::string Route::SaveFilesPath::get(void) const
@@ -198,4 +240,5 @@ void Route::show(void)
 	std::cout << "Path: " << get_path() << std::endl;
 	std::cout << "CGI_Route: " << (cgi_route.get() ? "true" : "false") << std::endl;
 	try_files.show();
+	cgi_extensions.show();
 }

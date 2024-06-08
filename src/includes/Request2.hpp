@@ -50,7 +50,7 @@ class Request2
 		size_t get_body_size(void);
         void info(void);
 
-		std::string get_cgi_file(void);
+		std::string get_file(void);
 		std::string get_route(void);
 		bool is_cgi(void);
 };

@@ -17,6 +17,7 @@ void Request2::init(char *buff, ssize_t size)
     extract_request_line();
     extract_headers();
     extract_body_size();
+    extract_route();
     info();
 }
 
@@ -146,28 +147,12 @@ void Request2::info(void)
     std::cout << "Method: " << _method << std::endl;
     std::cout << "Target: " << _target << std::endl;
     std::cout << "Version: " << _http_version << std::endl;
+    std::cout << "Route: " << _route << std::endl;
     std::cout << "----- HEADERS -----\n" << std::endl;
     std::map<std::string, std::string>::iterator it;
     for (it = _headers.begin(); it != _headers.end(); it++)
         std::cout << (*it).first << " -> " << (*it).second << std::endl;
 }
-
-std::string Request2::get_cgi_file(void)
-{
-    verify_initialization();
-    return _file;
-}
-std::string Request2::get_route(void)
-{
-    verify_initialization();
-    return _route;
-}
-bool Request2::is_cgi(void)
-{
-    verify_initialization();
-    return _is_cgi;
-}
-
 
 static bool is_file_or_query(std::string str)
 {
@@ -200,4 +185,20 @@ void Request2::extract_route(void)
 void Request2::extract_file(void)
 {
 
+}
+
+std::string Request2::get_file(void)
+{
+    verify_initialization();
+    return _file;
+}
+std::string Request2::get_route(void)
+{
+    verify_initialization();
+    return _route;
+}
+bool Request2::is_cgi(void)
+{
+    verify_initialization();
+    return _is_cgi;
 }

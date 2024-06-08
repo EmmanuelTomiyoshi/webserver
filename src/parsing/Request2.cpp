@@ -150,6 +150,7 @@ void Request2::info(void)
     std::cout << "Version: " << _http_version << std::endl;
     std::cout << "Route: " << _route << std::endl;
     std::cout << "File: " << _file << std::endl;
+    std::cout << "Is CGI: " << (_is_cgi ? "true" : "false") << std::endl;
     std::cout << "----- HEADERS -----\n" << std::endl;
     std::map<std::string, std::string>::iterator it;
     for (it = _headers.begin(); it != _headers.end(); it++)
@@ -191,10 +192,8 @@ void Request2::extract_file(void)
     str = str.substr(str.find_last_of('/') + 1);
 
     if (str.find_last_of('.') == std::string::npos)
-    {
-        _is_cgi = true;
         return ;
-    }
+    _is_cgi = true;
     if (str.find_first_of('?') == std::string::npos)
     {
         _file = str;

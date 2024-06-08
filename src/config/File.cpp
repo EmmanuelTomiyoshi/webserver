@@ -4,29 +4,30 @@ File::File(std::string file_name) : _file(file_name.c_str())
 {
 	if (this->_file.bad())
 		throw std::runtime_error("failed to open '" + file_name + "'");
-	std::string aux[] = {
+	const char *singles[] = {
 		"host",
 		"body_size",
 		"root",
 		"port",
 		"save_files_path",
 		"autoindex",
-		"return"
+		"return",
+		"cgi_route",
+		NULL
 	};
 
-	for (int i = 0; i < 7; i++)
-		single_value_keys.push_back(aux[i]);
+	for (int i = 0; singles[i] != NULL; i++)
+		single_value_keys.push_back(singles[i]);
 
-	std::string aux2[] = {
+	const char *multiples[] = {
 		"server_name",
 		"try_files",
 		"methods",
 		"cgi_extensions",
-
+		NULL
 	};
-
-	for (int i = 0; i < 4; i++)
-		multi_value_keys.push_back(aux2[i]);
+	for (int i = 0; multiples[i] != NULL; i++)
+		multi_value_keys.push_back(multiples[i]);
  
 	fill_data();
 	extract_blocks();

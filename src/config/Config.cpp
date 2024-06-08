@@ -76,6 +76,7 @@ void Config::Routes::set(std::list<File::Conf> & l_routes)
 		dst.redirect.set(src._single_value["return"]);
 		dst.set_parent_root(this->_parent->root.get());
 		dst.set_root(src._single_value["root"]);
+		dst.cgi_route.set(src._single_value["cgi_route"]);
 		it++;
 	}
 }

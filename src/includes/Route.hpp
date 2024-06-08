@@ -47,6 +47,16 @@ class Route
 				void set(std::string value);
 		};
 
+		class CGI_Route {
+			private:
+				bool _value;
+			public:
+				CGI_Route(void);
+				bool get(void) const;
+				void set(bool value);
+				void set(std::string value);
+		};
+
 		class Return {
 			private:
 				std::string _value;
@@ -67,6 +77,7 @@ class Route
 		Location location;
 		TryFiles try_files;
 		Autoindex autoindex;
+		CGI_Route cgi_route;
 		SaveFilesPath save_files_path;
 
 		std::string get_page(void);

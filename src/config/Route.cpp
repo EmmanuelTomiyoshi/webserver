@@ -85,7 +85,7 @@ void Route::SaveFilesPath::set(std::string path)
 }
 
 
-/* ---------------- SAVE FILES PATH ----------------- */
+/* ---------------- AUTOINDEX ----------------- */
 Route::Autoindex::Autoindex(void) : _on(false)
 {
 }
@@ -103,6 +103,26 @@ void Route::Autoindex::set(bool value)
 void Route::Autoindex::set(std::string value)
 {
 	this->_on = (value == "on");
+}
+
+/* ---------------- CGI_ROUTE ----------------- */
+Route::CGI_Route::CGI_Route(void) : _value(false)
+{
+}
+
+bool Route::CGI_Route::get(void) const
+{
+	return this->_value;
+}
+
+void Route::CGI_Route::set(bool value)
+{
+	this->_value = value;
+}
+
+void Route::CGI_Route::set(std::string value)
+{
+	this->_value = (value == "true");
 }
 
 /* RETURN Or REDIRECT */
@@ -176,5 +196,6 @@ void Route::show(void)
 	std::cout << "Autoindex: " << (autoindex.get() ? "on" : "off") << std::endl;
 	std::cout << "Redirect: " << redirect.get() << std::endl;
 	std::cout << "Path: " << get_path() << std::endl;
+	std::cout << "CGI_Route: " << (cgi_route.get() ? "true" : "false") << std::endl;
 	try_files.show();
 }

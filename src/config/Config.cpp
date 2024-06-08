@@ -74,7 +74,10 @@ void Config::Routes::set(std::list<File::Conf> & l_routes)
 		dst.try_files.set(src._multi_values["try_files"]);
 		dst.methods.set(src._multi_values["methods"]);
 		dst.redirect.set(src._single_value["return"]);
-		dst.set_root(this->_parent->root.get());
+		if (src._single_value["root"].empty())
+			dst.set_root(this->_parent->root.get());
+		else
+			dst.set_root(src._single_value["root"]);
 		it++;
 	}
 }
@@ -83,17 +86,10 @@ void Config::Routes::show(void)
 {
 	std::map<std::string, Route>::iterator it;
 	it = this->_routes.begin();
-	int i = 0;
 	while (it != this->_routes.end())
 	{
 		Route & r = (*it).second;
-		std::cout << "----- ROUTE "<< i++ << ":\n";
-		std::cout << "Location: " << r.location.get() << std::endl;
-		std::cout << "SaveFilesPath: " << r.save_files_path.get() << std::endl;
-		std::cout << "Autoindex: " << (r.autoindex.get() ? "true" : "false") << std::endl;
-		std::cout << "Return: " << r.redirect.get() << std::endl;
-		r.methods.show();
-		r.try_files.show();
+		r.show();
 		std::cout << std::endl;
 		it++;
 	}

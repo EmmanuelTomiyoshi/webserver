@@ -157,3 +157,15 @@ std::string Route::get_path(void) const
 	std::string path = this->_root + this->location.get();
 	return path;
 }
+
+void Route::show(void)
+{
+	std::cout << "\n--------- ROUTE ---------" << std::endl;
+	std::cout << "Root: " << _root << std::endl;
+	std::cout << "Location: " << location.get() << std::endl;
+	std::cout << "SaveFilesPath: " << save_files_path.get() << std::endl;
+	std::cout << "Autoindex: " << (autoindex.get() ? "on" : "off") << std::endl;
+	std::cout << "Redirect: " << redirect.get() << std::endl;
+	std::cout << "Path: " << get_path() << std::endl;
+	try_files.show();
+}

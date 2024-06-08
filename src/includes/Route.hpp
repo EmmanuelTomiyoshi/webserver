@@ -72,6 +72,7 @@ class Route
 		void set_root(std::string root);
 		std::string get_root(void) const;
 		std::string get_path(void) const;
+		void show(void);
 };
 
 #endif

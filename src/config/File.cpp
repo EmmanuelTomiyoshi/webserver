@@ -9,7 +9,6 @@ File::File(std::string file_name) : _file(file_name.c_str())
 		"body_size",
 		"root",
 		"port",
-
 		"save_files_path",
 		"autoindex",
 		"return"

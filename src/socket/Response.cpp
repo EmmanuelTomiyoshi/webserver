@@ -8,8 +8,6 @@ Response::Response(char *buff, size_t size, Config *config, Timeout & timeout) :
 _buff(buff), _buff_size(size), _status("200"), _http_response(NULL),
 _config(config), _timeout(timeout)
 {
-    //this->_req.init(buff);
-
     mime_types["js"] = "application/javascript";
     mime_types["json"] = "application/json";
     mime_types["pdf"] = "application/pdf";
@@ -212,11 +210,45 @@ void Response::create_response(void)
     std::memmove(_http_response + response.size(), _body.data, _body.size);
 }
 
-void Response::GET(void)
+void Response::GET_normal(void)
 {
     open_file();
     fill_body();
     create_response();
+    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+    send(
+        event_data->fd,
+        _http_response, 
+        _http_response_size,
+        MSG_DONTWAIT
+    );
+    epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
+	close(event_data->fd);
+}
+void Response::GET_cgi(void)
+{
+    CGI cgi;
+    cgi.set_request_method("GET");
+    cgi.set_body(_request.get_body());
+    cgi.set_body_size(_request.get_body_size());
+    cgi.set_query_string(_request.get_query());
+    cgi.set_timeout(&_timeout);
+    std::string script = _route->get_path();
+    script += "/" + _request.get_file();
+    cgi.set_script_name(script);
+    cgi.set_event(_event);
+    cgi.execute();
+}
+
+void Response::GET(void)
+{
+    if (!is_public() && _route->cgi_route.is_true())
+    {
+
+        GET_cgi();
+    }
+    else
+        GET_normal();
 }
 
 char *find_str_pos(const char *str, char *src)
@@ -281,6 +313,15 @@ void Response::execute_error(std::string code)
     open_public_file();
     fill_body();
     create_response();
+    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+    send(
+        event_data->fd,
+        _http_response, 
+        _http_response_size,
+        MSG_DONTWAIT
+    );
+    epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
+	close(event_data->fd);
 }
 
 ssize_t Response::send_response(epoll_event & event)
@@ -290,30 +331,27 @@ ssize_t Response::send_response(epoll_event & event)
 
     try
     {
+        std::cout << "send response ----" << std::endl;
         _request.init(_buff, _buff_size);
+        std::cout << "is_public: " << (is_public() ? "true" : "false") << std::endl;
+        if (is_public() == false)
+        {
+            _route = &(_config->routes.get(_request.get_route()));
+            _route->show();
+        }
         this->execute();
     }
     catch(const std::exception& e)
     {
+        std::cout << "executing error: " << e.what() << std::endl;
         execute_error(e.what());
     }
-
-	epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, &event);
 
     if (_request.get_method() == "POST")
     {
         std::cout << "*********JAMALAICACA" << std::endl;
+        epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, &event);
         return 1;
     }
-
-    ssize_t bytes = send(
-        event_data->fd,
-        _http_response, 
-        _http_response_size,
-        MSG_DONTWAIT
-    );
-
-	close(event_data->fd);
-
-    return bytes;
+    return 1;
 }

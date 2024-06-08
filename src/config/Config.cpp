@@ -57,7 +57,14 @@ static void remove_last_slash(std::string & location)
 Route & Config::Routes::get(std::string location)
 {
 	remove_last_slash(location);
-	return this->_routes.at(location);
+	try
+	{
+		return this->_routes.at(location);
+	}
+	catch (std::exception & e)
+	{
+		throw std::runtime_error(HTTP_NOT_FOUND);
+	}
 }
 
 void Config::Routes::set(std::list<File::Conf> & l_routes)

@@ -33,5 +33,6 @@
 # include <ctime>
 
 # include "../tests/save_request.hpp"
+# include "error_codes.hpp"
 
 #endif

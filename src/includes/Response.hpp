@@ -56,6 +56,8 @@ class Response
         Body _body;
 
         void GET(void);
+        void GET_normal(void);
+        void GET_cgi(void);
         void POST(void);
         void DELETE(void);
 

@@ -4,6 +4,7 @@
 	- TODO: delete method
 	- TODO: verify if any exception or error could crash the server
 	- TODO: handle signals
+	- TODO: fix error when passing non existent config file on argv 
 ---
 
 ## NOTES

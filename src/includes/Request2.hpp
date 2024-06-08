@@ -32,6 +32,12 @@ class Request2
 
 		void verify_initialization(void) const;
 
+		bool _is_cgi;
+		std::string _file;
+		std::string _route;
+		void extract_route(void);
+		void extract_file(void);
+
 	public:
 		Request2(void);
 
@@ -43,6 +49,10 @@ class Request2
 		char *get_body(void);
 		size_t get_body_size(void);
         void info(void);
+
+		std::string get_cgi_file(void);
+		std::string get_route(void);
+		bool is_cgi(void);
 };
 
 #endif

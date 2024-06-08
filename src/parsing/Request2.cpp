@@ -151,3 +151,53 @@ void Request2::info(void)
     for (it = _headers.begin(); it != _headers.end(); it++)
         std::cout << (*it).first << " -> " << (*it).second << std::endl;
 }
+
+std::string Request2::get_cgi_file(void)
+{
+    verify_initialization();
+    return _file;
+}
+std::string Request2::get_route(void)
+{
+    verify_initialization();
+    return _route;
+}
+bool Request2::is_cgi(void)
+{
+    verify_initialization();
+    return _is_cgi;
+}
+
+
+static bool is_file_or_query(std::string str)
+{
+    if (str.find_last_of('/') != std::string::npos)
+        str = str.substr(str.find_last_of('/') + 1);
+    
+    if (str.find('.') != std::string::npos)
+        return true;
+    if (str.find('?') != std::string::npos)
+        return true;
+    return false;
+}
+
+void Request2::extract_route(void)
+{
+    std::string r = _target;
+
+    if (r.size() == 1)
+    {
+        _route = r;
+        return ;
+    }
+    
+    if (is_file_or_query(r))
+        _route = r.substr(0, r.find_last_of('/'));
+    else
+        _route = r;
+}
+
+void Request2::extract_file(void)
+{
+
+}

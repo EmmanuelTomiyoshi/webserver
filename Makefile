@@ -18,6 +18,9 @@ SRC 		=	main.cpp \
 				temp.cpp \
 				Request2.cpp \
 				Timeout.cpp \
+				tests.cpp \
+				save_request.cpp \
+				test_request.cpp \
 
 VPATH		=	./src \
 				./src/parsing \
@@ -25,6 +28,7 @@ VPATH		=	./src \
 				./src/socket \
 				./src/config \
 				./src/includes \
+				./src/tests \
 
 CXX 		=	c++
 CXXFLAGS 	=	-Wall -Wextra -Werror -std=c++98 -g

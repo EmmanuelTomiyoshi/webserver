@@ -16,6 +16,13 @@ void cgi(void)
 	
 }
 
+static bool is_config_file(std::string file)
+{
+	std::string ext = ".conf";
+	file = file.substr(file.size() - ext.size());
+	return file == ext;
+}
+
 void start_server(int argc, char **argv)
 {
 	if (argc > 2)
@@ -27,7 +34,7 @@ void start_server(int argc, char **argv)
 	Server *server;
 	try
 	{
-		if (argc == 2)
+		if (argc == 2 && is_config_file(argv[1]))
 			server = new Server(argv[1]);
 		else
 			server = new Server("./conf/ws.conf");
@@ -41,10 +48,11 @@ void start_server(int argc, char **argv)
 }
 
 void temp(void);
+void tests(int argc, char **argv);
 
 int main(int argc, char *argv[])
 {
-	temp();
+	tests(argc, argv);
 	start_server(argc, argv);
 	return (0);
 }

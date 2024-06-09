@@ -246,9 +246,10 @@ void Response::GET_cgi(void)
 
 void Response::GET(void)
 {
+    if (!is_public() && _route->methods.allowed("GET") == false)
+        throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
     if (!is_public() && _route->cgi_route.is_true())
     {
-
         GET_cgi();
     }
     else
@@ -268,6 +269,8 @@ char *find_str_pos(const char *str, char *src)
 
 void Response::POST(void)
 {
+    if (_route->methods.allowed("POST") == false)
+        throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
     CGI cgi;
     cgi.set_request_method("POST");
     cgi.set_body(_request.get_body());
@@ -295,7 +298,8 @@ void Response::POST(void)
 
 void Response::DELETE(void)
 {
-    throw std::runtime_error(HTTP_SERVICE_UNAVAILABLE);
+    if (_route->methods.allowed("DELETE") == false)
+        throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
 }
 
 void Response::execute(void)

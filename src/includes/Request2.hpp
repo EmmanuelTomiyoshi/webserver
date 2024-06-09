@@ -37,6 +37,8 @@ class Request2
 		std::string _route;
 		std::string _query;
 		void extract_route(void);
+		void extract_route_normal(void);
+		void extract_route_delete(void);
 		void extract_file(void);
 		void extract_file_cgi(void);
 		void extract_file_delete(void);

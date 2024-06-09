@@ -178,7 +178,7 @@ static bool is_file_or_query(std::string str)
     return false;
 }
 
-void Request2::extract_route(void)
+void Request2::extract_route_normal(void)
 {
     std::string r = _target;
 
@@ -192,6 +192,28 @@ void Request2::extract_route(void)
         _route = r.substr(0, r.find_last_of('/'));
     else
         _route = r;
+}
+
+void Request2::extract_route_delete(void)
+{
+    std::string r = _target;
+
+    if (r.size() == 1)
+        throw std::runtime_error(HTTP_BAD_REQUEST);
+    
+    r = r.substr(0, r.find_last_of('/'));
+    if (r.empty())
+        throw std::runtime_error(HTTP_BAD_REQUEST);
+
+    _route = r;
+}
+
+void Request2::extract_route(void)
+{
+    if (_method == "DELETE")
+        extract_route_delete();
+    else
+        extract_route_normal();
 }
 
 void Request2::extract_file_cgi(void)

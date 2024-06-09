@@ -118,7 +118,10 @@ bool Route::CGI_Extensions::is_allowed(std::string ext) const
 /* ---------------- SAVE FILES PATH ----------------- */
 std::string Route::SaveFilesPath::get(void) const
 {
-	return this->_save_files_path;
+	if (this->_root == "/")
+		return this->_save_files_path;
+	
+	return this->_root + this->_save_files_path;
 }
 
 void Route::SaveFilesPath::set(std::string path)
@@ -126,6 +129,10 @@ void Route::SaveFilesPath::set(std::string path)
 	this->_save_files_path = path;
 }
 
+void Route::SaveFilesPath::set_root(std::string root)
+{
+	this->_root = root;
+}
 
 /* ---------------- AUTOINDEX ----------------- */
 Route::Autoindex::Autoindex(void) : _on(false)
@@ -180,12 +187,17 @@ std::string Route::Return::get(void) const
 
 void Route::set_root(std::string root)
 {
+	if (root.empty())
+		return ;
 	this->_root = root;
+	this->save_files_path.set_root(root);
 }
 
 void Route::set_parent_root(std::string root)
 {
 	this->_parent_root = root;
+	if (_root.empty())
+		this->save_files_path.set_root(get_path());
 }
 
 std::string Route::get_root(void) const

@@ -42,8 +42,10 @@ class Route
 
 		class SaveFilesPath {
 			private:
+				std::string _root;
 				std::string _save_files_path;
 			public:
+				void set_root(std::string root);
 				std::string get(void) const;
 				void set(std::string path);
 		};

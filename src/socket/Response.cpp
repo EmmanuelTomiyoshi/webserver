@@ -26,32 +26,6 @@ Response::Response(void)
 {
 }
 
-/* 
-    there will be 3 functions to process the request: GET(), POST(), DELETE()
-    a map containing each of the functions mapped to the strings "GET", "POST", "DELETE"
-    a function error() to send an error as a response if any operation fails
-    when entering the GET, POST, DELETE function the first thing to be done is to get the route
-    then verify if the METHOD is allowed by the route
-    then process the request
-
-    GET:
-        read the file
-        store in a string
-        put in the body of the http response
-        send to user
-
-    POST:
-        create a file with the requested format
-        extract the body from the http request
-        store the extracted body into this file
-        send a successfull response to the user
-
-    DELETE
-        deletes a file inside the folder that contains user uploaded files
-        sends a response back 
-
- */
-
 bool Response::is_public(void) {
     std::string str = _request.get_target();
     str = str.substr(0, std::string("/public").length());

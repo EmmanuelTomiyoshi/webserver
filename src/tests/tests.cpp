@@ -34,6 +34,8 @@ static void test_request(void)
 
 static void test_cgi(void)
 {
+    if (_request.is_cgi() == false)
+        return ;
     Config & config = configs.next();
     std::cout << "\n------- CGI DEBUGGING --------" << std::endl;
     struct epoll_event event;
@@ -74,7 +76,6 @@ static void execute_tests(void)
     test_request();
     test_config();
     test_cgi();
-
 }
 
 void tests(int argc, char **argv)

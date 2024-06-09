@@ -194,7 +194,7 @@ void Request2::extract_route(void)
         _route = r;
 }
 
-void Request2::extract_file(void)
+void Request2::extract_file_cgi(void)
 {
     std::string str = _target;
 
@@ -210,6 +210,31 @@ void Request2::extract_file(void)
     }
     str = str.substr(0, str.find_first_of('?'));
     _file = str;
+}
+
+void Request2::extract_file_delete(void)
+{
+    std::string str = _target;
+
+    str = str.substr(str.find_last_of('/') + 1);
+    if (str.empty())
+        throw std::runtime_error(HTTP_BAD_REQUEST);
+
+    if (str.find_first_of('?') == std::string::npos)
+    {
+        _file = str;
+        return ;
+    }
+    str = str.substr(0, str.find_first_of('?'));
+    _file = str;
+}
+
+void Request2::extract_file(void)
+{
+    if (_method == "DELETE")
+        extract_file_delete();
+    else
+        extract_file_cgi();
 }
 
 std::string Request2::get_file(void)

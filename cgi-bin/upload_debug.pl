@@ -6,7 +6,7 @@ use CGI;
 use File::Basename;
 
 # Set the path to store uploaded files
-my $upload_dir = "./front/uploads";
+my $upload_dir = "./cgi-bin/temp";
 
 # print STDERR "STDIN\n\n";
 # while (<STDIN>) {

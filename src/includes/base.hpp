@@ -31,6 +31,7 @@
 # include <list>
 # include <algorithm>
 # include <ctime>
+# include <cstdio>
 
 # include "../tests/save_request.hpp"
 # include "error_codes.hpp"

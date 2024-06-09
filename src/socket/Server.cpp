@@ -39,7 +39,7 @@ void	Server::send_message(epoll_event & event)
 	ssize_t sent = this->_response->send_response(event);
 	delete this->_response;
 	if (sent <= 0)
-		throw std::runtime_error("empty response");
+		throw std::runtime_error(HTTP_BAD_REQUEST);
 }
 
 void Server::recv_message(epoll_event & event)

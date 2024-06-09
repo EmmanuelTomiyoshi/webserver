@@ -179,13 +179,28 @@ void Response::create_response(void)
         content_length +
         "\r\n";
     
-    //obs: should or shouldn't put '\0' after the response data (before the body data)?
     size_t size = response.size();
     size += _body.size;
     _http_response = new char[size];
     _http_response_size = size;
     std::memmove(_http_response, response.c_str(), response.size());
     std::memmove(_http_response + response.size(), _body.data, _body.size);
+}
+
+void Response::create_response_no_content(void)
+{
+    std::string status_line = http_version + " 204 No content\r\n";
+    std::string content_length = "Content-Length: 0\r\n";
+
+    std::string response = status_line + 
+        "Connection: close\r\n" +
+        content_length +
+        "\r\n";
+    
+    size_t size = response.size();
+    _http_response = new char[size];
+    _http_response_size = size;
+    std::memmove(_http_response, response.c_str(), response.size());
 }
 
 void Response::GET_normal(void)
@@ -274,17 +289,68 @@ void Response::DELETE(void)
 {
     if (_route->methods.allowed("DELETE") == false)
         throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
+
+    std::string file_path = _route->save_files_path.get();
+    file_path += "/" + _request.get_file();
+    std::cout << "FILE_PATH: " << file_path << std::endl;
+    if (ft::file_exists(file_path) == false)
+        throw std::runtime_error(HTTP_NOT_FOUND);
+    if (std::remove(file_path.c_str()) != 0)
+        throw std::runtime_error(HTTP_INTERNAL_SERVER_ERROR);
+    create_response_no_content();
+    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+    send(
+        event_data->fd,
+        _http_response, 
+        _http_response_size,
+        MSG_DONTWAIT
+    );
+    epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
+	close(event_data->fd);
+}
+
+void Response::create_cors_response(void)
+{
+    std::string status_line = http_version + " 200 OK\r\n";
+    std::string h0 = "Connection: close\r\n";
+    std::string h1 = "Content-Length: 0\r\n";
+    std::string h2 = "Access-Control-Allow-Origin: *\r\n";
+    std::string h3 = "Access-Control-Allow-Methods: GET, POST, PUT, DELETE\r\n";
+    std::string h4 = "Access-Control-Allow-Headers: Content-Type, Authorization\r\n";
+
+    std::string response = status_line + 
+        h0 + h1 + h2 + h3 + h4 + "\r\n";
+        
+
+    size_t size = response.size();
+    _http_response = new char[size];
+    _http_response_size = size;
+    std::memmove(_http_response, response.c_str(), response.size());
 }
 
 void Response::execute(void)
 {
     std::string method = _request.get_method();
+    std::cout << "&*****method: " << method << std::endl;
     if (method == "GET")
         GET();
     else if (method == "POST")
         POST();
     else if (method == "DELETE")
         DELETE();
+    else if (method ==  "OPTIONS")
+    {
+        create_cors_response();
+        ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+        send(
+            event_data->fd,
+            _http_response, 
+            _http_response_size,
+            MSG_DONTWAIT
+        );
+        epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
+        close(event_data->fd);
+    }
     else
         throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
 }

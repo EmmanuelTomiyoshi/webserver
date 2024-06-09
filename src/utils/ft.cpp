@@ -172,4 +172,9 @@ namespace ft {
         close(pfds2[0]);
         close(pfds2[1]);
     }
+
+    bool file_exists(std::string filename) {
+        std::ifstream file(filename.c_str());
+        return file.good();
+    }
 }

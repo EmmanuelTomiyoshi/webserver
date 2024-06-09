@@ -56,7 +56,7 @@ void Request2::extract_request_line(void)
         throw std::runtime_error(HTTP_BAD_REQUEST);
     if (_http_version != "HTTP/1.1")
         throw std::runtime_error(HTTP_BAD_REQUEST);
-    if (_method != "GET" && _method != "POST" && _method != "DELETE")
+    if (_method != "GET" && _method != "POST" && _method != "DELETE" &&  _method != "OPTIONS")
         throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
 
     _info = _info.substr(_info.find_first_of('\n') + 1);

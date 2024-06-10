@@ -17,8 +17,8 @@ SRC 		=	main.cpp \
 				CGI.cpp \
 				temp.cpp \
 				Request2.cpp \
-				Timeout.cpp \
 				tests.cpp \
+				Timeout.cpp \
 				save_request.cpp \
 				test_request.cpp \
 

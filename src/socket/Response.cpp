@@ -189,7 +189,7 @@ void Response::create_response(void)
 
 void Response::create_response_no_content(void)
 {
-    std::string status_line = http_version + " 204 No content\r\n";
+    std::string status_line = http_version + " 200 OK\r\n";
     std::string content_length = "Content-Length: 0\r\n";
 
     std::string response = status_line + 
@@ -267,16 +267,8 @@ void Response::POST(void)
     cgi.set_body_size(_request.get_body_size());
     cgi.set_content_type(_request.get_header("Content-Type"));
     cgi.set_timeout(_timeout);
+    cgi.set_script_name("./cgi-bin/upload_debug.pl");
 
-    static int i = 0;
-    i++;
-    std::cout << "---> i: " << i << std::endl;
-    if (i % 2 == 0)
-        cgi.set_script_name("./cgi-bin/upload_debug.pl");
-    else
-        cgi.set_script_name("./cgi-bin/upload_debug_loop.pl");
-    
-    
     cgi.set_event(_event);
     cgi.info();
     cgi.execute();

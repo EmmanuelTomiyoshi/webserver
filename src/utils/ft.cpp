@@ -115,7 +115,7 @@ namespace ft {
         char tmp[tmp_size];
         while (1)
         {
-            ssize_t bytes = recv(fd, tmp, tmp_size, MSG_WAITALL);
+            ssize_t bytes = recv(fd, tmp, tmp_size, MSG_DONTWAIT);
             if (bytes <= 0)
                 break;
             total_size += bytes;

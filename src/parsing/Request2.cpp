@@ -13,6 +13,7 @@ void Request2::init(char *buff, ssize_t size)
         std::cerr << "ERROR: Empty request" << std::endl;
         throw std::runtime_error(HTTP_BAD_REQUEST);
     }
+
 	separate_info();
     extract_request_line();
     extract_headers();

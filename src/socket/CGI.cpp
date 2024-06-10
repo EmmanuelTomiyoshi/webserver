@@ -159,9 +159,55 @@ void CGI::read_response(void)
     _response_size = ft::read_all(_pfds_b[R], &_response);
 }
 
+void CGI::add_write_event(int fd, char *buff, ssize_t size, int epfd, int cgi_fd)
+{
+    ft::CustomData *event_data = new ft::CustomData;
+    event_data->fd = fd;
+    event_data->cgi_fd = cgi_fd;
+    event_data->type = ft::CGI_W;
+    event_data->epfd = epfd;
+    event_data->timeout = 5;
+    event_data->start_time = time(NULL);
+    event_data->buff = buff;
+    event_data->buff_size = size;
+    event_data->w_count = 0;
+
+    epoll_event *event = new epoll_event;
+    event->events = EPOLLOUT | EPOLLET;
+    event->data.ptr = (void *) event_data;
+
+    epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
+    _timeout->add(event);
+}
+
+void CGI::write_to_cgi(epoll_event *event)
+{
+    ft::CustomData *data = (ft::CustomData *) event->data.ptr;
+
+    ssize_t bytes = write(
+        data->fd,
+        data->buff + data->w_count,
+        data->buff_size - data->w_count
+    );
+
+    // std::cout << "$$-> SIZE: " << data->buff_size << std::endl;
+    // std::cout << "$$-> COUNT: " << data->w_count + bytes << std::endl;
+    // std::cout << "$$-> LEFT: " << data->buff_size - data->w_count - bytes << std::endl;
+
+    if (bytes >= data->buff_size || bytes <= 0 || data->w_count + bytes >= data->buff_size)
+    {
+        epoll_ctl(data->epfd, EPOLL_CTL_DEL, data->fd, event);
+        close(data->fd);
+        data->type = ft::TRASH;
+        return ;
+    }
+
+    data->w_count += bytes;
+}
+
 void CGI::execute_cgi_post(void)
 {
-    pipe(_pfds_a);
+    pipe2(_pfds_a, O_NONBLOCK);
     pipe(_pfds_b);
     _pid = fork();
 
@@ -170,12 +216,12 @@ void CGI::execute_cgi_post(void)
         ft::CustomData *old_event_data = (ft::CustomData *) _event->data.ptr;
         epoll_ctl(old_event_data->epfd, EPOLL_CTL_DEL, old_event_data->fd, _event);
 
-        old_event_data->type = ft::TIMEOUT;
+        old_event_data->type = ft::TRASH;
 
         ft::CustomData *event_data = new ft::CustomData;
         event_data->cgi_fd = old_event_data->fd;
         event_data->fd = _pfds_b[R];
-        event_data->type = ft::CGI;
+        event_data->type = ft::CGI_R;
         event_data->epfd = old_event_data->epfd;
         event_data->timeout = 5;
         event_data->start_time = time(NULL);
@@ -187,18 +233,19 @@ void CGI::execute_cgi_post(void)
 
         epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
         _timeout->add(event);
+
         close(_pfds_a[R]);
-        close(_pfds_a[W]);
         close(_pfds_b[W]);
+
+        add_write_event(_pfds_a[W], _body, _body_size, old_event_data->epfd, old_event_data->fd);
     }
 
     if (_pid == 0)
     {
         dup2(_pfds_a[R], STDIN_FILENO);
         dup2(_pfds_b[W], STDOUT_FILENO);
-        write(_pfds_a[W], _body, _body_size);
+        
         ft::close_pipes(_pfds_a, _pfds_b);
-
         execve(_argv[0], (char * const *) _argv, (char * const *) _envs);
         std::cerr << "CGI ERROR: fail to execute cgi script" << std::endl;
         exit(0);
@@ -220,7 +267,7 @@ void CGI::execute_cgi_get(void)
         ft::CustomData *event_data = new ft::CustomData;
         event_data->cgi_fd = old_event_data->fd;
         event_data->fd = _pfds_b[R];
-        event_data->type = ft::CGI;
+        event_data->type = ft::CGI_R;
         event_data->epfd = old_event_data->epfd;
         event_data->timeout = 5;
         event_data->start_time = time(NULL);

@@ -1,4 +1,5 @@
 #include "Timeout.hpp"
+# include "Response.hpp"
 
 Timeout::Timeout(void) : _id(0)
 {
@@ -38,14 +39,23 @@ void Timeout::event_timed_out(epoll_event *event)
 {
     ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
 
-    event_data->type = ft::TIMEOUT;
-    epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, event);
-    std::string response = "HTTP/1.1 500 CGI Unavailable\r\nContent-Type: text; plain\r\nContent-Length: 10\r\n\r\n1234567890";
-    send(event_data->cgi_fd, response.c_str(), response.size(), MSG_DONTWAIT);
-    close(event_data->cgi_fd);
     close(event_data->fd);
-    kill(event_data->pid, SIGKILL);
+    if (event_data->type == ft::CGI_R)
+    {
+        kill(event_data->pid, SIGKILL);
+        Response response;
+        response.process_error(HTTP_INTERNAL_SERVER_ERROR);
+        send(
+            event_data->cgi_fd,
+            response.get_response(),
+            response.get_response_size(),
+            MSG_DONTWAIT
+        );
+        close(event_data->cgi_fd);
+    }
     remove(event);
+    epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, event);
+    event_data->type = ft::TIMEOUT;
     std::cout << "Event timed out" << std::endl;
 }
 

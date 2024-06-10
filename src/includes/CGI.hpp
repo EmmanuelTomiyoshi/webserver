@@ -72,6 +72,8 @@ class CGI
         void extract_response_data(char *response, ssize_t response_size);
         void extract_content_type(char *response, size_t header_size);
 
+        void add_write_event(int fd, char *buff, ssize_t size, int epfd, int cgi_fd);
+
         void format_http_response(void);
 
         ResponseData _response_data;
@@ -101,6 +103,7 @@ class CGI
         void debug_pfds_b(void);
         ssize_t read_pfds_b(char **buff);
 
+        void write_to_cgi(epoll_event *event);
 };
 
 #endif

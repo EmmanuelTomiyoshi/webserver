@@ -8,8 +8,10 @@ namespace ft {
     {
         SOCK,
         CONN,
-        CGI,
-        TIMEOUT
+        CGI_R,
+        CGI_W,
+        TIMEOUT,
+        TRASH,
     };
 
     typedef struct CustomData
@@ -22,6 +24,9 @@ namespace ft {
         int pid;
         EventType type;
         size_t id;
+        char *buff;
+        ssize_t buff_size;
+        ssize_t w_count;
     } CustomData;
 
     bool number_is_in(int value, int *arr, int size);

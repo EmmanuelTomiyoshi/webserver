@@ -47,6 +47,7 @@ void Server::recv_message(epoll_event & event)
 	ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
 	char *buff = NULL;
 	int buff_size = ft::recv_all(event_data->fd, &buff);
+	std::cout << " - recv size: " << buff_size << std::endl;
 	save_request(buff, buff_size);
 	if (buff_size <= 0)
 		throw std::runtime_error("empty request");
@@ -128,13 +129,19 @@ void	Server::run(void)
 			}
 			else if (event_data->type == ft::CONN)
 			{
-				std::cout << "request processed" << std::endl;
+				std::cout << "connection event triggered" << std::endl;
 				process_request(_events[i]);
 			}
-			else if (event_data->type == ft::CGI)
+			else if (event_data->type == ft::CGI_R)
 			{
-				std::cout << "cgi response processed" << std::endl;
+				std::cout << "cgi read event triggered" << std::endl;
 				process_cgi_response(_events[i]);
+			}
+			else if (event_data->type == ft::CGI_W)
+			{
+				std::cout << "cgi write event triggered" << std::endl;
+				CGI cgi;
+				cgi.write_to_cgi(&_events[i]);
 			}
 		}
 	}

@@ -2,6 +2,8 @@
 # define FT_HPP
 #include "base.hpp"
 
+class Config;
+
 namespace ft {
 
     enum EventType
@@ -12,6 +14,7 @@ namespace ft {
         CGI_W,
         TIMEOUT,
         TRASH,
+        CLIENT_BODY,
     };
 
     typedef struct CustomData
@@ -27,6 +30,7 @@ namespace ft {
         char *buff;
         ssize_t buff_size;
         ssize_t w_count;
+        Config *config;
     } CustomData;
 
     bool number_is_in(int value, int *arr, int size);

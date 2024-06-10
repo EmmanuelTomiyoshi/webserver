@@ -30,12 +30,15 @@ class Server
 		void run(void);
 		void send_message(epoll_event & event);
 		void recv_message(epoll_event & event);
+		void recv_client_body(epoll_event & event);
 
 		void process_cgi_response(epoll_event & event);
 		void process_request(epoll_event & event);
 
 		static addrinfo get_hints(void);
 		void setup(void);
+
+		void close_ports(void);
 
 	public:
 		Server(std::string config_file);

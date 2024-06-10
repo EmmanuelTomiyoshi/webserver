@@ -42,17 +42,29 @@ void	Server::send_message(epoll_event & event)
 		throw std::runtime_error(HTTP_BAD_REQUEST);
 }
 
+/* 
+	alocar memoria pro body inteiro
+
+	armazenar a parte que ja recebeu
+
+	terminar de receber o restante
+
+ */
+
 void Server::recv_message(epoll_event & event)
 {
 	ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
+	event_data->config = _configs._fdconfigs.at(event_data->fd);
+
 	char *buff = NULL;
 	int buff_size = ft::recv_all(event_data->fd, &buff);
 	Request2 request;
 	std::cout << " - recv size: " << buff_size << std::endl;
 	request.init_info(buff, buff_size);
 	request.info();
-	save_request(buff, buff_size);
+	close_ports();
 	exit(0);
+	save_request(buff, buff_size);
 	if (buff_size <= 0)
 		throw std::runtime_error("empty request");
 	std::cout << "buff_size: " << buff_size << std::endl;
@@ -63,6 +75,12 @@ void Server::recv_message(epoll_event & event)
 		&_timeout
 	);
 }
+
+void Server::recv_client_body(epoll_event & event)
+{
+	(void) event;
+}
+
 
 void Server::process_cgi_response(epoll_event & event)
 {
@@ -128,7 +146,7 @@ void	Server::run(void)
 				int fd_conn = accept4(event_data->fd, NULL, NULL, SOCK_NONBLOCK);
 				//fd_conn is related to socket_fd that is related to a port that is related to a specific config file
 				//this is why this relationship works and I get the right config file in the line below
-				_configs._fdconfigs[fd_conn] = _configs._fdconfigs[event_data->fd]; 
+				_configs._fdconfigs[fd_conn] = _configs._fdconfigs[event_data->fd];
 				new_epoll_event(fd_conn, EPOLLIN | EPOLLET, ft::CONN);
 			}
 			else if (event_data->type == ft::CONN)
@@ -146,6 +164,11 @@ void	Server::run(void)
 				std::cout << "cgi write event triggered" << std::endl;
 				CGI cgi;
 				cgi.write_to_cgi(&_events[i]);
+			}
+			else if (event_data->type == ft::CLIENT_BODY)
+			{
+				std::cout << "client body event triggered" << std::endl;
+				recv_client_body(_events[i]);
 			}
 		}
 	}
@@ -197,4 +220,11 @@ void Server::start(void)
 	setup();
 	std::cout << "Server started." << std::endl;
 	run();
+}
+
+void Server::close_ports(void)
+{
+	std::list<int>::iterator it = this->_socket_fds.begin();
+	for (; it != _socket_fds.end(); it++)
+		close(*it);
 }

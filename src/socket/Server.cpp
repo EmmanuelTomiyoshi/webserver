@@ -47,8 +47,12 @@ void Server::recv_message(epoll_event & event)
 	ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
 	char *buff = NULL;
 	int buff_size = ft::recv_all(event_data->fd, &buff);
+	Request2 request;
 	std::cout << " - recv size: " << buff_size << std::endl;
+	request.init_info(buff, buff_size);
+	request.info();
 	save_request(buff, buff_size);
+	exit(0);
 	if (buff_size <= 0)
 		throw std::runtime_error("empty request");
 	std::cout << "buff_size: " << buff_size << std::endl;

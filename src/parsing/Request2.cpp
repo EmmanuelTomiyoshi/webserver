@@ -24,6 +24,19 @@ void Request2::init(char *buff, ssize_t size)
     info();
 }
 
+void Request2::init_info(char *buff, ssize_t size)
+{
+    _buff = buff;
+    _buff_size = size;
+	separate_info();
+    extract_request_line();
+    extract_headers();
+    extract_body_size();
+    extract_route();
+    extract_file();
+    extract_query();
+}
+
 void Request2::verify_initialization(void) const
 {
     if (_buff == NULL)
@@ -92,10 +105,6 @@ void Request2::extract_body_size(void)
     {
         std::string & length = _headers.at("Content-Length");
         _body_size = ft::str_to_int(length);
-
-        _body = new char[_body_size];
-        std::memmove(_body, ft::get_body_position(_buff, _buff_size), _body_size);
-        ft::debug_file("./debug", _body, _body_size);
     }
     catch (std::exception & e)
     {

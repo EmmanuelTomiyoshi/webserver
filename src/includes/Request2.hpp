@@ -15,10 +15,12 @@ class Request2
 
 	private:
 		std::string _info;
+		std::string _info_raw;
 		char *_buff;
 		size_t _buff_size;
 		char *_body;
 		size_t _body_size;
+		size_t _body_bytes;
 		void separate_info(void);
         void extract_request_line(void);
 		void extract_headers(void);
@@ -55,6 +57,7 @@ class Request2
 		char *get_body(void);
 		size_t get_body_size(void);
         void info(void);
+		void debug(void);
 
 		std::string get_file(void);
 		std::string get_route(void);
@@ -62,6 +65,7 @@ class Request2
 		bool is_cgi(void);
 
 		void init_info(char *buff, ssize_t size);
+		ssize_t body_bytes_remaining(void);
 };
 
 #endif

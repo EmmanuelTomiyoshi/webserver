@@ -55,6 +55,9 @@ void Request2::separate_info(void)
 	info[size_info] = '\0';
 
     _info = info;
+    _info_raw = info;
+    _body_bytes = _buff_size - size_info;
+    delete [] info;
 }
 
 void Request2::extract_request_line(void)
@@ -295,4 +298,18 @@ void Request2::extract_query(void)
 std::string Request2::get_query(void)
 {
     return _query;
+}
+
+void Request2::debug(void)
+{
+    std::cout << "\n-------- Request2 Debug --------" << std::endl;
+    std::cout << "buff_size: " << _buff_size << std::endl;
+    std::cout << "body_bytes: " << _body_bytes << std::endl;
+    std::cout << "body_size: " << _body_size << std::endl;
+    std::cout << "info_size: " << this->_info_raw.size() << std::endl;
+}
+
+ssize_t Request2::body_bytes_remaining(void)
+{
+    return _body_size - _body_bytes;
 }

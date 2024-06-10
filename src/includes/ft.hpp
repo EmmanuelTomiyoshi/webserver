@@ -3,6 +3,7 @@
 #include "base.hpp"
 
 class Config;
+class Request2;
 
 namespace ft {
 
@@ -31,6 +32,7 @@ namespace ft {
         ssize_t buff_size;
         ssize_t w_count;
         Config *config;
+        Request2 *request;
     } CustomData;
 
     bool number_is_in(int value, int *arr, int size);

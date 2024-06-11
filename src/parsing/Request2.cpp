@@ -17,7 +17,7 @@ void Request2::init(char *buff, ssize_t size)
 	separate_info();
     extract_request_line();
     extract_headers();
-    extract_body_size();
+    extract_body();
     extract_route();
     extract_file();
     extract_query();
@@ -31,7 +31,7 @@ void Request2::init_info(char *buff, ssize_t size)
 	separate_info();
     extract_request_line();
     extract_headers();
-    extract_body_size();
+    extract_body();
     extract_route();
     extract_file();
     extract_query();
@@ -102,12 +102,16 @@ void Request2::extract_headers(void)
     }
 }
 
-void Request2::extract_body_size(void)
+void Request2::extract_body(void)
 {
     try
     {
         std::string & length = _headers.at("Content-Length");
         _body_size = ft::str_to_int(length);
+
+        _body = new char[_body_size];
+        _body = ft::get_body_position(_buff, _buff_size);
+
     }
     catch (std::exception & e)
     {
@@ -115,6 +119,7 @@ void Request2::extract_body_size(void)
         if (_method == "POST")
             throw std::runtime_error(HTTP_BAD_REQUEST);
         _body_size = 0;
+        _body_bytes = 0;
         _body = NULL;
     }
 }
@@ -307,9 +312,15 @@ void Request2::debug(void)
     std::cout << "body_bytes: " << _body_bytes << std::endl;
     std::cout << "body_size: " << _body_size << std::endl;
     std::cout << "info_size: " << this->_info_raw.size() << std::endl;
+    std::cout << "is_body_complete: " << (is_body_complete() ? "true" : "false") << std::endl;
 }
 
 ssize_t Request2::body_bytes_remaining(void)
 {
     return _body_size - _body_bytes;
+}
+
+bool Request2::is_body_complete(void)
+{
+    return _body_bytes >= _body_size;
 }

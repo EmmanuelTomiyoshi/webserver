@@ -24,7 +24,7 @@ class Request2
 		void separate_info(void);
         void extract_request_line(void);
 		void extract_headers(void);
-		void extract_body_size(void);
+		void extract_body(void);
 
 		std::string _method;
 		std::string _http_version;
@@ -66,6 +66,7 @@ class Request2
 
 		void init_info(char *buff, ssize_t size);
 		ssize_t body_bytes_remaining(void);
+		bool is_body_complete(void);
 };
 
 #endif

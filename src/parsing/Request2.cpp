@@ -6,26 +6,6 @@ Request2::Request2(void) : _buff(NULL), _body(NULL), _is_cgi(false)
 
 void Request2::init(char *buff, ssize_t size)
 {
-    _buff = buff;
-    _buff_size = size;
-    if (size <= 0)
-    {
-        std::cerr << "ERROR: Empty request" << std::endl;
-        throw std::runtime_error(HTTP_BAD_REQUEST);
-    }
-
-	separate_info();
-    extract_request_line();
-    extract_headers();
-    extract_body();
-    extract_route();
-    extract_file();
-    extract_query();
-    info();
-}
-
-void Request2::init_info(char *buff, ssize_t size)
-{
     if (size <= 0)
     {
         std::cerr << "ERROR: Empty request" << std::endl;

@@ -388,7 +388,6 @@ ssize_t Response::send_response(void)
 {
     ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
 
-    event_data->request->debug();
     try
     {
         this->execute();

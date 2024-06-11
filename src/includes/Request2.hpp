@@ -64,7 +64,6 @@ class Request2
 		std::string get_query(void);
 		bool is_cgi(void);
 
-		void init_info(char *buff, ssize_t size);
 		ssize_t body_bytes_remaining(void);
 		bool is_body_complete(void);
 };

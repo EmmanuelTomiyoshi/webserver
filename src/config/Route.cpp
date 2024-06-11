@@ -189,13 +189,13 @@ void Route::set_root(std::string root)
 {
 	if (root.empty())
 		return ;
-	this->_root = root;
-	this->save_files_path.set_root(root);
+	this->_root = ft::get_full_path(root);
+	this->save_files_path.set_root(this->_root);
 }
 
 void Route::set_parent_root(std::string root)
 {
-	this->_parent_root = root;
+	this->_parent_root = ft::get_full_path(root);
 	if (_root.empty())
 		this->save_files_path.set_root(get_path());
 }

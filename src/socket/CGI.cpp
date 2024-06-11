@@ -59,6 +59,7 @@ void CGI::set_query_string(std::string value)
 
 void CGI::set_script_name(std::string value)
 {
+    value = ft::get_full_path(value);
     _script_name = "SCRIPT_FILENAME=" + value;
     _script_name_raw = value;
     add_env(_script_name.c_str());
@@ -245,8 +246,10 @@ void CGI::execute_cgi_post(void)
     {
         dup2(_pfds_a[R], STDIN_FILENO);
         dup2(_pfds_b[W], STDOUT_FILENO);
-        
+
         ft::close_pipes(_pfds_a, _pfds_b);
+    
+        enter_dir(_route->save_files_path.get());
         execve(_argv[0], (char * const *) _argv, (char * const *) _envs);
         std::cerr << "CGI ERROR: fail to execute cgi script" << std::endl;
         exit(0);
@@ -400,4 +403,22 @@ size_t CGI::get_response_size(void)
 void CGI::set_route(Route *route)
 {
     _route = route;
+}
+
+void CGI::enter_dir(std::string dir)
+{
+    if (chdir(dir.c_str()) != 0)
+    {
+        if (mkdir(dir.c_str(), 0766) != 0)
+        {
+            std::cerr << "CGI error entering dir: " << _route->save_files_path.get() << std::endl;
+            exit(1);
+        }
+
+        if (chdir(dir.c_str()) != 0)
+        {
+            std::cerr << "CGI error entering dir: " << _route->save_files_path.get() << std::endl;
+            exit(1);
+        }
+    }
 }

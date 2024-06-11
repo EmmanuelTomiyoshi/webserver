@@ -83,6 +83,8 @@ class CGI
 
         Timeout *_timeout;
 
+        void enter_dir(std::string dir);
+
     public:
         CGI(void);
 

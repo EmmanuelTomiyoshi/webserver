@@ -32,6 +32,7 @@
 # include <algorithm>
 # include <ctime>
 # include <cstdio>
+# include <sys/stat.h>
 
 # include "../tests/save_request.hpp"
 # include "error_codes.hpp"

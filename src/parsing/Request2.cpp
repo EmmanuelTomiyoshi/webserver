@@ -195,9 +195,12 @@ void Request2::extract_route_normal(void)
     }
     
     if (is_file_or_query(r))
-        _route = r.substr(0, r.find_last_of('/'));
-    else
-        _route = r;
+    {
+        r = r.substr(0, r.find_last_of('/'));
+        if (r.empty())
+            r = "/";
+    }
+    _route = r;
 }
 
 void Request2::extract_route_delete(void)
@@ -209,14 +212,14 @@ void Request2::extract_route_delete(void)
     
     r = r.substr(0, r.find_last_of('/'));
     if (r.empty())
-        throw std::runtime_error(HTTP_BAD_REQUEST);
-
-    _route = r;
+        _route = "/";
+    else
+        _route = r;
 }
 
 void Request2::extract_route(void)
 {
-    if (_method == "DELETE")
+    if (_method == "DELETE" || _method == "OPTIONS")
         extract_route_delete();
     else
         extract_route_normal();

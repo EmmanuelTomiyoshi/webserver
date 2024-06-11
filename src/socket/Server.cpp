@@ -92,6 +92,7 @@ void Server::recv_message(epoll_event & event)
 
 	if (event_data->request->is_body_complete())
 	{
+		event_data->request->info();
 		Response response(&event);
 		response.send_response();
 	}

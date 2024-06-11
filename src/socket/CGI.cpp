@@ -1,4 +1,5 @@
 #include "CGI.hpp"
+#include "Route.hpp"
 
 std::string CGI::_gateway_interface("GATEWAY_INTERFACE=CGI/1.1");
 std::string CGI::_server_protocol("SERVER_PROTOCOL=HTTP/1.1");
@@ -394,4 +395,9 @@ char *CGI::get_response(void)
 size_t CGI::get_response_size(void)
 {
     return _response_data.http_response_size;
+}
+
+void CGI::set_route(Route *route)
+{
+    _route = route;
 }

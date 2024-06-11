@@ -246,6 +246,7 @@ void Response::GET_cgi(void)
     cgi.set_body_size(_request->get_body_size());
     cgi.set_query_string(_request->get_query());
     cgi.set_timeout(_timeout);
+    cgi.set_route(_route);
     std::string script = _route->get_path();
     script += "/" + _request->get_file();
     cgi.set_script_name(script);
@@ -288,6 +289,7 @@ void Response::POST(void)
     cgi.set_content_type(_request->get_header("Content-Type"));
     cgi.set_timeout(_timeout);
     cgi.set_script_name("./cgi-bin/upload_debug.pl");
+    cgi.set_route(_route);
 
     cgi.set_event(_event);
     cgi.info();

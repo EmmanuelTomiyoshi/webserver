@@ -15,6 +15,8 @@
 # define W 1
 # define R 0
 
+class Route;
+
 class CGI
 {
     public:
@@ -39,6 +41,7 @@ class CGI
         std::string _script_name_raw;
         static std::string _gateway_interface;
         static std::string _server_protocol;
+        Route *_route;
 
         const char *_envs[ENVS_SIZE];
         const char *_argv[ARGV_SIZE];
@@ -92,6 +95,7 @@ class CGI
         void set_body_size(size_t value);
         void set_event(struct epoll_event *event);
         void set_timeout(Timeout *timeout);
+        void set_route(Route *route);
 
         void execute(void);
         void info(void);

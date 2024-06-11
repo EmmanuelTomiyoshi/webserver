@@ -40,7 +40,6 @@ class Response
         char *_http_response;
         size_t _http_response_size;
         void create_response(void);
-        void create_response_no_content(void);
 
         void build_error(std::string code);
 

@@ -207,22 +207,6 @@ void Response::create_response(void)
     std::memmove(_http_response + response.size(), _body.data, _body.size);
 }
 
-void Response::create_response_no_content(void)
-{
-    std::string status_line = http_version + " 200 OK\r\n";
-    std::string content_length = "Content-Length: 0\r\n";
-
-    std::string response = status_line + 
-        "Connection: close\r\n" +
-        content_length +
-        "\r\n";
-    
-    size_t size = response.size();
-    _http_response = new char[size];
-    _http_response_size = size;
-    std::memmove(_http_response, response.c_str(), response.size());
-}
-
 void Response::GET_normal(void)
 {
     open_file();
@@ -311,7 +295,7 @@ void Response::DELETE(void)
         throw std::runtime_error(HTTP_NOT_FOUND);
     if (std::remove(file_path.c_str()) != 0)
         throw std::runtime_error(HTTP_INTERNAL_SERVER_ERROR);
-    create_response_no_content();
+    create_cors_response();
     ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
     send(
         event_data->fd,

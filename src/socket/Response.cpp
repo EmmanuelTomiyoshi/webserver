@@ -189,13 +189,15 @@ void Response::build_error(std::string code)
 void Response::create_response(void)
 {
     std::string status_line = http_version + " " + _status + " \r\n";
-    std::string content_type = "Content-Type: " + _mime + "\r\n";
+    std::string h1 = "Content-Type: " + _mime + "\r\n";
+    std::string h2 = "Access-Control-Allow-Origin: *\r\n";
+    std::string h3 = "Access-Control-Allow-Methods: GET, POST, DELETE\r\n";
     std::string content_length = "Content-Length: " + 
         ft::int_to_str(_body.size) + "\r\n";
 
     std::string response = status_line + 
         "Connection: close\r\n" +
-        content_type + 
+        h1 + h2 + h3 + 
         content_length +
         "\r\n";
     
@@ -313,11 +315,10 @@ void Response::create_cors_response(void)
     std::string h0 = "Connection: close\r\n";
     std::string h1 = "Content-Length: 0\r\n";
     std::string h2 = "Access-Control-Allow-Origin: *\r\n";
-    std::string h3 = "Access-Control-Allow-Methods: GET, POST, PUT, DELETE\r\n";
-    std::string h4 = "Access-Control-Allow-Headers: Content-Type, Authorization\r\n";
+    std::string h3 = "Access-Control-Allow-Methods: GET, POST, DELETE\r\n";
 
     std::string response = status_line + 
-        h0 + h1 + h2 + h3 + h4 + "\r\n";
+        h0 + h1 + h2 + h3 + "\r\n";
         
 
     size_t size = response.size();

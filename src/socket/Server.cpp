@@ -76,16 +76,16 @@ void Server::recv_message(epoll_event & event)
 	int buff_size = ft::recv_all(event_data->fd, &buff);
 	Request2 *request = new Request2;
 	request->init_info(buff, buff_size);
-	request->debug();
+	// request->debug();
 	event_data->request = request;
 	if (request->is_body_complete() == false)
 	{
 		close_ports();
 		exit(0);
 	}
-	// Response response(&event);
-	// response.send_response();
-	// save_request(buff, buff_size);
+	Response response(&event);
+	response.send_response();
+	save_request(buff, buff_size);
 }
 
 void Server::recv_client_body(epoll_event & event)

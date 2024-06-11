@@ -19,6 +19,7 @@ Response::Response(epoll_event *event)
 {
 	ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
 
+    _event = event;
     _config = event_data->config;
     _request = event_data->request;
     _timeout = event_data->timeout;
@@ -387,6 +388,7 @@ ssize_t Response::send_response(void)
 {
     ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
 
+    event_data->request->debug();
     try
     {
         this->execute();

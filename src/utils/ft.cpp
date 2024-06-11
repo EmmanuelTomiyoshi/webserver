@@ -177,4 +177,20 @@ namespace ft {
         std::ifstream file(filename.c_str());
         return file.good();
     }
+
+    std::string get_full_path(std::string relative)
+    {
+        if (relative.empty())
+            return "";
+        if (relative.at(0) != '.')
+            return relative;
+        
+        char *cwd = getcwd(NULL, 0);
+        if (cwd == NULL)
+            return "";
+        std::string path(cwd);
+        free(cwd);
+
+        return path + relative.substr(1);
+    }
 }

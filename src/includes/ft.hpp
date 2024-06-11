@@ -74,6 +74,9 @@ namespace ft {
 
     ssize_t read_all(int fd, char **buff);
     bool file_exists(std::string filename);
+
+    //receives a relative path and returns a full path
+    std::string get_full_path(std::string relative);
 }
 
 #endif

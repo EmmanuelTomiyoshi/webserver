@@ -70,9 +70,19 @@ static void test_cgi(void)
     );
 }
 
+void random_tests(void)
+{
+    std::cout << "FULL PATH: " << ft::get_full_path("./") << std::endl;
+    std::cout << "FULL PATH: " << ft::get_full_path("./front") << std::endl;
+    std::cout << "FULL PATH: " << ft::get_full_path("./cgi-bin/temp") << std::endl;
+    std::cout << "FULL PATH: " << ft::get_full_path("/home/fodase/floeres/leguminosas") << std::endl;
+    exit(0);
+}
+
 static void execute_tests(void)
 {
     std::cout << "------------ EXECUTING TESTS ------------\n\n" << std::endl;
+    random_tests();
     test_request();
     test_config();
     test_cgi();

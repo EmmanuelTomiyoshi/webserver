@@ -58,20 +58,12 @@ void Server::recv_message(epoll_event & event)
 
 	char *buff = NULL;
 	int buff_size = ft::recv_all(event_data->fd, &buff);
-	std::cout << "received: " << buff_size << std::endl;
 	Request2 request;
-	std::cout << " - recv size: " << buff_size << std::endl;
 	request.init_info(buff, buff_size);
 	request.debug();
-	std::cout << "body_bytes_remaining: " << request.body_bytes_remaining() << std::endl;
-	// request.info();
-	std::cout << "expected body: " << request.get_body_size() << std::endl;
 	close_ports();
 	exit(0);
 	// save_request(buff, buff_size);
-	// if (buff_size <= 0)
-	// 	throw std::runtime_error("empty request");
-	// std::cout << "buff_size: " << buff_size << std::endl;
 	// this->_response = new Response(
 	// 	buff,
 	// 	buff_size,

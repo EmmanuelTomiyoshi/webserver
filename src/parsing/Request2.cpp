@@ -26,6 +26,8 @@ void Request2::init(char *buff, ssize_t size)
 
 void Request2::init_info(char *buff, ssize_t size)
 {
+	if (size <= 0)
+	    throw std::runtime_error("empty request");
     _buff = buff;
     _buff_size = size;
 	separate_info();
@@ -313,6 +315,7 @@ void Request2::debug(void)
     std::cout << "body_size: " << _body_size << std::endl;
     std::cout << "info_size: " << this->_info_raw.size() << std::endl;
     std::cout << "is_body_complete: " << (is_body_complete() ? "true" : "false") << std::endl;
+    std::cout << "body_bytes_remaining: " << this->body_bytes_remaining() << std::endl;
 }
 
 ssize_t Request2::body_bytes_remaining(void)

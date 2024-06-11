@@ -172,18 +172,6 @@ void Request2::info(void)
         std::cout << (*it).first << " -> " << (*it).second << std::endl;
 }
 
-static bool is_file_or_query(std::string str)
-{
-    if (str.find_last_of('/') != std::string::npos)
-        str = str.substr(str.find_last_of('/') + 1);
-    
-    if (str.find('.') != std::string::npos)
-        return true;
-    if (str.find('?') != std::string::npos)
-        return true;
-    return false;
-}
-
 void Request2::extract_route_normal(void)
 {
     std::string r = _target;
@@ -194,12 +182,17 @@ void Request2::extract_route_normal(void)
         return ;
     }
     
-    if (is_file_or_query(r))
-    {
+    if (r.find_first_of('?') < r.find_first_of('.'))
+        r = r.substr(0, r.find_first_of('?'));
+    else if (r.find('.') != std::string::npos)
         r = r.substr(0, r.find_last_of('/'));
-        if (r.empty())
-            r = "/";
-    }
+    else if (r.find('?') != std::string::npos)
+        r = r.substr(0, r.find_first_of('?'));
+
+    if (r.empty())
+        r = "/";
+    if (r.size() > 2 && r.at(r.size() - 1) == '/')
+        r = r.substr(0, r.size() - 1);
     _route = r;
 }
 
@@ -225,7 +218,7 @@ void Request2::extract_route(void)
         extract_route_normal();
 }
 
-void Request2::extract_file_cgi(void)
+void Request2::extract_file_normal(void)
 {
     std::string str = _target;
 
@@ -265,7 +258,7 @@ void Request2::extract_file(void)
     if (_method == "DELETE")
         extract_file_delete();
     else
-        extract_file_cgi();
+        extract_file_normal();
 }
 
 std::string Request2::get_file(void)

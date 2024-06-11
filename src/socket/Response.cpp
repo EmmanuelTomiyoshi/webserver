@@ -8,6 +8,29 @@ Response::Response(char *buff, size_t size, Config *config, Timeout *timeout) :
 _buff(buff), _buff_size(size), _status("200"), _http_response(NULL),
 _config(config), _timeout(timeout)
 {
+    start_mimes();
+}
+
+Response::Response(void)
+{
+}
+
+Response::Response(epoll_event *event)
+{
+	ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
+
+    _config = event_data->config;
+    _request = event_data->request;
+    _timeout = event_data->timeout;
+    if (is_public())
+        _route = NULL;
+    else
+        _route = &_config->routes.get(_request->get_route());
+    start_mimes();
+}
+
+void Response::start_mimes(void)
+{
     mime_types["js"] = "application/javascript";
     mime_types["json"] = "application/json";
     mime_types["pdf"] = "application/pdf";
@@ -22,12 +45,8 @@ _config(config), _timeout(timeout)
     mime_types["svg"] = "image/svg+xml";
 }
 
-Response::Response(void)
-{
-}
-
 bool Response::is_public(void) {
-    std::string str = _request.get_target();
+    std::string str = _request->get_target();
     str = str.substr(0, std::string("/public").length());
     return str == "/public";
 }
@@ -59,7 +78,7 @@ void Response::open_route_file(void)
 
 void Response::set_public_file_info(void)
 {
-    this->_path = '.' + _request.get_target();
+    this->_path = '.' + _request->get_target();
     if (_path.empty())
     {
         std::cerr << "error: no path provided" << std::endl;
@@ -103,7 +122,7 @@ void Response::open_file(void)
 
     try
     {
-        _route = &(_config->routes.get(_request.get_target()));
+        _route = &(_config->routes.get(_request->get_target()));
         open_route_file();
     }
     catch (std::exception & e)
@@ -222,12 +241,12 @@ void Response::GET_cgi(void)
 {
     CGI cgi;
     cgi.set_request_method("GET");
-    cgi.set_body(_request.get_body());
-    cgi.set_body_size(_request.get_body_size());
-    cgi.set_query_string(_request.get_query());
+    cgi.set_body(_request->get_body());
+    cgi.set_body_size(_request->get_body_size());
+    cgi.set_query_string(_request->get_query());
     cgi.set_timeout(_timeout);
     std::string script = _route->get_path();
-    script += "/" + _request.get_file();
+    script += "/" + _request->get_file();
     cgi.set_script_name(script);
     cgi.set_event(_event);
     cgi.execute();
@@ -262,10 +281,10 @@ void Response::POST(void)
         throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
     CGI cgi;
     cgi.set_request_method("POST");
-    cgi.set_body(_request.get_body());
-    cgi.set_content_length(_request.get_header("Content-Length"));
-    cgi.set_body_size(_request.get_body_size());
-    cgi.set_content_type(_request.get_header("Content-Type"));
+    cgi.set_body(_request->get_body());
+    cgi.set_content_length(_request->get_header("Content-Length"));
+    cgi.set_body_size(_request->get_body_size());
+    cgi.set_content_type(_request->get_header("Content-Type"));
     cgi.set_timeout(_timeout);
     cgi.set_script_name("./cgi-bin/upload_debug.pl");
 
@@ -283,7 +302,7 @@ void Response::DELETE(void)
         throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
 
     std::string file_path = _route->save_files_path.get();
-    file_path += "/" + _request.get_file();
+    file_path += "/" + _request->get_file();
     std::cout << "FILE_PATH: " << file_path << std::endl;
     if (ft::file_exists(file_path) == false)
         throw std::runtime_error(HTTP_NOT_FOUND);
@@ -322,7 +341,7 @@ void Response::create_cors_response(void)
 
 void Response::execute(void)
 {
-    std::string method = _request.get_method();
+    std::string method = _request->get_method();
     std::cout << "&*****method: " << method << std::endl;
     if (method == "GET")
         GET();
@@ -364,21 +383,12 @@ void Response::execute_error(std::string code)
 	close(event_data->fd);
 }
 
-ssize_t Response::send_response(epoll_event & event)
+ssize_t Response::send_response(void)
 {
-    ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
-    _event = &event;
+    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
 
     try
     {
-        std::cout << "send response ----" << std::endl;
-        _request.init(_buff, _buff_size);
-        std::cout << "is_public: " << (is_public() ? "true" : "false") << std::endl;
-        if (is_public() == false)
-        {
-            _route = &(_config->routes.get(_request.get_route()));
-            _route->show();
-        }
         this->execute();
     }
     catch(const std::exception& e)
@@ -387,10 +397,10 @@ ssize_t Response::send_response(epoll_event & event)
         execute_error(e.what());
     }
 
-    if (_request.get_method() == "POST")
+    if (_request->get_method() == "POST")
     {
         std::cout << "*********JAMALAICACA" << std::endl;
-        epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, &event);
+        epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
         return 1;
     }
     return 1;

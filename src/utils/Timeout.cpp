@@ -65,7 +65,7 @@ void Timeout::verify(void)
     for (; it != _events.end(); it++)
     {
         ft::CustomData *event_data = (ft::CustomData *)(*it)->data.ptr;
-        if (event_data->start_time + event_data->timeout < time(NULL))
+        if (event_data->start_time + event_data->duration < time(NULL))
         {
             event_timed_out(*it);
             return ;

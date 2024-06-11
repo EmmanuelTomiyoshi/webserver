@@ -166,7 +166,7 @@ void CGI::add_write_event(int fd, char *buff, ssize_t size, int epfd, int cgi_fd
     event_data->cgi_fd = cgi_fd;
     event_data->type = ft::CGI_W;
     event_data->epfd = epfd;
-    event_data->timeout = 5;
+    event_data->duration = 5;
     event_data->start_time = time(NULL);
     event_data->buff = buff;
     event_data->buff_size = size;
@@ -223,7 +223,7 @@ void CGI::execute_cgi_post(void)
         event_data->fd = _pfds_b[R];
         event_data->type = ft::CGI_R;
         event_data->epfd = old_event_data->epfd;
-        event_data->timeout = 5;
+        event_data->duration = 5;
         event_data->start_time = time(NULL);
         event_data->pid = _pid;
 
@@ -269,7 +269,7 @@ void CGI::execute_cgi_get(void)
         event_data->fd = _pfds_b[R];
         event_data->type = ft::CGI_R;
         event_data->epfd = old_event_data->epfd;
-        event_data->timeout = 5;
+        event_data->duration = 5;
         event_data->start_time = time(NULL);
         event_data->pid = _pid;
 

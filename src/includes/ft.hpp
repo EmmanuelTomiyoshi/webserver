@@ -4,6 +4,7 @@
 
 class Config;
 class Request2;
+class Timeout;
 
 namespace ft {
 
@@ -23,8 +24,9 @@ namespace ft {
         int fd;
         int cgi_fd;
         int epfd;
+        Timeout *timeout;
         time_t start_time;
-        time_t timeout;
+        time_t duration;
         int pid;
         EventType type;
         size_t id;

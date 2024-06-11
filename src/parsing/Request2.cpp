@@ -26,8 +26,11 @@ void Request2::init(char *buff, ssize_t size)
 
 void Request2::init_info(char *buff, ssize_t size)
 {
-	if (size <= 0)
-	    throw std::runtime_error("empty request");
+    if (size <= 0)
+    {
+        std::cerr << "ERROR: Empty request" << std::endl;
+        throw std::runtime_error(HTTP_BAD_REQUEST);
+    }
     _buff = buff;
     _buff_size = size;
 	separate_info();

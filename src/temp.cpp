@@ -117,7 +117,7 @@ void timeout_test(void)
 
 	epoll_event *event = new epoll_event;
 	ft::CustomData *data = new ft::CustomData;
-	data->timeout = 5;
+	data->duration = 5;
 	data->start_time = time(NULL);
 	data->pid = fork();
 	if (data->pid == 0)
@@ -139,7 +139,7 @@ void timeout_test(void)
 
 	epoll_event *event2 = new epoll_event;
 	ft::CustomData *data2 = new ft::CustomData;
-	data2->timeout = 5;
+	data2->duration = 5;
 	data2->start_time = time(NULL);
 	data2->pid = fork();
 	if (data2->pid == 0)
@@ -153,7 +153,7 @@ void timeout_test(void)
 
 	epoll_event *event3 = new epoll_event;
 	ft::CustomData *data3 = new ft::CustomData;
-	data3->timeout = 3;
+	data3->duration = 3;
 	data3->start_time = time(NULL);
 	data3->pid = fork();
 	if (data3->pid == 0)

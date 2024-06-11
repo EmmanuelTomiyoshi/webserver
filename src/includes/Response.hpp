@@ -13,7 +13,7 @@ class Response
 {
     private:
         Request _req;
-        Request2 _request;
+        Request2 *_request;
         char *_buff;
         size_t _buff_size;
 
@@ -74,12 +74,15 @@ class Response
         void execute_error(std::string code);
 
         void create_cors_response(void);
+        
+        void start_mimes(void);
 
     public:
         Response(void);
+        Response(epoll_event *event);
         Response(char *buff, size_t size, Config *config, Timeout *timeout);
 
-        ssize_t send_response(epoll_event & event);
+        ssize_t send_response(void);
 
         static std::map<std::string, std::string> mime_types;
 

@@ -26,6 +26,7 @@ void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type
 	event_data->fd = conn_fd;
 	event_data->type = type;
 	event_data->epfd = _epfd;
+	event_data->timeout = &_timeout;
 
 	epoll_event *event = new epoll_event;
 	event->events = operation;
@@ -34,9 +35,25 @@ void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type
 	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, event);
 }
 
-void	Server::send_message(epoll_event & event)
+void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type, Config *config)
 {
-	ssize_t sent = this->_response->send_response(event);
+	ft::CustomData *event_data = new ft::CustomData;
+	event_data->fd = conn_fd;
+	event_data->type = type;
+	event_data->epfd = _epfd;
+	event_data->timeout = &_timeout;
+	event_data->config = config;
+
+	epoll_event *event = new epoll_event;
+	event->events = operation;
+	event->data.ptr = (void *) event_data;
+
+	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, event);
+}
+
+void	Server::send_message(void)
+{
+	ssize_t sent = this->_response->send_response();
 	delete this->_response;
 	if (sent <= 0)
 		throw std::runtime_error(HTTP_BAD_REQUEST);
@@ -54,22 +71,21 @@ void	Server::send_message(epoll_event & event)
 void Server::recv_message(epoll_event & event)
 {
 	ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
-	event_data->config = _configs._fdconfigs.at(event_data->fd);
 
 	char *buff = NULL;
 	int buff_size = ft::recv_all(event_data->fd, &buff);
-	Request2 request;
-	request.init_info(buff, buff_size);
-	request.debug();
-	close_ports();
-	exit(0);
+	Request2 *request = new Request2;
+	request->init_info(buff, buff_size);
+	request->debug();
+	event_data->request = request;
+	if (request->is_body_complete() == false)
+	{
+		close_ports();
+		exit(0);
+	}
+	// Response response(&event);
+	// response.send_response();
 	// save_request(buff, buff_size);
-	// this->_response = new Response(
-	// 	buff,
-	// 	buff_size,
-	// 	_configs._fdconfigs.at(event_data->fd),
-	// 	&_timeout
-	// );
 }
 
 void Server::recv_client_body(epoll_event & event)
@@ -117,7 +133,7 @@ void Server::process_request(epoll_event & event)
 	try
 	{
 		recv_message(event);
-		// send_message(event);
+		// send_message();
 	}
 	catch (std::exception & e)
 	{
@@ -143,7 +159,12 @@ void	Server::run(void)
 				//fd_conn is related to socket_fd that is related to a port that is related to a specific config file
 				//this is why this relationship works and I get the right config file in the line below
 				_configs._fdconfigs[fd_conn] = _configs._fdconfigs[event_data->fd];
-				new_epoll_event(fd_conn, EPOLLIN | EPOLLET, ft::CONN);
+				new_epoll_event(
+					fd_conn,
+					EPOLLIN | EPOLLET,
+					ft::CONN,
+					_configs._fdconfigs[event_data->fd]
+				);
 			}
 			else if (event_data->type == ft::CONN)
 			{

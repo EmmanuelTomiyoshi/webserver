@@ -28,7 +28,7 @@ class Server
 		Timeout _timeout;
 
 		void run(void);
-		void send_message(epoll_event & event);
+		void send_message(void);
 		void recv_message(epoll_event & event);
 		void recv_client_body(epoll_event & event);
 
@@ -46,6 +46,7 @@ class Server
 
 		void start(void);
 		void new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type);
+		void new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type, Config *config);
 };
 
 #endif

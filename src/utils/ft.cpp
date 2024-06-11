@@ -111,7 +111,7 @@ namespace ft {
     {
         char *data = NULL;
         ssize_t total_size = 0;
-        const ssize_t tmp_size = 5000;
+        const ssize_t tmp_size = 20000;
         char tmp[tmp_size];
         while (1)
         {

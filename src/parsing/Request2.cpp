@@ -33,15 +33,14 @@ void Request2::verify_initialization(void) const
 
 void Request2::separate_info(void)
 {
-	_body = ft::get_body_position(_buff, _buff_size);
-	size_t size_info = _body - _buff;
+	char *body = ft::get_body_position(_buff, _buff_size);
+	size_t size_info = body - _buff;
 	char *info = new char[size_info + 1];
 	std::memmove(info, _buff, size_info);
 	info[size_info] = '\0';
 
     _info = info;
     _info_raw = info;
-    _body_bytes = _buff_size - size_info;
     delete [] info;
 }
 
@@ -94,9 +93,13 @@ void Request2::extract_body(void)
         std::string & length = _headers.at("Content-Length");
         _body_size = ft::str_to_int(length);
 
+        _body_bytes = _buff_size - _info_raw.size();
         _body = new char[_body_size];
-        _body = ft::get_body_position(_buff, _buff_size);
-
+        std::memmove(
+            _body,
+            ft::get_body_position(_buff, _buff_size),
+            _body_bytes
+        );
     }
     catch (std::exception & e)
     {
@@ -309,4 +312,10 @@ ssize_t Request2::body_bytes_remaining(void)
 bool Request2::is_body_complete(void)
 {
     return _body_bytes >= _body_size;
+}
+
+void Request2::add_more_body(char *buff, ssize_t size)
+{
+    std::memmove(_body + _body_bytes, buff, size);
+    _body_bytes += size;
 }

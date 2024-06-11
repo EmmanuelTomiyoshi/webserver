@@ -75,6 +75,7 @@ void Server::recv_message(epoll_event & event)
 
 	char *buff = NULL;
 	int buff_size = ft::recv_all(event_data->fd, &buff);
+	std::cout << "data received: " << buff_size << std::endl;
 	save_request(buff, buff_size);
 
 	if (event_data->request == NULL)
@@ -82,15 +83,14 @@ void Server::recv_message(epoll_event & event)
 		event_data->request = new Request2;
 		event_data->request->init(buff, buff_size);
 	}
+	else if (event_data->request->is_body_complete() == false)
+	{
+		event_data->request->add_more_body(buff, buff_size);
+	}
 
 	event_data->request->debug();
 
-	if (event_data->request->is_body_complete() == false)
-	{
-		close_ports();
-		exit(0);
-	}
-	else
+	if (event_data->request->is_body_complete())
 	{
 		Response response(&event);
 		response.send_response();

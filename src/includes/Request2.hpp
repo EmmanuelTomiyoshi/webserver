@@ -66,6 +66,7 @@ class Request2
 
 		ssize_t body_bytes_remaining(void);
 		bool is_body_complete(void);
+		void add_more_body(char *buff, ssize_t size);
 };
 
 #endif

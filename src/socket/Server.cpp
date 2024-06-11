@@ -43,6 +43,7 @@ void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type
 	event_data->epfd = _epfd;
 	event_data->timeout = &_timeout;
 	event_data->config = config;
+	event_data->request = NULL;
 
 	epoll_event *event = new epoll_event;
 	event->events = operation;
@@ -60,11 +61,11 @@ void	Server::send_message(void)
 }
 
 /* 
-	alocar memoria pro body inteiro
+	if is first time: initialize request
 
-	armazenar a parte que ja recebeu
+	else: if is body is incomplete, keep reading
 
-	terminar de receber o restante
+	request.add_more_body();
 
  */
 
@@ -76,17 +77,24 @@ void Server::recv_message(epoll_event & event)
 	int buff_size = ft::recv_all(event_data->fd, &buff);
 	save_request(buff, buff_size);
 
-	Request2 *request = new Request2;
-	request->init(buff, buff_size);
-	request->debug();
-	event_data->request = request;
-	if (request->is_body_complete() == false)
+	if (event_data->request == NULL)
+	{
+		event_data->request = new Request2;
+		event_data->request->init(buff, buff_size);
+	}
+
+	event_data->request->debug();
+
+	if (event_data->request->is_body_complete() == false)
 	{
 		close_ports();
 		exit(0);
 	}
-	Response response(&event);
-	response.send_response();
+	else
+	{
+		Response response(&event);
+		response.send_response();
+	}
 }
 
 void Server::recv_client_body(epoll_event & event)

@@ -112,6 +112,10 @@ void Config::BodySize::set(std::string value)
 {
 	std::stringstream ss(value);
 	ss >> this->_body_size;
+	if (_body_size <= 0)
+		throw std::runtime_error("Config: invalid body size, expected an integer >= 1");
+	if (_body_size > 150000000)
+		throw std::runtime_error("Config: body size is too large, the limit is 150000000");
 }
 
 //--------------- ServerName ------------------//

@@ -38,6 +38,8 @@ class File {
 		File(std::string file_name);
 		~File(void);
 
+		void init(void);
+
 		void info(std::list<Conf> & confs) const;
 		std::list<Conf> confs;
 

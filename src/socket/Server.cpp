@@ -244,6 +244,7 @@ void Server::setup(void)
 
 void Server::start(void)
 {
+	_configs.init();
 	setup();
 	std::cout << "Server started." << std::endl;
 	run();

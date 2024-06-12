@@ -2,6 +2,11 @@
 
 Configs::Configs(std::string config_file) : _file(config_file)
 {
+}
+
+void Configs::init(void)
+{
+	_file.init();
 	std::list<File::Conf>::iterator it;
 	it = _file.confs.begin();
 	for (; it != _file.confs.end(); it++)

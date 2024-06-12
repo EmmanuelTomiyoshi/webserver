@@ -1,20 +1,7 @@
 #include "webserver.hpp"
 #include "Server.hpp"
 #include "ft.hpp"
-
-void cgi(void)
-{
-	int pid = fork();
-
-	if (pid == 0)
-	{
-		char python[] = "/bin/python3";
-		char script[] = "./cgi-bin/hello.py";
-		char *argv[] = {python, script, NULL};
-		execv(python, argv);
-	}
-	
-}
+#include "base.hpp"
 
 static bool is_config_file(std::string file)
 {
@@ -31,7 +18,7 @@ void start_server(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	Server *server;
+	Server *server = NULL;
 	try
 	{
 		if (argc == 2 && is_config_file(argv[1]))
@@ -40,11 +27,16 @@ void start_server(int argc, char **argv)
 			server = new Server("./conf/ws.conf");
 		server->start();
 	}
+	catch (const std::runtime_error& e)
+	{
+		std::cerr << "Error: " << e.what() << std::endl;
+	}
 	catch (std::exception & e)
 	{
 		std::cerr << "Error: " << e.what() << std::endl;
 	}
-	delete server;
+	if (server)
+		delete server;
 }
 
 void temp(void);
@@ -52,8 +44,23 @@ void tests(int argc, char **argv);
 
 int main(int argc, char *argv[])
 {
-	tests(argc, argv);
-	start_server(argc, argv);
+	try
+	{
+		tests(argc, argv);
+		start_server(argc, argv);
+	}
+	catch (const std::runtime_error& e)
+	{
+		std::cerr << "Error: " << e.what() << std::endl;
+	}
+	catch(std::exception & e)
+	{
+		std::cerr << "Error: " << e.what() << std::endl;
+	}
+	catch(...)
+	{
+		std::cerr << "We got a problem!!!" << std::endl;
+	}
 	return (0);
 }
 

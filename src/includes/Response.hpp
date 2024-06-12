@@ -42,6 +42,7 @@ class Response
         void create_response(void);
 
         void build_error(std::string code);
+        void build_default_error(void);
 
         //the body can hold string or binary
         class Body
@@ -50,7 +51,8 @@ class Response
                 Body(void);
                 ~Body(void);
                 char *data;
-                size_t size;
+                ssize_t size;
+                bool should_free;
         };
 
         Body _body;

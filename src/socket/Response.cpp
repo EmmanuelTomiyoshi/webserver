@@ -129,14 +129,13 @@ void Response::open_file(void)
     }
 }
 
-Response::Body::Body(void)
+Response::Body::Body(void) : data(NULL), should_free(true)
 {
-    this->data = NULL;
 }
 
 Response::Body::~Body(void)
 {
-    if (this->data)
+    if (this->data && this->should_free)
         delete[] this->data;
 }
 
@@ -163,7 +162,7 @@ void Response::read_text(void)
 
     _body.size = text.size() + 1;
     _body.data = new char[_body.size];
-    std::memmove(_body.data, text.c_str(), _body.size);
+    std::memmove((void*) _body.data, text.c_str(), _body.size);
 }
 
 void Response::fill_body(void)
@@ -183,6 +182,17 @@ void Response::build_error(std::string code)
     _path = "./public/pages/errors/" + code + ".html";
 }
 
+void Response::build_default_error(void)
+{
+    _status = HTTP_INTERNAL_SERVER_ERROR;
+    _ext = "html";
+    _mime = this->mime_types[_ext];
+    _type = "html";
+    _body.data = (char *) DEFAULT_ERROR_MESSAGE;
+    _body.size = std::strlen(_body.data);
+    _body.should_free = false;
+}
+
 void Response::create_response(void)
 {
     std::string status_line = http_version + " " + _status + " \r\n";
@@ -198,8 +208,7 @@ void Response::create_response(void)
         content_length +
         "\r\n";
     
-    size_t size = response.size();
-    size += _body.size;
+    size_t size = response.size() + _body.size;
     _http_response = new char[size];
     _http_response_size = size;
     std::memmove(_http_response, response.c_str(), response.size());
@@ -353,9 +362,16 @@ void Response::execute(void)
 
 void Response::execute_error(std::string code)
 {
-    build_error(code);
-    open_public_file();
-    fill_body();
+    try
+    {
+        build_error(code);
+        open_public_file();
+        fill_body();
+    }
+    catch (std::exception & e)
+    {
+        build_default_error();
+    }
     create_response();
     ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
     send(

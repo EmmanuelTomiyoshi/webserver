@@ -2,13 +2,21 @@
 # define FT_HPP
 #include "base.hpp"
 
+class Config;
+class Request2;
+class Timeout;
+
 namespace ft {
 
     enum EventType
     {
         SOCK,
         CONN,
-        CGI
+        CGI_R,
+        CGI_W,
+        TIMEOUT,
+        TRASH,
+        CLIENT_BODY,
     };
 
     typedef struct CustomData
@@ -16,7 +24,17 @@ namespace ft {
         int fd;
         int cgi_fd;
         int epfd;
+        Timeout *timeout;
+        time_t start_time;
+        time_t duration;
+        int pid;
         EventType type;
+        size_t id;
+        char *buff;
+        ssize_t buff_size;
+        ssize_t w_count;
+        Config *config;
+        Request2 *request;
     } CustomData;
 
     bool number_is_in(int value, int *arr, int size);
@@ -55,6 +73,10 @@ namespace ft {
     void close_pipes(int *pfds1, int *pfds2);
 
     ssize_t read_all(int fd, char **buff);
+    bool file_exists(std::string filename);
+
+    //receives a relative path and returns a full path
+    std::string get_full_path(std::string relative);
 }
 
 #endif

@@ -1,9 +1,10 @@
 #include "CGI.hpp"
+#include "Route.hpp"
 
 std::string CGI::_gateway_interface("GATEWAY_INTERFACE=CGI/1.1");
 std::string CGI::_server_protocol("SERVER_PROTOCOL=HTTP/1.1");
 
-CGI::CGI(void) : _body(NULL), _response_size(0)
+CGI::CGI(void) : _body(NULL), _response_size(0), _timeout(NULL)
 {
     for (int i = 0; i < ENVS_SIZE; i++)
         _envs[i] = NULL;
@@ -58,6 +59,7 @@ void CGI::set_query_string(std::string value)
 
 void CGI::set_script_name(std::string value)
 {
+    value = ft::get_full_path(value);
     _script_name = "SCRIPT_FILENAME=" + value;
     _script_name_raw = value;
     add_env(_script_name.c_str());
@@ -79,6 +81,11 @@ void CGI::set_body_size(size_t value)
 void CGI::set_event(struct epoll_event *event)
 {
     _event = event;
+}
+
+void CGI::set_timeout(Timeout *timeout)
+{
+    _timeout = timeout;
 }
 
 bool CGI::error(void)
@@ -105,6 +112,11 @@ bool CGI::error(void)
             std::cerr << "CGI ERROR: content_length empty" << std::endl;
             return true;
         }
+    }
+    if (_timeout == NULL)
+    {
+        std::cerr << "CGI ERROR: timeout empty" << std::endl;
+        return true;
     }
 
     return false;
@@ -149,39 +161,141 @@ void CGI::read_response(void)
     _response_size = ft::read_all(_pfds_b[R], &_response);
 }
 
-void CGI::execute_cgi_script(void)
+void CGI::add_write_event(int fd, char *buff, ssize_t size, int epfd, int cgi_fd)
 {
-    pipe(_pfds_a);
+    ft::CustomData *event_data = new ft::CustomData;
+    event_data->fd = fd;
+    event_data->cgi_fd = cgi_fd;
+    event_data->type = ft::CGI_W;
+    event_data->epfd = epfd;
+    event_data->duration = 5;
+    event_data->start_time = time(NULL);
+    event_data->buff = buff;
+    event_data->buff_size = size;
+    event_data->w_count = 0;
+
+    epoll_event *event = new epoll_event;
+    event->events = EPOLLOUT | EPOLLET;
+    event->data.ptr = (void *) event_data;
+
+    epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
+    _timeout->add(event);
+}
+
+void CGI::write_to_cgi(epoll_event *event)
+{
+    ft::CustomData *data = (ft::CustomData *) event->data.ptr;
+
+    ssize_t bytes = write(
+        data->fd,
+        data->buff + data->w_count,
+        data->buff_size - data->w_count
+    );
+
+    // std::cout << "$$-> SIZE: " << data->buff_size << std::endl;
+    // std::cout << "$$-> COUNT: " << data->w_count + bytes << std::endl;
+    // std::cout << "$$-> LEFT: " << data->buff_size - data->w_count - bytes << std::endl;
+
+    if (bytes >= data->buff_size || bytes <= 0 || data->w_count + bytes >= data->buff_size)
+    {
+        epoll_ctl(data->epfd, EPOLL_CTL_DEL, data->fd, event);
+        close(data->fd);
+        data->type = ft::TRASH;
+        return ;
+    }
+
+    data->w_count += bytes;
+}
+
+void CGI::execute_cgi_post(void)
+{
+    pipe2(_pfds_a, O_NONBLOCK);
     pipe(_pfds_b);
     _pid = fork();
 
     if (_pid != 0)
     {
-        ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
-        event_data->cgi_fd = event_data->fd;
+        ft::CustomData *old_event_data = (ft::CustomData *) _event->data.ptr;
+        epoll_ctl(old_event_data->epfd, EPOLL_CTL_DEL, old_event_data->fd, _event);
+
+        old_event_data->type = ft::TRASH;
+
+        ft::CustomData *event_data = new ft::CustomData;
+        event_data->cgi_fd = old_event_data->fd;
         event_data->fd = _pfds_b[R];
-        event_data->type = ft::CGI;
-        event_data->epfd = event_data->epfd;
+        event_data->type = ft::CGI_R;
+        event_data->epfd = old_event_data->epfd;
+        event_data->duration = 5;
+        event_data->start_time = time(NULL);
+        event_data->pid = _pid;
 
         epoll_event *event = new epoll_event;
         event->events = EPOLLIN | EPOLLET;
         event->data.ptr = (void *) event_data;
 
         epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
+        _timeout->add(event);
+
         close(_pfds_a[R]);
-        close(_pfds_a[W]);
         close(_pfds_b[W]);
+
+        add_write_event(_pfds_a[W], _body, _body_size, old_event_data->epfd, old_event_data->fd);
     }
 
     if (_pid == 0)
     {
         dup2(_pfds_a[R], STDIN_FILENO);
         dup2(_pfds_b[W], STDOUT_FILENO);
-        write(_pfds_a[W], _body, _body_size);
-        ft::close_pipes(_pfds_a, _pfds_b);
 
+        ft::close_pipes(_pfds_a, _pfds_b);
+    
+        enter_dir(_route->save_files_path.get());
         execve(_argv[0], (char * const *) _argv, (char * const *) _envs);
         std::cerr << "CGI ERROR: fail to execute cgi script" << std::endl;
+        exit(0);
+    }
+}
+
+void CGI::execute_cgi_get(void)
+{
+    pipe(_pfds_b);
+    _pid = fork();
+    
+    if (_pid != 0)
+    {
+        ft::CustomData *old_event_data = (ft::CustomData *) _event->data.ptr;
+        epoll_ctl(old_event_data->epfd, EPOLL_CTL_DEL, old_event_data->fd, _event);
+
+        old_event_data->type = ft::TIMEOUT;
+
+        ft::CustomData *event_data = new ft::CustomData;
+        event_data->cgi_fd = old_event_data->fd;
+        event_data->fd = _pfds_b[R];
+        event_data->type = ft::CGI_R;
+        event_data->epfd = old_event_data->epfd;
+        event_data->duration = 5;
+        event_data->start_time = time(NULL);
+        event_data->pid = _pid;
+
+        epoll_event *event = new epoll_event;
+        event->events = EPOLLIN | EPOLLET;
+        event->data.ptr = (void *) event_data;
+
+        epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
+        _timeout->add(event);
+        close(_pfds_b[W]);
+    }
+
+    if (_pid == 0)
+    {
+        dup2(_pfds_b[W], STDOUT_FILENO);
+        close(_pfds_b[W]);
+        close(_pfds_b[R]);
+
+        enter_dir(_route->get_path());
+
+        execve(_argv[0], (char * const *) _argv, (char * const *) _envs);
+        std::cerr << "CGI ERROR: fail to execute cgi GET script" << std::endl;
         exit(0);
     }
 }
@@ -254,13 +368,28 @@ void CGI::process_response(char *response, ssize_t response_size)
     format_http_response();
 }
 
+void CGI::debug_pfds_b(void)
+{
+    char *buff;
+    ssize_t bytes = ft::read_all(_pfds_b[R], &buff);
+    std::cout << "\n-------- CGI DEBUG_PFDS_B --------" << std::endl;
+    write(1, buff, bytes);
+}
+
+ssize_t CGI::read_pfds_b(char **buff)
+{
+    return ft::read_all(_pfds_b[R], buff);
+}
 
 void CGI::execute(void)
 {
     if (this->error())
         return ;
 
-    execute_cgi_script();
+    if (_request_method_raw == "POST")
+         execute_cgi_post();
+    else if (_request_method_raw == "GET")
+        execute_cgi_get();
 }
 
 char *CGI::get_response(void)
@@ -271,4 +400,27 @@ char *CGI::get_response(void)
 size_t CGI::get_response_size(void)
 {
     return _response_data.http_response_size;
+}
+
+void CGI::set_route(Route *route)
+{
+    _route = route;
+}
+
+void CGI::enter_dir(std::string dir)
+{
+    if (chdir(dir.c_str()) != 0)
+    {
+        if (mkdir(dir.c_str(), 0766) != 0)
+        {
+            std::cerr << "CGI error entering dir: " << _route->save_files_path.get() << std::endl;
+            exit(1);
+        }
+
+        if (chdir(dir.c_str()) != 0)
+        {
+            std::cerr << "CGI error entering dir: " << _route->save_files_path.get() << std::endl;
+            exit(1);
+        }
+    }
 }

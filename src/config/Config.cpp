@@ -48,9 +48,23 @@ void Config::Routes::set_parent(Config *parent)
 	this->_parent = parent;
 }
 
+static void remove_last_slash(std::string & location)
+{
+	if (location.size() > 2 && location.at(location.size() - 1) == '/')
+		location = location.substr(0, location.size() - 1);
+}
+
 Route & Config::Routes::get(std::string location)
 {
-	return this->_routes.at(location);
+	remove_last_slash(location);
+	try
+	{
+		return this->_routes.at(location);
+	}
+	catch (std::exception & e)
+	{
+		throw std::runtime_error(HTTP_NOT_FOUND);
+	}
 }
 
 void Config::Routes::set(std::list<File::Conf> & l_routes)
@@ -67,7 +81,10 @@ void Config::Routes::set(std::list<File::Conf> & l_routes)
 		dst.try_files.set(src._multi_values["try_files"]);
 		dst.methods.set(src._multi_values["methods"]);
 		dst.redirect.set(src._single_value["return"]);
-		dst.set_root(this->_parent->root.get());
+		dst.set_parent_root(this->_parent->root.get());
+		dst.set_root(src._single_value["root"]);
+		dst.cgi_route.set(src._single_value["cgi_route"]);
+		dst.cgi_extensions.set(src._multi_values["cgi_extensions"]);
 		it++;
 	}
 }
@@ -76,24 +93,17 @@ void Config::Routes::show(void)
 {
 	std::map<std::string, Route>::iterator it;
 	it = this->_routes.begin();
-	int i = 0;
 	while (it != this->_routes.end())
 	{
 		Route & r = (*it).second;
-		std::cout << "----- ROUTE "<< i++ << ":\n";
-		std::cout << "Location: " << r.location.get() << std::endl;
-		std::cout << "SaveFilesPath: " << r.save_files_path.get() << std::endl;
-		std::cout << "Autoindex: " << (r.autoindex.get() ? "true" : "false") << std::endl;
-		std::cout << "Return: " << r.redirect.get() << std::endl;
-		r.methods.show();
-		r.try_files.show();
+		r.show();
 		std::cout << std::endl;
 		it++;
 	}
 }
 
 //--------------- BodySize ------------------//
-int Config::BodySize::get(void) const
+ssize_t Config::BodySize::get(void) const
 {
 	return this->_body_size;
 }
@@ -102,6 +112,10 @@ void Config::BodySize::set(std::string value)
 {
 	std::stringstream ss(value);
 	ss >> this->_body_size;
+	if (_body_size <= 0)
+		throw std::runtime_error("Config: invalid body size, expected an integer >= 1");
+	if (_body_size > 150000000)
+		throw std::runtime_error("Config: body size is too large, the limit is 150000000");
 }
 
 //--------------- ServerName ------------------//

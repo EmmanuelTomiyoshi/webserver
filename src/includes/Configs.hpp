@@ -13,6 +13,8 @@ class Configs {
 		Configs(std::string config_file);
 		~Configs(void);
 
+		void init(void);
+
 		Config & next(void);
 		int len(void) const;
 		void reset_iterator(void);

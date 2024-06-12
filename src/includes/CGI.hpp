@@ -3,6 +3,7 @@
 # include "base.hpp"
 # include "ft.hpp"
 # include "error_codes.hpp"
+# include "Timeout.hpp"
 
 // # define CGI_PROGRAM "/bin/python3"
 # define gateway_interface "GATEWAY_INTERFACE=CGI/1.1"
@@ -13,6 +14,8 @@
 # define CGI_BIN "/bin/perl"
 # define W 1
 # define R 0
+
+class Route;
 
 class CGI
 {
@@ -38,6 +41,7 @@ class CGI
         std::string _script_name_raw;
         static std::string _gateway_interface;
         static std::string _server_protocol;
+        Route *_route;
 
         const char *_envs[ENVS_SIZE];
         const char *_argv[ARGV_SIZE];
@@ -64,14 +68,22 @@ class CGI
         int _pfds_b[2];
         int _pid;
 
+        void execute_cgi_post(void);
+        void execute_cgi_get(void);
         void execute_cgi_script(void);
 
         void extract_response_data(char *response, ssize_t response_size);
         void extract_content_type(char *response, size_t header_size);
 
+        void add_write_event(int fd, char *buff, ssize_t size, int epfd, int cgi_fd);
+
         void format_http_response(void);
 
         ResponseData _response_data;
+
+        Timeout *_timeout;
+
+        void enter_dir(std::string dir);
 
     public:
         CGI(void);
@@ -84,6 +96,8 @@ class CGI
         void set_body(char *value);
         void set_body_size(size_t value);
         void set_event(struct epoll_event *event);
+        void set_timeout(Timeout *timeout);
+        void set_route(Route *route);
 
         void execute(void);
         void info(void);
@@ -92,7 +106,10 @@ class CGI
         char *get_response(void);
         size_t get_response_size(void);
 
+        void debug_pfds_b(void);
+        ssize_t read_pfds_b(char **buff);
 
+        void write_to_cgi(epoll_event *event);
 };
 
 #endif

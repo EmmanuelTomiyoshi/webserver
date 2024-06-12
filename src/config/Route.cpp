@@ -72,11 +72,56 @@ void Route::TryFiles::set(std::list<std::string> const & files)
 	this->_it = this->_try_files.begin();
 }
 
+/* ---------------- CGI_EXTENSIONS ----------------- */
+Route::CGI_Extensions::CGI_Extensions(void)
+{
+}
+
+std::list<std::string> const & Route::CGI_Extensions::get(void) const
+{
+	return this->_values;
+}
+
+void Route::CGI_Extensions::show(void)
+{
+	std::list<std::string>::iterator it;
+	it = this->_values.begin();
+	std::cout << "CGI_Extensions: ";
+	while (it != this->_values.end())
+	{
+		std::cout << (*it) << " ";
+		it++;
+	}
+	std::cout << std::endl;
+}
+
+void Route::CGI_Extensions::set(std::list<std::string> const & values) 
+{
+	std::list<std::string>::const_iterator it;
+	it = values.begin();
+	while (it != values.end())
+	{
+		this->_values.push_back(*it);
+		it++;
+	}
+}
+
+bool Route::CGI_Extensions::is_allowed(std::string ext) const
+{
+	return std::find(
+		this->_values.begin(), 
+		this->_values.end(), 
+		ext
+	) != this->_values.end();
+}
 
 /* ---------------- SAVE FILES PATH ----------------- */
 std::string Route::SaveFilesPath::get(void) const
 {
-	return this->_save_files_path;
+	if (this->_root == "/")
+		return this->_save_files_path;
+	
+	return this->_root + this->_save_files_path;
 }
 
 void Route::SaveFilesPath::set(std::string path)
@@ -84,8 +129,12 @@ void Route::SaveFilesPath::set(std::string path)
 	this->_save_files_path = path;
 }
 
+void Route::SaveFilesPath::set_root(std::string root)
+{
+	this->_root = root;
+}
 
-/* ---------------- SAVE FILES PATH ----------------- */
+/* ---------------- AUTOINDEX ----------------- */
 Route::Autoindex::Autoindex(void) : _on(false)
 {
 }
@@ -105,6 +154,26 @@ void Route::Autoindex::set(std::string value)
 	this->_on = (value == "on");
 }
 
+/* ---------------- CGI_ROUTE ----------------- */
+Route::CGI_Route::CGI_Route(void) : _value(false)
+{
+}
+
+bool Route::CGI_Route::is_true(void) const
+{
+	return this->_value;
+}
+
+void Route::CGI_Route::set(bool value)
+{
+	this->_value = value;
+}
+
+void Route::CGI_Route::set(std::string value)
+{
+	this->_value = (value == "true");
+}
+
 /* RETURN Or REDIRECT */
 void Route::Return::set(std::string value)
 {
@@ -118,7 +187,17 @@ std::string Route::Return::get(void) const
 
 void Route::set_root(std::string root)
 {
-	this->_root = root;
+	if (root.empty())
+		return ;
+	this->_root = ft::get_full_path(root);
+	this->save_files_path.set_root(this->_root);
+}
+
+void Route::set_parent_root(std::string root)
+{
+	this->_parent_root = ft::get_full_path(root);
+	if (_root.empty())
+		this->save_files_path.set_root(get_path());
 }
 
 std::string Route::get_root(void) const
@@ -143,7 +222,6 @@ std::string Route::get_page(void)
 			break ;
 		it++;
 	}
-	std::cout << "UEEE" << std::endl;
 	if (file.bad())
 		throw std::runtime_error("page not found");
 	std::string content;
@@ -154,6 +232,25 @@ std::string Route::get_page(void)
 
 std::string Route::get_path(void) const
 {
-	std::string path = this->_root + this->location.get();
-	return path;
+	if (_root.empty() == false)
+		return _root;
+
+	if (location.get() == "/")
+		return _parent_root;
+	
+	return this->_parent_root + this->location.get();
+}
+
+void Route::show(void)
+{
+	std::cout << "\n--------- ROUTE ---------" << std::endl;
+	std::cout << "Root: " << _root << std::endl;
+	std::cout << "Location: " << location.get() << std::endl;
+	std::cout << "SaveFilesPath: " << save_files_path.get() << std::endl;
+	std::cout << "Autoindex: " << (autoindex.get() ? "on" : "off") << std::endl;
+	std::cout << "Redirect: " << redirect.get() << std::endl;
+	std::cout << "Path: " << get_path() << std::endl;
+	std::cout << "CGI_Route: " << (cgi_route.is_true() ? "true" : "false") << std::endl;
+	try_files.show();
+	cgi_extensions.show();
 }

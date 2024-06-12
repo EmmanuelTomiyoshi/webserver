@@ -7,12 +7,13 @@
 #include "error_codes.hpp"
 #include "Request2.hpp"
 #include "CGI.hpp"
+#include "Timeout.hpp"
 
 class Response
 {
     private:
         Request _req;
-        Request2 _request;
+        Request2 *_request;
         char *_buff;
         size_t _buff_size;
 
@@ -55,11 +56,15 @@ class Response
         Body _body;
 
         void GET(void);
+        void GET_normal(void);
+        void autoindex(void);
+        void GET_cgi(void);
         void POST(void);
         void DELETE(void);
 
         Config *_config;
         epoll_event *_event;
+        Timeout *_timeout;
 
         static std::string http_version;
 
@@ -68,12 +73,22 @@ class Response
         void execute(void);
         void execute_error(std::string code);
 
-    public:
-        Response(char *buff, size_t size, Config *config);
+        void create_cors_response(void);
+        
+        void start_mimes(void);
 
-        ssize_t send_response(epoll_event & event);
+    public:
+        Response(void);
+        Response(epoll_event *event);
+        Response(char *buff, size_t size, Config *config, Timeout *timeout);
+
+        ssize_t send_response(void);
 
         static std::map<std::string, std::string> mime_types;
+
+        void process_error(std::string code);
+        char *get_response(void);
+        ssize_t get_response_size(void);
 };
 
 #endif

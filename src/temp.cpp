@@ -110,8 +110,74 @@ void test_perl(void)
 	close(pfds[1]);
 }
 
+#include "Timeout.hpp"
+void timeout_test(void)
+{
+	Timeout timeout;
+
+	epoll_event *event = new epoll_event;
+	ft::CustomData *data = new ft::CustomData;
+	data->duration = 5;
+	data->start_time = time(NULL);
+	data->pid = fork();
+	if (data->pid == 0)
+	{
+		sleep(20);
+		exit(0);
+	}
+
+	int fds[2];
+	int fds2[2];
+	int fds3[2];
+	pipe(fds);
+	pipe(fds2);
+	pipe(fds3);
+
+	data->fd = fds[0];
+	data->cgi_fd = fds[1];
+	event->data.ptr = data;
+
+	epoll_event *event2 = new epoll_event;
+	ft::CustomData *data2 = new ft::CustomData;
+	data2->duration = 5;
+	data2->start_time = time(NULL);
+	data2->pid = fork();
+	if (data2->pid == 0)
+	{
+		sleep(20);
+		exit(0);
+	}
+	data2->fd = fds2[0];
+	data2->cgi_fd = fds2[1];
+	event2->data.ptr = data2;
+
+	epoll_event *event3 = new epoll_event;
+	ft::CustomData *data3 = new ft::CustomData;
+	data3->duration = 3;
+	data3->start_time = time(NULL);
+	data3->pid = fork();
+	if (data3->pid == 0)
+	{
+		sleep(20);
+		exit(0);
+	}
+	data3->fd = fds3[0];
+	data3->cgi_fd = fds3[1];
+	event3->data.ptr = data3;
+
+	timeout.add(event);
+	timeout.add(event2);
+	timeout.add(event3);
+
+	while (1)
+	{
+		timeout.verify();
+	}
+}
+
+
 void temp(void)
 {
-	// test_perl();
+	// timeout_test();
 	// exit(0);
 }

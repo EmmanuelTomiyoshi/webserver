@@ -6,6 +6,7 @@
 class Route
 {
 	private:
+		std::string _parent_root;
 		std::string _root;
 
 		class Location {
@@ -28,10 +29,23 @@ class Route
 				void show(void);
 		};
 
+		class CGI_Extensions {
+			private:
+				std::list<std::string> _values;
+			public:
+				CGI_Extensions(void);
+				std::list<std::string> const & get(void) const;
+				bool is_allowed(std::string ext) const;
+				void set(std::list<std::string> const & files);
+				void show(void);
+		};
+
 		class SaveFilesPath {
 			private:
+				std::string _root;
 				std::string _save_files_path;
 			public:
+				void set_root(std::string root);
 				std::string get(void) const;
 				void set(std::string path);
 		};
@@ -42,6 +56,16 @@ class Route
 			public:
 				Autoindex(void);
 				bool get(void) const;
+				void set(bool value);
+				void set(std::string value);
+		};
+
+		class CGI_Route {
+			private:
+				bool _value;
+			public:
+				CGI_Route(void);
+				bool is_true(void) const;
 				void set(bool value);
 				void set(std::string value);
 		};
@@ -65,13 +89,17 @@ class Route
 		Return redirect;
 		Location location;
 		TryFiles try_files;
+		CGI_Extensions cgi_extensions;
 		Autoindex autoindex;
+		CGI_Route cgi_route;
 		SaveFilesPath save_files_path;
 
 		std::string get_page(void);
 		void set_root(std::string root);
+		void set_parent_root(std::string root);
 		std::string get_root(void) const;
 		std::string get_path(void) const;
+		void show(void);
 };
 
 #endif

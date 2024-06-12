@@ -4,6 +4,7 @@
 # include "Config.hpp"
 # include "Response.hpp"
 # include "ft.hpp"
+# include "Timeout.hpp"
 
 class Server
 {
@@ -24,9 +25,12 @@ class Server
 		
 		Response *_response;
 
+		Timeout _timeout;
+
 		void run(void);
-		void send_message(epoll_event & event);
+		void send_message(void);
 		void recv_message(epoll_event & event);
+		void recv_client_body(epoll_event & event);
 
 		void process_cgi_response(epoll_event & event);
 		void process_request(epoll_event & event);
@@ -34,12 +38,15 @@ class Server
 		static addrinfo get_hints(void);
 		void setup(void);
 
+		void close_ports(void);
+
 	public:
 		Server(std::string config_file);
 		~Server(void);
 
 		void start(void);
 		void new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type);
+		void new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type, Config *config);
 };
 
 #endif

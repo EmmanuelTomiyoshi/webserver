@@ -4,11 +4,31 @@ std::string Response::http_version = "HTTP/1.1";
 
 std::map<std::string, std::string> Response::mime_types;
 
-Response::Response(char *buff, size_t size, Config *config) : 
-_buff(buff), _buff_size(size), _status("200"), _http_response(NULL), _config(config)
+Response::Response(char *buff, size_t size, Config *config, Timeout *timeout) : 
+_buff(buff), _buff_size(size), _status("200"), _http_response(NULL),
+_config(config), _timeout(timeout)
 {
-    //this->_req.init(buff);
+    start_mimes();
+}
 
+Response::Response(void)
+{
+}
+
+Response::Response(epoll_event *event) : _route(NULL), _status("200"),
+_http_response(NULL), _http_response_size(0)
+{
+	ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
+
+    _event = event;
+    _config = event_data->config;
+    _request = event_data->request;
+    _timeout = event_data->timeout;
+    start_mimes();
+}
+
+void Response::start_mimes(void)
+{
     mime_types["js"] = "application/javascript";
     mime_types["json"] = "application/json";
     mime_types["pdf"] = "application/pdf";
@@ -23,34 +43,8 @@ _buff(buff), _buff_size(size), _status("200"), _http_response(NULL), _config(con
     mime_types["svg"] = "image/svg+xml";
 }
 
-/* 
-    there will be 3 functions to process the request: GET(), POST(), DELETE()
-    a map containing each of the functions mapped to the strings "GET", "POST", "DELETE"
-    a function error() to send an error as a response if any operation fails
-    when entering the GET, POST, DELETE function the first thing to be done is to get the route
-    then verify if the METHOD is allowed by the route
-    then process the request
-
-    GET:
-        read the file
-        store in a string
-        put in the body of the http response
-        send to user
-
-    POST:
-        create a file with the requested format
-        extract the body from the http request
-        store the extracted body into this file
-        send a successfull response to the user
-
-    DELETE
-        deletes a file inside the folder that contains user uploaded files
-        sends a response back 
-
- */
-
 bool Response::is_public(void) {
-    std::string str = _request.get_target();
+    std::string str = _request->get_target();
     str = str.substr(0, std::string("/public").length());
     return str == "/public";
 }
@@ -77,12 +71,13 @@ void Response::open_route_file(void)
         if (_file.good())
             return ;
     }
-    //TODO: error();
+    std::cerr << "ERROR: open_route_file" << std::endl;
+    throw std::runtime_error(HTTP_NOT_FOUND);
 }
 
 void Response::set_public_file_info(void)
 {
-    this->_path = '.' + _request.get_target();
+    this->_path = '.' + _request->get_target();
     if (_path.empty())
     {
         std::cerr << "error: no path provided" << std::endl;
@@ -126,7 +121,6 @@ void Response::open_file(void)
 
     try
     {
-        _route = &(_config->routes.get(_request.get_target()));
         open_route_file();
     }
     catch (std::exception & e)
@@ -192,17 +186,18 @@ void Response::build_error(std::string code)
 void Response::create_response(void)
 {
     std::string status_line = http_version + " " + _status + " \r\n";
-    std::string content_type = "Content-Type: " + _mime + "\r\n";
+    std::string h1 = "Content-Type: " + _mime + "\r\n";
+    std::string h2 = "Access-Control-Allow-Origin: *\r\n";
+    std::string h3 = "Access-Control-Allow-Methods: GET, POST, DELETE\r\n";
     std::string content_length = "Content-Length: " + 
         ft::int_to_str(_body.size) + "\r\n";
 
     std::string response = status_line + 
         "Connection: close\r\n" +
-        content_type + 
+        h1 + h2 + h3 + 
         content_length +
         "\r\n";
     
-    //obs: should or shouldn't put '\0' after the response data (before the body data)?
     size_t size = response.size();
     size += _body.size;
     _http_response = new char[size];
@@ -211,11 +206,47 @@ void Response::create_response(void)
     std::memmove(_http_response + response.size(), _body.data, _body.size);
 }
 
-void Response::GET(void)
+void Response::GET_normal(void)
 {
     open_file();
     fill_body();
     create_response();
+    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+    send(
+        event_data->fd,
+        _http_response, 
+        _http_response_size,
+        MSG_DONTWAIT
+    );
+    epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
+	close(event_data->fd);
+}
+void Response::GET_cgi(void)
+{
+    CGI cgi;
+    cgi.set_request_method("GET");
+    cgi.set_body(_request->get_body());
+    cgi.set_body_size(_request->get_body_size());
+    cgi.set_query_string(_request->get_query());
+    cgi.set_timeout(_timeout);
+    cgi.set_route(_route);
+    std::string script = _route->get_path();
+    script += "/" + _request->get_file();
+    cgi.set_script_name(script);
+    cgi.set_event(_event);
+    cgi.execute();
+}
+
+void Response::GET(void)
+{
+    if (!is_public() && _route->methods.allowed("GET") == false)
+        throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
+    if (!is_public() && _route->cgi_route.is_true())
+    {
+        GET_cgi();
+    }
+    else
+        GET_normal();
 }
 
 char *find_str_pos(const char *str, char *src)
@@ -231,22 +262,18 @@ char *find_str_pos(const char *str, char *src)
 
 void Response::POST(void)
 {
+    if (_route->methods.allowed("POST") == false)
+        throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
     CGI cgi;
     cgi.set_request_method("POST");
-    cgi.set_body(_request.get_body());
-    cgi.set_content_length(_request.get_header("Content-Length"));
-    cgi.set_body_size(_request.get_body_size());
-    cgi.set_content_type(_request.get_header("Content-Type"));
+    cgi.set_body(_request->get_body());
+    cgi.set_content_length(_request->get_header("Content-Length"));
+    cgi.set_body_size(_request->get_body_size());
+    cgi.set_content_type(_request->get_header("Content-Type"));
+    cgi.set_timeout(_timeout);
+    cgi.set_script_name("./cgi-bin/upload_debug.pl");
+    cgi.set_route(_route);
 
-    static int i = 0;
-    i++;
-    std::cout << "---> i: " << i << std::endl;
-    if (i % 2 == 0)
-        cgi.set_script_name("./cgi-bin/upload_debug.pl");
-    else
-        cgi.set_script_name("./cgi-bin/upload_debug_loop.pl");
-    
-    
     cgi.set_event(_event);
     cgi.info();
     cgi.execute();
@@ -257,18 +284,69 @@ void Response::POST(void)
 
 void Response::DELETE(void)
 {
-    throw std::runtime_error(HTTP_SERVICE_UNAVAILABLE);
+    if (_route->methods.allowed("DELETE") == false)
+        throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
+
+    std::string file_path = _route->save_files_path.get();
+    file_path += "/" + _request->get_file();
+    std::cout << "FILE_PATH: " << file_path << std::endl;
+    if (ft::file_exists(file_path) == false)
+        throw std::runtime_error(HTTP_NOT_FOUND);
+    if (std::remove(file_path.c_str()) != 0)
+        throw std::runtime_error(HTTP_INTERNAL_SERVER_ERROR);
+    create_cors_response();
+    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+    send(
+        event_data->fd,
+        _http_response, 
+        _http_response_size,
+        MSG_DONTWAIT
+    );
+    epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
+	close(event_data->fd);
+}
+
+void Response::create_cors_response(void)
+{
+    std::string status_line = http_version + " 200 OK\r\n";
+    std::string h0 = "Connection: close\r\n";
+    std::string h1 = "Content-Length: 0\r\n";
+    std::string h2 = "Access-Control-Allow-Origin: *\r\n";
+    std::string h3 = "Access-Control-Allow-Methods: GET, POST, DELETE\r\n";
+
+    std::string response = status_line + 
+        h0 + h1 + h2 + h3 + "\r\n";
+        
+
+    size_t size = response.size();
+    _http_response = new char[size];
+    _http_response_size = size;
+    std::memmove(_http_response, response.c_str(), response.size());
 }
 
 void Response::execute(void)
 {
-    std::string method = _request.get_method();
+    std::string method = _request->get_method();
+    std::cout << "&*****method: " << method << std::endl;
     if (method == "GET")
         GET();
     else if (method == "POST")
         POST();
     else if (method == "DELETE")
         DELETE();
+    else if (method ==  "OPTIONS")
+    {
+        create_cors_response();
+        ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+        send(
+            event_data->fd,
+            _http_response, 
+            _http_response_size,
+            MSG_DONTWAIT
+        );
+        epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
+        close(event_data->fd);
+    }
     else
         throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
 }
@@ -279,38 +357,73 @@ void Response::execute_error(std::string code)
     open_public_file();
     fill_body();
     create_response();
-}
-
-ssize_t Response::send_response(epoll_event & event)
-{
-    ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
-    _event = &event;
-
-    try
-    {
-        _request.init(_buff, _buff_size);
-        this->execute();
-    }
-    catch(const std::exception& e)
-    {
-        execute_error(e.what());
-    }
-
-    if (_request.get_method() == "POST")
-    {
-        std::cout << "*********JAMALAICACA" << std::endl;
-        return 1;
-    }
-
-    ssize_t bytes = send(
+    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+    send(
         event_data->fd,
         _http_response, 
         _http_response_size,
         MSG_DONTWAIT
     );
-
-	epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, &event);
+    epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
 	close(event_data->fd);
+}
 
-    return bytes;
+void Response::autoindex(void)
+{
+    std::cout << "\n-> EXECUTING AUTOINDEX <-\n" << std::endl;
+
+    CGI cgi;
+    cgi.set_request_method("GET");
+    cgi.set_query_string(_request->get_query());
+    cgi.set_timeout(_timeout);
+    cgi.set_route(_route);
+    cgi.set_script_name("./cgi-bin/autoindex.pl");
+    cgi.set_event(_event);
+    cgi.execute();
+}
+
+ssize_t Response::send_response(void)
+{
+    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+
+    try
+    {
+        if(_request->is_error())
+            throw std::runtime_error(_request->get_error());
+        if (is_public() == false)
+            _route = &_config->routes.get(_request->get_route());
+        this->execute();
+    }
+    catch(const std::exception& e)
+    {
+        std::cout << "executing error: " << e.what() << std::endl;
+        if (_route != NULL && e.what() == std::string(HTTP_NOT_FOUND) && _route->autoindex.get())
+            autoindex();
+        else
+            execute_error(e.what());
+    }
+
+    if (_request->get_method() == "POST" && _request->is_error() == false)
+    {
+        std::cout << "*********JAMALAICACA" << std::endl;
+        epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
+        return 1;
+    }
+    return 1;
+}
+
+void Response::process_error(std::string code)
+{
+    build_error(code);
+    open_public_file();
+    fill_body();
+    create_response();
+}
+char *Response::get_response(void)
+{
+    return _http_response;
+}
+ssize_t Response::get_response_size(void)
+{
+    return _http_response_size;
 }

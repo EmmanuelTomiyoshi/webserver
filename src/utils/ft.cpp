@@ -111,11 +111,11 @@ namespace ft {
     {
         char *data = NULL;
         ssize_t total_size = 0;
-        const ssize_t tmp_size = 5000;
+        const ssize_t tmp_size = 20000;
         char tmp[tmp_size];
         while (1)
         {
-            ssize_t bytes = recv(fd, tmp, tmp_size, MSG_WAITALL);
+            ssize_t bytes = recv(fd, tmp, tmp_size, MSG_DONTWAIT);
             if (bytes <= 0)
                 break;
             total_size += bytes;
@@ -171,5 +171,26 @@ namespace ft {
         close(pfds1[1]);
         close(pfds2[0]);
         close(pfds2[1]);
+    }
+
+    bool file_exists(std::string filename) {
+        std::ifstream file(filename.c_str());
+        return file.good();
+    }
+
+    std::string get_full_path(std::string relative)
+    {
+        if (relative.empty())
+            return "";
+        if (relative.at(0) != '.')
+            return relative;
+        
+        char *cwd = getcwd(NULL, 0);
+        if (cwd == NULL)
+            return "";
+        std::string path(cwd);
+        free(cwd);
+
+        return path + relative.substr(1);
     }
 }

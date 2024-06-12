@@ -3,32 +3,35 @@
 File::File(std::string file_name) : _file(file_name.c_str())
 {
 	if (this->_file.bad())
-		throw std::runtime_error("failed to open '" + file_name + "'");
-	std::string aux[] = {
+		throw std::runtime_error("Config: failed to open '" + file_name + "'");
+	const char *singles[] = {
 		"host",
 		"body_size",
 		"root",
 		"port",
-
 		"save_files_path",
 		"autoindex",
-		"return"
+		"return",
+		"cgi_route",
+		NULL
 	};
 
-	for (int i = 0; i < 7; i++)
-		single_value_keys.push_back(aux[i]);
+	for (int i = 0; singles[i] != NULL; i++)
+		single_value_keys.push_back(singles[i]);
 
-	std::string aux2[] = {
+	const char *multiples[] = {
 		"server_name",
 		"try_files",
 		"methods",
 		"cgi_extensions",
-
+		NULL
 	};
+	for (int i = 0; multiples[i] != NULL; i++)
+		multi_value_keys.push_back(multiples[i]);
+}
 
-	for (int i = 0; i < 4; i++)
-		multi_value_keys.push_back(aux2[i]);
- 
+void File::init(void)
+{
 	fill_data();
 	extract_blocks();
 	parse_blocks();
@@ -70,10 +73,10 @@ void File::read_config_block(void)
 		return ;
 	}
 	if (word != "server")
-		throw std::runtime_error("found '" + word + "' instead of 'server'");
+		throw std::runtime_error("Config: found '" + word + "' instead of 'server'");
 	ss >> word;
 	if (word != "{")
-		throw std::runtime_error("'{' not found");
+		throw std::runtime_error("Config: '{' not found");
 	open = _data.find('{');
 
 	//jump all the subblocks inside brackets
@@ -162,7 +165,7 @@ bool File::parse_multi_value(
 	std::string line = block.substr(block.find(word) + word.length());
 
 	if (line[0] != ' ' && line[0] != '\t')
-		throw std::runtime_error("expected space");
+		throw std::runtime_error("Config: expected space");
 
 	line = line.substr(0, line.find_first_of('\n'));
 	std::stringstream ss_line(line);
@@ -170,7 +173,7 @@ bool File::parse_multi_value(
 
 	ss_line >> value;
 	if (value.empty())
-		throw std::runtime_error("config: empty value");
+		throw std::runtime_error("Config: empty value");
 
 	while (true)
 	{
@@ -194,14 +197,14 @@ bool File::parse_route(std::string & block, std::list<Conf> & routes)
 		throw std::runtime_error("'config: location' not found");
 	ss >> word;
 	if (word == "{")
-		throw std::runtime_error("path not found");
+		throw std::runtime_error("Config: path not found");
 
 	Conf route;
 	route._single_value["location"] = word;
 	
 	ss >> word;
 	if (word != "{")
-		throw std::runtime_error("'{' not found");
+		throw std::runtime_error("Config: '{' not found");
 
 	int start = block.find("{");
 	std::string route_block = block.substr(
@@ -209,24 +212,24 @@ bool File::parse_route(std::string & block, std::list<Conf> & routes)
 		block.find("}") - start - 1
 	);
 
-		while (true)
-		{
-			std::string word;
-			std::stringstream ss(route_block);
-			ss >> word;
-			if (word.empty())
-				break ;
-			if (is_inside(single_value_keys, word))
-				parse_single_value(route_block, route._single_value);
-			else if (is_inside(multi_value_keys, word))
-				parse_multi_value(route_block, route._multi_values);
-			else
-				throw std::runtime_error("'" + word + "' is invalid");
-		}
-		routes.push_back(route);
+	while (true)
+	{
+		std::string word;
+		std::stringstream ss(route_block);
+		ss >> word;
+		if (word.empty())
+			break ;
+		if (is_inside(single_value_keys, word))
+			parse_single_value(route_block, route._single_value);
+		else if (is_inside(multi_value_keys, word))
+			parse_multi_value(route_block, route._multi_values);
+		else
+			throw std::runtime_error("Config: '" + word + "' is invalid");
+	}
+	routes.push_back(route);
 
-		block = block.substr(block.find("}") + 1);
-		return true;
+	block = block.substr(block.find("}") + 1);
+	return true;
 }
 
 void File::parse_blocks(void)
@@ -250,7 +253,7 @@ void File::parse_blocks(void)
 			else if (word == "location")
 				parse_route(block, config._routes);
 			else
-				throw std::runtime_error("'" + word + "' is invalid");
+				throw std::runtime_error("Config: '" + word + "' is invalid");
 		}
 		this->confs.push_back(config);
 	}
@@ -289,5 +292,6 @@ void File::info(std::list<Conf> & confs) const
 
 File::~File(void)
 {
-	_file.close();
+	if (_file.good())
+		_file.close();
 }

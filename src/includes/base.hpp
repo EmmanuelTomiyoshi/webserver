@@ -25,9 +25,16 @@
 #include <iterator>
 #include "sys/wait.h"
 
+
 # include <map>
 # include <vector>
 # include <list>
 # include <algorithm>
+# include <ctime>
+# include <cstdio>
+# include <sys/stat.h>
+
+# include "../tests/save_request.hpp"
+# include "error_codes.hpp"
 
 #endif

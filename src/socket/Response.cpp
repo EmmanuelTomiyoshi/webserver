@@ -24,8 +24,6 @@ _http_response(NULL), _http_response_size(0)
     _config = event_data->config;
     _request = event_data->request;
     _timeout = event_data->timeout;
-    if (is_public() == false)
-        _route = &_config->routes.get(_request->get_route());
     start_mimes();
 }
 
@@ -376,6 +374,8 @@ ssize_t Response::send_response(void)
 
     try
     {
+        if (is_public() == false)
+            _route = &_config->routes.get(_request->get_route());
         this->execute();
     }
     catch(const std::exception& e)

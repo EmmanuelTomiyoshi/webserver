@@ -15,7 +15,8 @@ Response::Response(void)
 {
 }
 
-Response::Response(epoll_event *event)
+Response::Response(epoll_event *event) : _route(NULL), _status("200"),
+_http_response(NULL), _http_response_size(0)
 {
 	ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
 
@@ -23,9 +24,7 @@ Response::Response(epoll_event *event)
     _config = event_data->config;
     _request = event_data->request;
     _timeout = event_data->timeout;
-    if (is_public())
-        _route = NULL;
-    else
+    if (is_public() == false)
         _route = &_config->routes.get(_request->get_route());
     start_mimes();
 }
@@ -74,7 +73,8 @@ void Response::open_route_file(void)
         if (_file.good())
             return ;
     }
-    //TODO: error();
+    std::cerr << "ERROR: open_route_file" << std::endl;
+    throw std::runtime_error(HTTP_NOT_FOUND);
 }
 
 void Response::set_public_file_info(void)
@@ -123,7 +123,6 @@ void Response::open_file(void)
 
     try
     {
-        _route = &(_config->routes.get(_request->get_target()));
         open_route_file();
     }
     catch (std::exception & e)

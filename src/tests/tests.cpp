@@ -24,11 +24,12 @@ static void test_config(void)
 static void test_request(void)
 {
     std::cout << "****TEST_REQUEST****" << std::endl;
+    Config & config = *(configs.get().begin());
 
     char *buff;
     ssize_t bytes = read_debug(0, &buff);
     write(1, buff, bytes);
-    _request.init(buff, bytes);
+    _request.init(buff, bytes, &config);
     _request.info();
 }
 

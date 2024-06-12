@@ -81,7 +81,7 @@ void Server::recv_message(epoll_event & event)
 	if (event_data->request == NULL)
 	{
 		event_data->request = new Request2;
-		event_data->request->init(buff, buff_size);
+		event_data->request->init(buff, buff_size, event_data->config);
 	}
 	else if (event_data->request->is_body_complete() == false)
 	{
@@ -245,6 +245,7 @@ void Server::setup(void)
 void Server::start(void)
 {
 	_configs.init();
+	_configs.show();
 	setup();
 	std::cout << "Server started." << std::endl;
 	run();

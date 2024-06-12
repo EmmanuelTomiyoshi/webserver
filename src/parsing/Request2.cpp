@@ -1,16 +1,18 @@
 #include "Request2.hpp"
+#include "Config.hpp"
 
 Request2::Request2(void) : _buff(NULL), _body(NULL), _is_cgi(false)
 {
 }
 
-void Request2::init(char *buff, ssize_t size)
+void Request2::init(char *buff, ssize_t size, Config *config)
 {
     if (size <= 0)
     {
         std::cerr << "ERROR: Empty request" << std::endl;
         throw std::runtime_error(HTTP_BAD_REQUEST);
     }
+    _config = config;
     _buff = buff;
     _buff_size = size;
 	separate_info();
@@ -20,6 +22,12 @@ void Request2::init(char *buff, ssize_t size)
     extract_route();
     extract_file();
     extract_query();
+    validations();
+}
+
+void Request2::validations(void)
+{
+    std::cout << "\n\nDO SOME VALIDATIONS\n" << std::endl;
 }
 
 void Request2::verify_initialization(void) const

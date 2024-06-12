@@ -10,10 +10,13 @@
 
  */
 
+class Config;
+
 class Request2
 {
 
 	private:
+		Config *_config;
 		std::string _info;
 		std::string _info_raw;
 		char *_buff;
@@ -45,11 +48,12 @@ class Request2
 		void extract_file_normal(void);
 		void extract_file_delete(void);
 		void extract_query(void);
+		void validations(void);
 
 	public:
 		Request2(void);
 
-		void init(char *buff, ssize_t size);
+		void init(char *buff, ssize_t size, Config *config);
 		std::string get_header(std::string key) const;
 		std::string get_method(void);
 		std::string get_target(void);

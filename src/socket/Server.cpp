@@ -74,9 +74,20 @@ void Server::recv_message(epoll_event & event)
 	ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
 
 	char *buff = NULL;
-	int buff_size = ft::recv_all(event_data->fd, &buff);
+	ssize_t buff_size = ft::recv_all(event_data->fd, &buff);
 	std::cout << "data received: " << buff_size << std::endl;
 	save_request(buff, buff_size);
+
+	if (buff_size <= 0)
+	{
+		epoll_ctl(
+			event_data->epfd,
+			EPOLL_CTL_DEL, event_data->fd,
+			&event
+		);
+		close(event_data->fd);
+		return ;
+	}
 
 	if (event_data->request == NULL)
 	{

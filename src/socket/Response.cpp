@@ -182,6 +182,14 @@ void Response::build_error(std::string code)
     _path = "./public/pages/errors/" + code + ".html";
 }
 
+void Response::replace_error_path(std::string code)
+{
+    if (_config->error_pages.get(code).empty() == false)
+        _path = _config->error_pages.get(code);
+    if (_route != NULL && _route->error_pages.get(code).empty() == false)
+        _path = _route->error_pages.get(code);
+}
+
 void Response::build_default_error(void)
 {
     _status = HTTP_INTERNAL_SERVER_ERROR;
@@ -365,6 +373,7 @@ void Response::execute_error(std::string code)
     try
     {
         build_error(code);
+        replace_error_path(code);
         open_public_file();
         fill_body();
     }

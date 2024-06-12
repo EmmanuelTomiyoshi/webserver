@@ -2,6 +2,7 @@
 # define ROUTE_HPP
 # include "base.hpp"
 # include "Methods.hpp"
+# include "ErrorPages.hpp"
 
 class Route
 {
@@ -93,6 +94,7 @@ class Route
 		Autoindex autoindex;
 		CGI_Route cgi_route;
 		SaveFilesPath save_files_path;
+		ErrorPages error_pages;
 
 		std::string get_page(void);
 		void set_root(std::string root);

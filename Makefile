@@ -21,6 +21,7 @@ SRC 		=	main.cpp \
 				Timeout.cpp \
 				save_request.cpp \
 				test_request.cpp \
+				ErrorPages.cpp \
 
 VPATH		=	./src \
 				./src/parsing \

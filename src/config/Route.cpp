@@ -251,6 +251,7 @@ void Route::show(void)
 	std::cout << "Redirect: " << redirect.get() << std::endl;
 	std::cout << "Path: " << get_path() << std::endl;
 	std::cout << "CGI_Route: " << (cgi_route.is_true() ? "true" : "false") << std::endl;
+	this->error_pages.show();
 	try_files.show();
 	cgi_extensions.show();
 }

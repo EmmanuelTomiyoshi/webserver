@@ -3,6 +3,7 @@
 # include "base.hpp"
 # include "./File.hpp"
 # include "Route.hpp"
+# include "ErrorPages.hpp"
 
 class Config
 {
@@ -74,6 +75,7 @@ class Config
 		Routes routes;
 		BodySize body_size;
 		ServerNames server_names;
+		ErrorPages error_pages;
 };
 
 #endif

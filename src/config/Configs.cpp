@@ -18,6 +18,13 @@ void Configs::init(void)
 		config.host.set(conf._single_value["host"]);
 		config.port.set(conf._single_value["port"]);
 		config.root.set(conf._single_value["root"]);
+		config.error_pages.add(HTTP_BAD_REQUEST, conf._single_value[HTTP_BAD_REQUEST]);
+		config.error_pages.add(HTTP_INTERNAL_SERVER_ERROR, conf._single_value[HTTP_INTERNAL_SERVER_ERROR]);
+		config.error_pages.add(HTTP_METHOD_NOT_ALLOWED, conf._single_value[HTTP_METHOD_NOT_ALLOWED]);
+		config.error_pages.add(HTTP_NOT_FOUND, conf._single_value[HTTP_NOT_FOUND]);
+		config.error_pages.add(HTTP_OK, conf._single_value[HTTP_OK]);
+		config.error_pages.add(HTTP_PAYLOAD_TOO_LARGE, conf._single_value[HTTP_PAYLOAD_TOO_LARGE]);
+		config.error_pages.add(HTTP_SERVICE_UNAVAILABLE, conf._single_value[HTTP_SERVICE_UNAVAILABLE]);
 		config.routes.set(conf._routes);
 		this->_configs.push_back(config);
 	}

@@ -42,6 +42,7 @@ class Response
         void create_response(void);
 
         void build_error(std::string code);
+        void replace_error_path(std::string code);
         void build_default_error(void);
 
         //the body can hold string or binary

@@ -13,6 +13,13 @@ File::File(std::string file_name) : _file(file_name.c_str())
 		"autoindex",
 		"return",
 		"cgi_route",
+		HTTP_BAD_REQUEST,
+		HTTP_INTERNAL_SERVER_ERROR,
+		HTTP_METHOD_NOT_ALLOWED,
+		HTTP_NOT_FOUND,
+		HTTP_OK,
+		HTTP_PAYLOAD_TOO_LARGE,
+		HTTP_SERVICE_UNAVAILABLE,
 		NULL
 	};
 

@@ -328,7 +328,7 @@ void CGI::extract_response_data(char *response, ssize_t response_size)
 {
     char *body = ft::get_body_position(response, response_size);
     if (body == NULL)
-        throw std::runtime_error(HTTP_SERVICE_UNAVAILABLE);
+        throw std::runtime_error(HTTP_NOT_FOUND);
     size_t header_size = body - response;
     size_t body_size = response_size - header_size;
     _response_data.body = body;

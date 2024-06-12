@@ -90,7 +90,7 @@ void Server::recv_message(epoll_event & event)
 
 	event_data->request->debug();
 
-	if (event_data->request->is_body_complete())
+	if (event_data->request->is_body_complete() || event_data->request->is_error())
 	{
 		event_data->request->info();
 		Response response(&event);

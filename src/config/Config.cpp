@@ -103,7 +103,7 @@ void Config::Routes::show(void)
 }
 
 //--------------- BodySize ------------------//
-int Config::BodySize::get(void) const
+ssize_t Config::BodySize::get(void) const
 {
 	return this->_body_size;
 }

@@ -388,6 +388,8 @@ ssize_t Response::send_response(void)
 
     try
     {
+        if(_request->is_error())
+            throw std::runtime_error(_request->get_error());
         if (is_public() == false)
             _route = &_config->routes.get(_request->get_route());
         this->execute();
@@ -401,7 +403,7 @@ ssize_t Response::send_response(void)
             execute_error(e.what());
     }
 
-    if (_request->get_method() == "POST")
+    if (_request->get_method() == "POST" && _request->is_error() == false)
     {
         std::cout << "*********JAMALAICACA" << std::endl;
         epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);

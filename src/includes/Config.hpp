@@ -36,9 +36,9 @@ class Config
 
 		class BodySize {
 			private:
-				int _body_size;
+				ssize_t _body_size;
 			public:
-				int get(void) const;
+				ssize_t get(void) const;
 				void set(std::string value);
 		};
 

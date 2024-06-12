@@ -17,13 +17,15 @@ class Request2
 
 	private:
 		Config *_config;
+		std::string _error;
+
 		std::string _info;
 		std::string _info_raw;
 		char *_buff;
-		size_t _buff_size;
+		ssize_t _buff_size;
 		char *_body;
-		size_t _body_size;
-		size_t _body_bytes;
+		ssize_t _body_size;
+		ssize_t _body_bytes;
 		void separate_info(void);
         void extract_request_line(void);
 		void extract_headers(void);
@@ -59,7 +61,7 @@ class Request2
 		std::string get_target(void);
 		std::string get_version(void);
 		char *get_body(void);
-		size_t get_body_size(void);
+		ssize_t get_body_size(void);
         void info(void);
 		void debug(void);
 
@@ -71,6 +73,9 @@ class Request2
 		ssize_t body_bytes_remaining(void);
 		bool is_body_complete(void);
 		void add_more_body(char *buff, ssize_t size);
+
+		bool is_error(void);
+		std::string get_error(void);
 };
 
 #endif

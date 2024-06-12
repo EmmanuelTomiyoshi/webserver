@@ -27,7 +27,21 @@ void Request2::init(char *buff, ssize_t size, Config *config)
 
 void Request2::validations(void)
 {
-    std::cout << "\n\nDO SOME VALIDATIONS\n" << std::endl;
+    if (_body_size > _config->body_size.get())
+    {
+        _error = HTTP_PAYLOAD_TOO_LARGE;
+        return ;
+    }
+}
+
+bool Request2::is_error(void)
+{
+    return _error.empty() == false;
+}
+
+std::string Request2::get_error(void)
+{
+    return _error;
 }
 
 void Request2::verify_initialization(void) const
@@ -126,7 +140,7 @@ char *Request2::get_body(void)
     return _body;
 }
 
-size_t Request2::get_body_size(void)
+ssize_t Request2::get_body_size(void)
 {
     verify_initialization();
     return _body_size;

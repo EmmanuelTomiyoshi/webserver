@@ -17,6 +17,7 @@ class Timeout {
 
         void add(epoll_event *event);
         void remove(epoll_event *event);
+        void reset_time(epoll_event *event);
 
         void verify(void);
 

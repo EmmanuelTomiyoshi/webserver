@@ -35,6 +35,21 @@ void Timeout::remove(epoll_event *event)
     std::cerr << "Event not found, failed to remove" << std::endl;
 }
 
+void Timeout::reset_time(epoll_event *event)
+{
+   std::list<epoll_event *>::iterator it = _events.begin();
+   ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
+    for (; it != _events.end(); it++)
+    {
+        ft::CustomData *li = (ft::CustomData *) (*it)->data.ptr;
+        if (li->id == event_data->id)
+        {
+            li->start_time = time(NULL);
+            return ;
+        }
+    }
+}
+
 void Timeout::event_timed_out(epoll_event *event)
 {
     ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;

@@ -114,7 +114,6 @@ void Server::recv_client_body(epoll_event & event)
 	(void) event;
 }
 
-
 void Server::process_cgi_response(epoll_event & event)
 {
 	ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;

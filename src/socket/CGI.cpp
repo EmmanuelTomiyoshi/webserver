@@ -186,15 +186,12 @@ void CGI::write_to_cgi(epoll_event *event)
 {
     ft::CustomData *data = (ft::CustomData *) event->data.ptr;
 
+    _timeout->reset_time(event);
     ssize_t bytes = write(
         data->fd,
         data->buff + data->w_count,
         data->buff_size - data->w_count
     );
-
-    // std::cout << "$$-> SIZE: " << data->buff_size << std::endl;
-    // std::cout << "$$-> COUNT: " << data->w_count + bytes << std::endl;
-    // std::cout << "$$-> LEFT: " << data->buff_size - data->w_count - bytes << std::endl;
 
     if (bytes >= data->buff_size || bytes <= 0 || data->w_count + bytes >= data->buff_size)
     {
@@ -266,7 +263,7 @@ void CGI::execute_cgi_get(void)
         ft::CustomData *old_event_data = (ft::CustomData *) _event->data.ptr;
         epoll_ctl(old_event_data->epfd, EPOLL_CTL_DEL, old_event_data->fd, _event);
 
-        old_event_data->type = ft::TIMEOUT;
+        old_event_data->type = ft::TRASH;
 
         ft::CustomData *event_data = new ft::CustomData;
         event_data->cgi_fd = old_event_data->fd;

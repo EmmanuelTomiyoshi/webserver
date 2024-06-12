@@ -368,6 +368,20 @@ void Response::execute_error(std::string code)
 	close(event_data->fd);
 }
 
+void Response::autoindex(void)
+{
+    std::cout << "\n-> EXECUTING AUTOINDEX <-\n" << std::endl;
+
+    CGI cgi;
+    cgi.set_request_method("GET");
+    cgi.set_query_string(_request->get_query());
+    cgi.set_timeout(_timeout);
+    cgi.set_route(_route);
+    cgi.set_script_name("./cgi-bin/autoindex.pl");
+    cgi.set_event(_event);
+    cgi.execute();
+}
+
 ssize_t Response::send_response(void)
 {
     ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
@@ -381,7 +395,10 @@ ssize_t Response::send_response(void)
     catch(const std::exception& e)
     {
         std::cout << "executing error: " << e.what() << std::endl;
-        execute_error(e.what());
+        if (_route != NULL && e.what() == std::string(HTTP_NOT_FOUND) && _route->autoindex.get())
+            autoindex();
+        else
+            execute_error(e.what());
     }
 
     if (_request->get_method() == "POST")

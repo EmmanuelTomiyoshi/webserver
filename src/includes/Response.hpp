@@ -57,6 +57,7 @@ class Response
 
         void GET(void);
         void GET_normal(void);
+        void autoindex(void);
         void GET_cgi(void);
         void POST(void);
         void DELETE(void);

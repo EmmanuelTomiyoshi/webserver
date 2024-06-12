@@ -292,6 +292,8 @@ void CGI::execute_cgi_get(void)
         close(_pfds_b[W]);
         close(_pfds_b[R]);
 
+        enter_dir(_route->get_path());
+
         execve(_argv[0], (char * const *) _argv, (char * const *) _envs);
         std::cerr << "CGI ERROR: fail to execute cgi GET script" << std::endl;
         exit(0);

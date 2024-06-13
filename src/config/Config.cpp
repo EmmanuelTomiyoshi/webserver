@@ -141,6 +141,7 @@ void Config::ServerNames::set(std::list<std::string> & values)
 		this->_values.push_back(*it);
 		it++;
 	}
+	this->_values.push_back("localhost");
 }
 
 void Config::ServerNames::show(void) const

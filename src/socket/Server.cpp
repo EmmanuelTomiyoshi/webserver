@@ -220,6 +220,28 @@ void	Server::run(void)
 	}
 }
 
+addrinfo *Server::try_server_names(Config *config)
+{
+	std::list<std::string>::const_iterator it;
+	it = config->server_names.get().begin();
+
+	addrinfo hints = get_hints();
+	addrinfo *res;
+	for (; it != config->server_names.get().end(); it++)
+	{
+		int status = getaddrinfo(
+			it->c_str(),
+			config->port.get().c_str(),
+			&hints,
+			&res
+		);
+		if (status == 0)
+			return res;
+	}
+	return NULL;
+}
+
+
 void Server::setup(void)
 {
 	_addr_hints = get_hints();
@@ -235,21 +257,21 @@ void Server::setup(void)
 	for (; it != _configs.get().end(); it++)
 	{
 		Config & config = (*it);
-		// config.routes.get("/").get_page();
-		_domain_name = config.host.get();
+		// _domain_name = config.host.get();
 
-		getaddrinfo(
-			_domain_name.c_str(),
-			config.port.get().c_str(),
-			&_addr_hints,
-			&addr_res
-		);
+		config.server_names.show();
+
+		addr_res = Server::try_server_names(&config);
+		if (addr_res == NULL)
+		{
+			std::cerr << "couldn't resolve the dns for the following server names:\n";
+			config.server_names.show();
+			continue ;
+		}
 
 		_addr_res_list.push_back(addr_res);
 
 		const int listen_sock = socket(AF_INET, SOCK_STREAM, 0);
-		_socket_fds.push_back(listen_sock);
-		_configs._fdconfigs[listen_sock] = &(*it); //insert the current config address in fdconfigs map
 
 		bind(
 			listen_sock,
@@ -257,8 +279,14 @@ void Server::setup(void)
 			addr_res->ai_addrlen
 		);
 
-		listen(listen_sock, 20);
+		if (listen(listen_sock, 20) != 0)
+		{
+			std::cerr << "Server setup error: can't listen to this port" << std::endl;
+			continue ;
+		}
 
+		_socket_fds.push_back(listen_sock);
+		_configs._fdconfigs[listen_sock] = &(*it); //insert the current config address in fdconfigs map
 		new_epoll_event(listen_sock, EPOLLIN, ft::SOCK);
 	}
 }

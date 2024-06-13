@@ -27,15 +27,14 @@ void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type
 	event_data->fd = conn_fd;
 	event_data->type = type;
 	event_data->epfd = _epfd;
-	event_data->timeout = &_timeout;
 
-	epoll_event *event = new epoll_event;
-	event->events = operation;
-	event->data.ptr = (void *) event_data;
+	epoll_event event;
+	event.events = operation;
+	event.data.ptr = (void *) event_data;
 
-	Memory::add(event);
+	Memory::add(&event);
 
-	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, event);
+	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, &event);
 }
 
 void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type, Config *config)
@@ -44,17 +43,16 @@ void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type
 	event_data->fd = conn_fd;
 	event_data->type = type;
 	event_data->epfd = _epfd;
-	event_data->timeout = &_timeout;
 	event_data->config = config;
 	event_data->request = NULL;
 
-	epoll_event *event = new epoll_event;
-	event->events = operation;
-	event->data.ptr = (void *) event_data;
+	epoll_event event;
+	event.events = operation;
+	event.data.ptr = (void *) event_data;
 
-	Memory::add(event);
+	Memory::add(&event);
 
-	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, event);
+	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, &event);
 }
 
 void	Server::send_message(void)
@@ -91,6 +89,7 @@ void Server::recv_message(epoll_event & event)
 			&event
 		);
 		close(event_data->fd);
+		Memory::del(&event);
 		return ;
 	}
 
@@ -123,7 +122,7 @@ void Server::process_cgi_response(epoll_event & event)
 {
 	CustomData *event_data = (CustomData *) event.data.ptr;
 	char *buff = NULL;
-	_timeout.remove(&event);
+	Timeout::remove(&event);
 	epoll_ctl(_epfd, EPOLL_CTL_DEL, event_data->fd, &event);
 	int buff_size = ft::read_all(event_data->fd, &buff);
 
@@ -138,6 +137,10 @@ void Server::process_cgi_response(epoll_event & event)
 
 		close(event_data->cgi_fd);
 		close(event_data->fd);
+		delete [] response;
+		if (buff)
+			free(buff);
+		Memory::del(&event);
 	}
 	catch (std::exception & e)
 	{
@@ -164,6 +167,7 @@ void Server::process_request(epoll_event & event)
 	{
 		epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
 		close(event.data.fd);
+		Memory::del(&event);
 		std::cerr << "REQUEST FAILED: " << e.what() << std::endl;
 	}
 }
@@ -172,7 +176,7 @@ void	Server::run(void)
 {
 	while (1)
 	{
-		_timeout.verify();
+		Timeout::verify();
 		int nfds = epoll_wait(this->_epfd, this->_events, 20, 0);
 		for (int i = 0; i < nfds; i++)
 		{

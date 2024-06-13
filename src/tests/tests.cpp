@@ -1,7 +1,6 @@
 #include "tests.hpp"
 
 Request2 _request;
-Timeout _timeout;
 Configs configs("./conf/ws.conf");
 
 ssize_t read_debug(size_t index, char **buff)
@@ -45,7 +44,6 @@ static void test_cgi(void)
     cgi.set_body(_request.get_body());
     cgi.set_body_size(_request.get_body_size());
     cgi.set_query_string(_request.get_query());
-    cgi.set_timeout(&_timeout);
     std::string script = config.routes.get(_request.get_route()).get_path();
     script += "/" + _request.get_file();
     std::cout << "Script path: " << script << std::endl;

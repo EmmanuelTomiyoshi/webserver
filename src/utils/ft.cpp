@@ -123,6 +123,8 @@ namespace ft {
             data = new char[total_size];
             std::memmove(data, aux, total_size - bytes);
             std::memmove(data + total_size - bytes, tmp, bytes);
+            if (aux)
+                delete [] aux;
         }
         *buff = data;
         return total_size;

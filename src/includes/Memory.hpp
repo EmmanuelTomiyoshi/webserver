@@ -3,10 +3,12 @@
 # include "base.hpp"
 # include "ft.hpp"
 
+class CustomData;
+
 class Memory
 {
     private:
-        static std::list<epoll_event *> _m_events;
+        static std::list<CustomData *> _m_events;
         static std::list<char *> _m_buffers;
     public:
         static void add(epoll_event *);

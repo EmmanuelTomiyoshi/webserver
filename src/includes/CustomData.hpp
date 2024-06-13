@@ -23,7 +23,6 @@ class CustomData
         int epfd;
         int pid;
         ft::EventType type;
-        size_t id;
         ssize_t buff_size;
         ssize_t w_count;
 };

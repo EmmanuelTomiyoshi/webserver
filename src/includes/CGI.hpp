@@ -81,8 +81,6 @@ class CGI
 
         ResponseData _response_data;
 
-        Timeout *_timeout;
-
         void enter_dir(std::string dir);
 
     public:
@@ -96,7 +94,6 @@ class CGI
         void set_body(char *value);
         void set_body_size(size_t value);
         void set_event(struct epoll_event *event);
-        void set_timeout(Timeout *timeout);
         void set_route(Route *route);
 
         void execute(void);

@@ -13,7 +13,7 @@ epfd(-1), pid(-1), buff_size(0), w_count(0)
 CustomData::~CustomData(void)
 {
     if (this->buff)
-        delete this->buff;
+        delete [] this->buff;
     if (this->request)
         delete this->request;
     // if (this->id >= 0)

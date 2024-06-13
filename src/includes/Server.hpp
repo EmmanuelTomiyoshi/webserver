@@ -25,8 +25,6 @@ class Server
 		
 		Response *_response;
 
-		Timeout _timeout;
-
 		void run(void);
 		void send_message(void);
 		void recv_message(epoll_event & event);

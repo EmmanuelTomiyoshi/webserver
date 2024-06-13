@@ -65,7 +65,6 @@ class Response
 
         Config *_config;
         epoll_event *_event;
-        Timeout *_timeout;
 
         static std::string http_version;
 
@@ -81,7 +80,7 @@ class Response
     public:
         Response(void);
         Response(epoll_event *event);
-        Response(char *buff, size_t size, Config *config, Timeout *timeout);
+        Response(char *buff, size_t size, Config *config);
         ~Response(void);
 
         ssize_t send_response(void);

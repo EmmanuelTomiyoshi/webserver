@@ -6,7 +6,7 @@
 std::string CGI::_gateway_interface("GATEWAY_INTERFACE=CGI/1.1");
 std::string CGI::_server_protocol("SERVER_PROTOCOL=HTTP/1.1");
 
-CGI::CGI(void) : _body(NULL), _response_size(0), _timeout(NULL)
+CGI::CGI(void) : _body(NULL), _response_size(0)
 {
     for (int i = 0; i < ENVS_SIZE; i++)
         _envs[i] = NULL;
@@ -85,11 +85,6 @@ void CGI::set_event(struct epoll_event *event)
     _event = event;
 }
 
-void CGI::set_timeout(Timeout *timeout)
-{
-    _timeout = timeout;
-}
-
 bool CGI::error(void)
 {
     if (_argv[0] == NULL)
@@ -114,11 +109,6 @@ bool CGI::error(void)
             std::cerr << "CGI ERROR: content_length empty" << std::endl;
             return true;
         }
-    }
-    if (_timeout == NULL)
-    {
-        std::cerr << "CGI ERROR: timeout empty" << std::endl;
-        return true;
     }
 
     return false;
@@ -176,21 +166,21 @@ void CGI::add_write_event(int fd, char *buff, ssize_t size, int epfd, int cgi_fd
     event_data->buff_size = size;
     event_data->w_count = 0;
 
-    epoll_event *event = new epoll_event;
-    event->events = EPOLLOUT | EPOLLET;
-    event->data.ptr = (void *) event_data;
+    epoll_event event;
+    event.events = EPOLLOUT | EPOLLET;
+    event.data.ptr = (void *) event_data;
 
-    Memory::add(event);
+    Memory::add(&event);
 
-    epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
-    _timeout->add(event);
+    epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, &event);
+    Timeout::add(&event);
 }
 
 void CGI::write_to_cgi(epoll_event *event)
 {
     CustomData *data = (CustomData *) event->data.ptr;
 
-    _timeout->reset_time(event);
+    Timeout::reset_time(event);
     ssize_t bytes = write(
         data->fd,
         data->buff + data->w_count,
@@ -202,6 +192,7 @@ void CGI::write_to_cgi(epoll_event *event)
         epoll_ctl(data->epfd, EPOLL_CTL_DEL, data->fd, event);
         close(data->fd);
         data->type = ft::TRASH;
+        Memory::del(event);
         return ;
     }
 
@@ -230,19 +221,20 @@ void CGI::execute_cgi_post(void)
         event_data->start_time = time(NULL);
         event_data->pid = _pid;
 
-        epoll_event *event = new epoll_event;
-        event->events = EPOLLIN | EPOLLET;
-        event->data.ptr = (void *) event_data;
+        epoll_event event;
+        event.events = EPOLLIN | EPOLLET;
+        event.data.ptr = (void *) event_data;
 
-        Memory::add(event);
+        Memory::add(&event);
 
-        epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
-        _timeout->add(event);
+        epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, &event);
+        Timeout::add(&event);
 
         close(_pfds_a[R]);
         close(_pfds_b[W]);
 
         add_write_event(_pfds_a[W], _body, _body_size, old_event_data->epfd, old_event_data->fd);
+        Memory::del(_event);
     }
 
     if (_pid == 0)
@@ -280,15 +272,16 @@ void CGI::execute_cgi_get(void)
         event_data->start_time = time(NULL);
         event_data->pid = _pid;
 
-        epoll_event *event = new epoll_event;
-        event->events = EPOLLIN | EPOLLET;
-        event->data.ptr = (void *) event_data;
+        epoll_event event;
+        event.events = EPOLLIN | EPOLLET;
+        event.data.ptr = (void *) event_data;
 
-        Memory::add(event);
+        Memory::add(&event);
 
-        epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
-        _timeout->add(event);
+        epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, &event);
+        Timeout::add(&event);
         close(_pfds_b[W]);
+        Memory::del(_event);
     }
 
     if (_pid == 0)
@@ -322,9 +315,11 @@ void CGI::extract_content_type(char *response, size_t header_size)
     char *content = &response[pos];
     char *end = std::strchr(content, '\n');
     size_t size = end - content;
+    if (size <= 0)
+        throw std::runtime_error(HTTP_NOT_FOUND);
     char *content_type = new char[size + 1];
     std::memmove(content_type, content, size);
-    content_type[size] = '\n';
+    content_type[size] = '\0';
     _response_data.content_type = content_type;
     delete [] content_type;
 }

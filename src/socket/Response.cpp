@@ -1,18 +1,20 @@
 #include "Response.hpp"
 #include "CustomData.hpp"
+#include "Memory.hpp"
 
 std::string Response::http_version = "HTTP/1.1";
 
 std::map<std::string, std::string> Response::mime_types;
 
-Response::Response(char *buff, size_t size, Config *config, Timeout *timeout) : 
+Response::Response(char *buff, size_t size, Config *config) : 
 _buff(buff), _buff_size(size), _status("200"), _http_response(NULL),
-_config(config), _timeout(timeout)
+_config(config)
 {
     start_mimes();
 }
 
-Response::Response(void)
+Response::Response(void) : _request(NULL), _route(NULL),
+_http_response(NULL), _config(NULL), _event(NULL)
 {
 }
 
@@ -24,13 +26,12 @@ _http_response(NULL), _http_response_size(0)
     _event = event;
     _config = event_data->config;
     _request = event_data->request;
-    _timeout = event_data->timeout;
     start_mimes();
 }
 
 Response::~Response(void)
 {
-    if (_http_response)
+    if (_http_response != NULL)
         delete [] _http_response;
 }
 
@@ -224,6 +225,8 @@ void Response::create_response(void)
         "\r\n";
     
     size_t size = response.size() + _body.size;
+    if (size <= 0)
+        throw std::runtime_error(HTTP_NOT_FOUND);
     _http_response = new char[size];
     _http_response_size = size;
     std::memmove(_http_response, response.c_str(), response.size());
@@ -244,6 +247,7 @@ void Response::GET_normal(void)
     );
     epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
 	close(event_data->fd);
+    Memory::del(_event);
 }
 void Response::GET_cgi(void)
 {
@@ -252,7 +256,6 @@ void Response::GET_cgi(void)
     cgi.set_body(_request->get_body());
     cgi.set_body_size(_request->get_body_size());
     cgi.set_query_string(_request->get_query());
-    cgi.set_timeout(_timeout);
     cgi.set_route(_route);
     std::string script = _route->get_path();
     script += "/" + _request->get_file();
@@ -294,16 +297,12 @@ void Response::POST(void)
     cgi.set_content_length(_request->get_header("Content-Length"));
     cgi.set_body_size(_request->get_body_size());
     cgi.set_content_type(_request->get_header("Content-Type"));
-    cgi.set_timeout(_timeout);
     cgi.set_script_name("./cgi-bin/upload_debug.pl");
     cgi.set_route(_route);
 
     cgi.set_event(_event);
     cgi.info();
     cgi.execute();
-
-    _http_response = cgi.get_response();
-    _http_response_size = cgi.get_response_size();
 }
 
 void Response::DELETE(void)
@@ -370,6 +369,7 @@ void Response::execute(void)
         );
         epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
         close(event_data->fd);
+        Memory::del(_event);
     }
     else
         throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
@@ -398,6 +398,7 @@ void Response::execute_error(std::string code)
     );
     epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
 	close(event_data->fd);
+    Memory::del(_event);
 }
 
 void Response::autoindex(void)
@@ -407,7 +408,6 @@ void Response::autoindex(void)
     CGI cgi;
     cgi.set_request_method("GET");
     cgi.set_query_string(_request->get_query());
-    cgi.set_timeout(_timeout);
     cgi.set_route(_route);
     cgi.set_script_name("./cgi-bin/autoindex.pl");
     cgi.set_event(_event);
@@ -416,8 +416,6 @@ void Response::autoindex(void)
 
 ssize_t Response::send_response(void)
 {
-    CustomData *event_data = (CustomData *) _event->data.ptr;
-
     try
     {
         if(_request->is_error())
@@ -433,13 +431,6 @@ ssize_t Response::send_response(void)
             autoindex();
         else
             execute_error(e.what());
-    }
-
-    if (_request->get_method() == "POST" && _request->is_error() == false)
-    {
-        std::cout << "*********JAMALAICACA" << std::endl;
-        epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
-        return 1;
     }
     return 1;
 }

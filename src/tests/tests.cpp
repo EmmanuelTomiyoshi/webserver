@@ -89,6 +89,30 @@ static void execute_tests(void)
     test_cgi();
 }
 
+#include "../utils/Memory.hpp"
+static void execute_tests2(void)
+{
+    char *buff = new char[100];
+    char *buff2 = new char[100];
+    char *buff3 = new char[100];
+    char *buff4 = new char[100];
+    Memory::add(buff);
+    Memory::add(buff2);
+    Memory::add(buff3);
+    Memory::add(buff4);
+
+    Memory::clear();
+
+    epoll_event *event = new epoll_event;
+    ft::CustomData *data = new ft::CustomData;
+    data->request = NULL;
+    event->data.ptr = data;
+
+    Memory::add(event);
+
+    Memory::clear();
+}
+
 void tests(int argc, char **argv)
 {
     if (argc != 2)
@@ -97,6 +121,11 @@ void tests(int argc, char **argv)
     if (std::string(argv[1]) == "test")
     {
         execute_tests();
+        exit(0);
+    }
+    if (std::string(argv[1]) == "test2")
+    {
+        execute_tests2();
         exit(0);
     }
     if (std::string(argv[1]) == "debug")

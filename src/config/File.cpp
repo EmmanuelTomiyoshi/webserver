@@ -52,6 +52,7 @@ void File::fill_data(void)
 		_file.getline(buffer, 2000, '\0');
 		_data += buffer;
 	}
+	_file.close();
 }
 
 std::string File::read_stream(std::stringstream & ss)
@@ -299,6 +300,4 @@ void File::info(std::list<Conf> & confs) const
 
 File::~File(void)
 {
-	if (_file.good())
-		_file.close();
 }

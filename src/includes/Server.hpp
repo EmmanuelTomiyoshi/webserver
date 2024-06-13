@@ -10,7 +10,7 @@ class Server
 {
 	private:
 		addrinfo	_addr_hints;
-		addrinfo	*_addr_res[5];
+		std::list<addrinfo *> _addr_res_list;
 		std::list<int> _socket_fds;
 
 		std::string _domain_name;

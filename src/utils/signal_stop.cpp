@@ -20,12 +20,13 @@ void stop_server(void)
         return ;
     
     server->stop();
+    delete server;
 }
 
 void sig_handler(int num)
 {
-    (void) num;
     stop_server();
+    exit(num);
 }
 
 void set_signal_stop(void)

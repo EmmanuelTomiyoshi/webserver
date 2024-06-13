@@ -14,7 +14,6 @@ Server::Server(std::string config_file) : _configs(config_file)
 
 Server::~Server(void)
 {
-	close(_epfd);
 	//TODO: verify what memories to free
 	// if (_addr_res != NULL)
 	// 	freeaddrinfo(_addr_res);
@@ -236,6 +235,8 @@ void Server::setup(void)
 			&addr_res
 		);
 
+		_addr_res_list.push_back(addr_res);
+
 		const int listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 		_socket_fds.push_back(listen_sock);
 		_configs._fdconfigs[listen_sock] = &(*it); //insert the current config address in fdconfigs map
@@ -263,12 +264,24 @@ void Server::start(void)
 
 void Server::stop(void)
 {
-	std::cout << "stopping server..." << std::endl;
+	std::cout << "\nstopping server..." << std::endl;
+	std::cout << "_epfd: " << _epfd << std::endl;
+	close(_epfd);
+	close_ports();
 }
 
 void Server::close_ports(void)
 {
 	std::list<int>::iterator it = this->_socket_fds.begin();
 	for (; it != _socket_fds.end(); it++)
+	{
+		std::cout << "closing " << *it << std::endl;
 		close(*it);
+	}
+
+	std::list<addrinfo *>::iterator it2 = _addr_res_list.begin();
+	for (; it2 != _addr_res_list.end(); it2++)
+	{
+		freeaddrinfo(*it2);
+	}
 }

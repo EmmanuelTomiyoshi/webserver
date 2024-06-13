@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "CustomData.hpp"
+#include "Memory.hpp"
 
 addrinfo Server::get_hints(void)
 {
@@ -32,6 +33,8 @@ void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type
 	event->events = operation;
 	event->data.ptr = (void *) event_data;
 
+	Memory::add(event);
+
 	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, event);
 }
 
@@ -48,6 +51,8 @@ void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type
 	epoll_event *event = new epoll_event;
 	event->events = operation;
 	event->data.ptr = (void *) event_data;
+
+	Memory::add(event);
 
 	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, event);
 }

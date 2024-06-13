@@ -1,5 +1,6 @@
 #include "base.hpp"
 #include "Server.hpp"
+#include "Memory.hpp"
 
 static Server **store_server(void)
 {
@@ -26,6 +27,7 @@ void stop_server(void)
 void sig_handler(int num)
 {
     stop_server();
+    Memory::clear();
     exit(num);
 }
 

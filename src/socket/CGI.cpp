@@ -1,6 +1,7 @@
 #include "CGI.hpp"
 #include "Route.hpp"
 #include "CustomData.hpp"
+#include "Memory.hpp"
 
 std::string CGI::_gateway_interface("GATEWAY_INTERFACE=CGI/1.1");
 std::string CGI::_server_protocol("SERVER_PROTOCOL=HTTP/1.1");
@@ -179,6 +180,8 @@ void CGI::add_write_event(int fd, char *buff, ssize_t size, int epfd, int cgi_fd
     event->events = EPOLLOUT | EPOLLET;
     event->data.ptr = (void *) event_data;
 
+    Memory::add(event);
+
     epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
     _timeout->add(event);
 }
@@ -231,6 +234,8 @@ void CGI::execute_cgi_post(void)
         event->events = EPOLLIN | EPOLLET;
         event->data.ptr = (void *) event_data;
 
+        Memory::add(event);
+
         epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
         _timeout->add(event);
 
@@ -278,6 +283,8 @@ void CGI::execute_cgi_get(void)
         epoll_event *event = new epoll_event;
         event->events = EPOLLIN | EPOLLET;
         event->data.ptr = (void *) event_data;
+
+        Memory::add(event);
 
         epoll_ctl(event_data->epfd, EPOLL_CTL_ADD, event_data->fd, event);
         _timeout->add(event);

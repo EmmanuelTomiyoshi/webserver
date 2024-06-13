@@ -5,11 +5,6 @@
 std::list<epoll_event *> Memory::_m_events;
 std::list<char *> Memory::_m_buffers;
 
-Memory::Memory(void)
-{
-
-}
-
 void Memory::add(epoll_event *addr)
 {
     if (addr == NULL)
@@ -28,7 +23,12 @@ void Memory::add(char * addr)
 
 void Memory::del(epoll_event *addr)
 {
-    (void) addr;
+    if (addr == NULL)
+        return ;
+    _m_events.remove(addr);
+    CustomData *data = (CustomData *) addr->data.ptr;
+    delete data;
+    delete addr;
 }
 
 void Memory::del(char *addr)
@@ -39,7 +39,7 @@ void Memory::del(char *addr)
 
 void Memory::remove(epoll_event *addr)
 {
- (void) addr;
+    _m_events.remove(addr);
 }
 
 void Memory::remove(char *addr)

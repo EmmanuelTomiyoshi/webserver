@@ -9,8 +9,6 @@ class Memory
         static std::list<epoll_event *> _m_events;
         static std::list<char *> _m_buffers;
     public:
-        Memory(void);
-
         static void add(epoll_event *);
         static void add(char *);
 

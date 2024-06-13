@@ -39,6 +39,7 @@ class Server
 		void close_ports(void);
 
 		static addrinfo *try_server_names(Config *config);
+		void setup_config(Config & config);
 
 	public:
 		Server(std::string config_file);

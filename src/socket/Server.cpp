@@ -241,35 +241,23 @@ addrinfo *Server::try_server_names(Config *config)
 	return NULL;
 }
 
-
-void Server::setup(void)
+void Server::setup_config(Config & config)
 {
-	_addr_hints = get_hints();
-	_epfd = epoll_create1(0);
-	if (_epfd == -1)
-		throw std::runtime_error("error creating epoll");
-	_timeout_ms = 0;
+	std::list<std::string>::const_iterator it;
+	it = config.server_names.get().begin();
+
+	addrinfo addr_hints = get_hints();
 	addrinfo *addr_res;
-
-	std::list<Config>::iterator it;
-	it = _configs.get().begin();
-
-	for (; it != _configs.get().end(); it++)
+	for (; it != config.server_names.get().end(); it++)
 	{
-		Config & config = (*it);
-		// _domain_name = config.host.get();
-
-		config.server_names.show();
-
-		addr_res = Server::try_server_names(&config);
-		if (addr_res == NULL)
-		{
-			std::cerr << "couldn't resolve the dns for the following server names:\n";
-			config.server_names.show();
+		int status = getaddrinfo(
+			it->c_str(),
+			config.port.get().c_str(),
+			&addr_hints,
+			&addr_res
+		);
+		if (status != 0)
 			continue ;
-		}
-
-		_addr_res_list.push_back(addr_res);
 
 		const int listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -281,13 +269,44 @@ void Server::setup(void)
 
 		if (listen(listen_sock, 20) != 0)
 		{
-			std::cerr << "Server setup error: can't listen to this port" << std::endl;
+			freeaddrinfo(addr_res);
 			continue ;
 		}
 
+		_addr_res_list.push_back(addr_res);
 		_socket_fds.push_back(listen_sock);
-		_configs._fdconfigs[listen_sock] = &(*it); //insert the current config address in fdconfigs map
+		_configs._fdconfigs[listen_sock] = &config; //insert the current config address in fdconfigs map
 		new_epoll_event(listen_sock, EPOLLIN, ft::SOCK);
+		return ;
+	}
+	throw new std::exception;
+}
+
+void Server::setup(void)
+{
+	_addr_hints = get_hints();
+	_epfd = epoll_create1(0);
+	if (_epfd == -1)
+		throw std::runtime_error("error creating epoll");
+	_timeout_ms = 0;
+
+	std::list<Config>::iterator it;
+	it = _configs.get().begin();
+
+	for (; it != _configs.get().end(); it++)
+	{
+		Config & config = (*it);
+		// _domain_name = config.host.get();
+
+		try
+		{
+			setup_config(config);
+		}
+		catch(const std::exception& e)
+		{
+			std::cout << "Failed to start a server with the following servernames:\n";
+			config.server_names.show();
+		}
 	}
 }
 

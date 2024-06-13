@@ -45,6 +45,7 @@ class Server
 		~Server(void);
 
 		void start(void);
+		void stop(void);
 		void new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type);
 		void new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type, Config *config);
 };

@@ -33,8 +33,14 @@
 # include <ctime>
 # include <cstdio>
 # include <sys/stat.h>
+# include <signal.h>
 
 # include "../tests/save_request.hpp"
 # include "error_codes.hpp"
+
+class Server;
+void set_server_store(Server *server);
+void stop_server(void);
+void set_signal_stop(void);
 
 #endif

@@ -25,6 +25,8 @@ void start_server(int argc, char **argv)
 			server = new Server(argv[1]);
 		else
 			server = new Server("./conf/ws.conf");
+		set_server_store(server);
+		set_signal_stop();
 		server->start();
 	}
 	catch (const std::runtime_error& e)

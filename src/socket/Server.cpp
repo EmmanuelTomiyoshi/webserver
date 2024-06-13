@@ -261,6 +261,11 @@ void Server::start(void)
 	run();
 }
 
+void Server::stop(void)
+{
+	std::cout << "stopping server..." << std::endl;
+}
+
 void Server::close_ports(void)
 {
 	std::list<int>::iterator it = this->_socket_fds.begin();

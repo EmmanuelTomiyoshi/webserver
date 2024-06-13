@@ -19,6 +19,7 @@ SRC 		=	main.cpp \
 				save_request.cpp \
 				test_request.cpp \
 				ErrorPages.cpp \
+				signal_stop.cpp \
 
 VPATH		=	./src \
 				./src/utils \

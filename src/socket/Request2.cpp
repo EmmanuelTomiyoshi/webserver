@@ -5,6 +5,12 @@ Request2::Request2(void) : _buff(NULL), _body(NULL), _is_cgi(false)
 {
 }
 
+Request2::~Request2(void)
+{
+    if (_buff)
+        delete [] _buff;
+}
+
 void Request2::init(char *buff, ssize_t size, Config *config)
 {
     if (size <= 0)

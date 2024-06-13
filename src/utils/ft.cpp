@@ -119,7 +119,9 @@ namespace ft {
             if (bytes <= 0)
                 break;
             total_size += bytes;
-            data = (char *)realloc(data, total_size);
+            char *aux = data;
+            data = new char[total_size];
+            std::memmove(data, aux, total_size - bytes);
             std::memmove(data + total_size - bytes, tmp, bytes);
         }
         *buff = data;

@@ -28,6 +28,12 @@ _http_response(NULL), _http_response_size(0)
     start_mimes();
 }
 
+Response::~Response(void)
+{
+    if (_http_response)
+        delete [] _http_response;
+}
+
 void Response::start_mimes(void)
 {
     mime_types["js"] = "application/javascript";

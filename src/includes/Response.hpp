@@ -82,6 +82,7 @@ class Response
         Response(void);
         Response(epoll_event *event);
         Response(char *buff, size_t size, Config *config, Timeout *timeout);
+        ~Response(void);
 
         ssize_t send_response(void);
 

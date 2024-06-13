@@ -54,6 +54,7 @@ class Request2
 
 	public:
 		Request2(void);
+		~Request2(void);
 
 		void init(char *buff, ssize_t size, Config *config);
 		std::string get_header(std::string key) const;

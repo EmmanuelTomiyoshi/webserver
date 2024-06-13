@@ -2,7 +2,6 @@ NAME 		=	webserv
 
 SRC 		=	main.cpp \
 				IPResolver.cpp \
-				Request.cpp \
 				Server.cpp \
 				Config.cpp \
 				Route.cpp \
@@ -15,7 +14,6 @@ SRC 		=	main.cpp \
 				ft.cpp \
 				Response.cpp \
 				CGI.cpp \
-				temp.cpp \
 				Request2.cpp \
 				tests.cpp \
 				Timeout.cpp \

@@ -1,7 +1,6 @@
 #ifndef RESPONSE_HPP
 # define RESPONSE_HPP
 #include  "base.hpp"
-#include "../parsing/Request.hpp"
 #include "Configs.hpp"
 #include "Config.hpp"
 #include "error_codes.hpp"
@@ -12,7 +11,6 @@
 class Response
 {
     private:
-        Request _req;
         Request2 *_request;
         char *_buff;
         size_t _buff_size;

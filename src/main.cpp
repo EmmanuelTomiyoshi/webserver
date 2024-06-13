@@ -39,7 +39,6 @@ void start_server(int argc, char **argv)
 		delete server;
 }
 
-void temp(void);
 void tests(int argc, char **argv);
 
 int main(int argc, char *argv[])

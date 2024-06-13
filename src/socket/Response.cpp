@@ -1,4 +1,5 @@
 #include "Response.hpp"
+#include "CustomData.hpp"
 
 std::string Response::http_version = "HTTP/1.1";
 
@@ -18,7 +19,7 @@ Response::Response(void)
 Response::Response(epoll_event *event) : _route(NULL), _status("200"),
 _http_response(NULL), _http_response_size(0)
 {
-	ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
+	CustomData *event_data = (CustomData *) event->data.ptr;
 
     _event = event;
     _config = event_data->config;
@@ -228,7 +229,7 @@ void Response::GET_normal(void)
     open_file();
     fill_body();
     create_response();
-    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+    CustomData *event_data = (CustomData *) _event->data.ptr;
     send(
         event_data->fd,
         _http_response, 
@@ -312,7 +313,7 @@ void Response::DELETE(void)
     if (std::remove(file_path.c_str()) != 0)
         throw std::runtime_error(HTTP_INTERNAL_SERVER_ERROR);
     create_cors_response();
-    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+    CustomData *event_data = (CustomData *) _event->data.ptr;
     send(
         event_data->fd,
         _http_response, 
@@ -354,7 +355,7 @@ void Response::execute(void)
     else if (method ==  "OPTIONS")
     {
         create_cors_response();
-        ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+        CustomData *event_data = (CustomData *) _event->data.ptr;
         send(
             event_data->fd,
             _http_response, 
@@ -382,7 +383,7 @@ void Response::execute_error(std::string code)
         build_default_error();
     }
     create_response();
-    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+    CustomData *event_data = (CustomData *) _event->data.ptr;
     send(
         event_data->fd,
         _http_response, 
@@ -409,7 +410,7 @@ void Response::autoindex(void)
 
 ssize_t Response::send_response(void)
 {
-    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+    CustomData *event_data = (CustomData *) _event->data.ptr;
 
     try
     {

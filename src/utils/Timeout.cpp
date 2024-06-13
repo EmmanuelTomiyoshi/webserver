@@ -1,5 +1,6 @@
 #include "Timeout.hpp"
 # include "Response.hpp"
+#include "CustomData.hpp"
 
 Timeout::Timeout(void) : _id(0)
 {
@@ -12,7 +13,7 @@ Timeout::~Timeout(void)
 
 void Timeout::add(epoll_event *event)
 {
-    ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
+    CustomData *event_data = (CustomData *) event->data.ptr;
 
     event_data->id = _id;
     _id++;
@@ -22,10 +23,10 @@ void Timeout::add(epoll_event *event)
 void Timeout::remove(epoll_event *event)
 {
    std::list<epoll_event *>::iterator it = _events.begin();
-   ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
+   CustomData *event_data = (CustomData *) event->data.ptr;
     for (; it != _events.end(); it++)
     {
-        ft::CustomData *li = (ft::CustomData *) (*it)->data.ptr;
+        CustomData *li = (CustomData *) (*it)->data.ptr;
         if (li->id == event_data->id)
         {
             _events.erase(it);
@@ -38,10 +39,10 @@ void Timeout::remove(epoll_event *event)
 void Timeout::reset_time(epoll_event *event)
 {
    std::list<epoll_event *>::iterator it = _events.begin();
-   ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
+   CustomData *event_data = (CustomData *) event->data.ptr;
     for (; it != _events.end(); it++)
     {
-        ft::CustomData *li = (ft::CustomData *) (*it)->data.ptr;
+        CustomData *li = (CustomData *) (*it)->data.ptr;
         if (li->id == event_data->id)
         {
             li->start_time = time(NULL);
@@ -52,7 +53,7 @@ void Timeout::reset_time(epoll_event *event)
 
 void Timeout::event_timed_out(epoll_event *event)
 {
-    ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
+    CustomData *event_data = (CustomData *) event->data.ptr;
 
     close(event_data->fd);
     if (event_data->type == ft::CGI_R)
@@ -79,7 +80,7 @@ void Timeout::verify(void)
     std::list<epoll_event *>::iterator it = _events.begin();
     for (; it != _events.end(); it++)
     {
-        ft::CustomData *event_data = (ft::CustomData *)(*it)->data.ptr;
+        CustomData *event_data = (CustomData *)(*it)->data.ptr;
         if (event_data->start_time + event_data->duration < time(NULL))
         {
             event_timed_out(*it);

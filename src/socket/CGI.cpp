@@ -1,5 +1,6 @@
 #include "CGI.hpp"
 #include "Route.hpp"
+#include "CustomData.hpp"
 
 std::string CGI::_gateway_interface("GATEWAY_INTERFACE=CGI/1.1");
 std::string CGI::_server_protocol("SERVER_PROTOCOL=HTTP/1.1");
@@ -163,7 +164,7 @@ void CGI::read_response(void)
 
 void CGI::add_write_event(int fd, char *buff, ssize_t size, int epfd, int cgi_fd)
 {
-    ft::CustomData *event_data = new ft::CustomData;
+    CustomData *event_data = new CustomData;
     event_data->fd = fd;
     event_data->cgi_fd = cgi_fd;
     event_data->type = ft::CGI_W;
@@ -184,7 +185,7 @@ void CGI::add_write_event(int fd, char *buff, ssize_t size, int epfd, int cgi_fd
 
 void CGI::write_to_cgi(epoll_event *event)
 {
-    ft::CustomData *data = (ft::CustomData *) event->data.ptr;
+    CustomData *data = (CustomData *) event->data.ptr;
 
     _timeout->reset_time(event);
     ssize_t bytes = write(
@@ -212,12 +213,12 @@ void CGI::execute_cgi_post(void)
 
     if (_pid != 0)
     {
-        ft::CustomData *old_event_data = (ft::CustomData *) _event->data.ptr;
+        CustomData *old_event_data = (CustomData *) _event->data.ptr;
         epoll_ctl(old_event_data->epfd, EPOLL_CTL_DEL, old_event_data->fd, _event);
 
         old_event_data->type = ft::TRASH;
 
-        ft::CustomData *event_data = new ft::CustomData;
+        CustomData *event_data = new CustomData;
         event_data->cgi_fd = old_event_data->fd;
         event_data->fd = _pfds_b[R];
         event_data->type = ft::CGI_R;
@@ -260,12 +261,12 @@ void CGI::execute_cgi_get(void)
     
     if (_pid != 0)
     {
-        ft::CustomData *old_event_data = (ft::CustomData *) _event->data.ptr;
+        CustomData *old_event_data = (CustomData *) _event->data.ptr;
         epoll_ctl(old_event_data->epfd, EPOLL_CTL_DEL, old_event_data->fd, _event);
 
         old_event_data->type = ft::TRASH;
 
-        ft::CustomData *event_data = new ft::CustomData;
+        CustomData *event_data = new CustomData;
         event_data->cgi_fd = old_event_data->fd;
         event_data->fd = _pfds_b[R];
         event_data->type = ft::CGI_R;

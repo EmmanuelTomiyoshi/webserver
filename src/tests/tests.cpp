@@ -89,8 +89,8 @@ static void execute_tests(void)
     test_cgi();
 }
 
-#include "../utils/Memory.hpp"
-#include "../utils/CustomData.hpp"
+#include "Memory.hpp"
+#include "CustomData.hpp"
 static void execute_tests2(void)
 {
     char *buff = new char[100];

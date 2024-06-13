@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "CustomData.hpp"
 
 addrinfo Server::get_hints(void)
 {
@@ -21,7 +22,7 @@ Server::~Server(void)
 
 void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type)
 {
-	ft::CustomData *event_data = new ft::CustomData;
+	CustomData *event_data = new CustomData;
 	event_data->fd = conn_fd;
 	event_data->type = type;
 	event_data->epfd = _epfd;
@@ -36,7 +37,7 @@ void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type
 
 void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type, Config *config)
 {
-	ft::CustomData *event_data = new ft::CustomData;
+	CustomData *event_data = new CustomData;
 	event_data->fd = conn_fd;
 	event_data->type = type;
 	event_data->epfd = _epfd;
@@ -70,7 +71,7 @@ void	Server::send_message(void)
 
 void Server::recv_message(epoll_event & event)
 {
-	ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
+	CustomData *event_data = (CustomData *) event.data.ptr;
 
 	char *buff = NULL;
 	ssize_t buff_size = ft::recv_all(event_data->fd, &buff);
@@ -115,7 +116,7 @@ void Server::recv_client_body(epoll_event & event)
 
 void Server::process_cgi_response(epoll_event & event)
 {
-	ft::CustomData *event_data = (ft::CustomData *) event.data.ptr;
+	CustomData *event_data = (CustomData *) event.data.ptr;
 	char *buff = NULL;
 	_timeout.remove(&event);
 	epoll_ctl(_epfd, EPOLL_CTL_DEL, event_data->fd, &event);
@@ -170,7 +171,7 @@ void	Server::run(void)
 		int nfds = epoll_wait(this->_epfd, this->_events, 20, 0);
 		for (int i = 0; i < nfds; i++)
 		{
-			ft::CustomData *event_data = (ft::CustomData *) _events[i].data.ptr;
+			CustomData *event_data = (CustomData *) _events[i].data.ptr;
 			if (event_data->type == ft::SOCK)
 			{
 				std::cout << "new connection" << std::endl;

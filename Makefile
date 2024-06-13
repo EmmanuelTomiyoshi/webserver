@@ -7,7 +7,6 @@ SRC 		=	main.cpp \
 				Route.cpp \
 				Methods.cpp \
 				config_test.cpp \
-				Parser.cpp \
 				Configs.cpp \
 				Utils.cpp	\
 				File.cpp \
@@ -22,7 +21,6 @@ SRC 		=	main.cpp \
 				ErrorPages.cpp \
 
 VPATH		=	./src \
-				./src/parsing \
 				./src/utils \
 				./src/socket \
 				./src/config \

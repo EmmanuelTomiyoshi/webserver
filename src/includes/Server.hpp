@@ -9,7 +9,6 @@
 class Server
 {
 	private:
-		addrinfo	_addr_hints;
 		std::list<addrinfo *> _addr_res_list;
 		std::list<int> _socket_fds;
 
@@ -17,7 +16,6 @@ class Server
 
 		epoll_event	_events[20];
 		int			_epfd;
-		int			_timeout_ms;
 
 		std::string	_target;
 

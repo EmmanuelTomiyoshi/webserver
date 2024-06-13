@@ -284,11 +284,9 @@ void Server::setup_config(Config & config)
 
 void Server::setup(void)
 {
-	_addr_hints = get_hints();
 	_epfd = epoll_create1(0);
 	if (_epfd == -1)
 		throw std::runtime_error("error creating epoll");
-	_timeout_ms = 0;
 
 	std::list<Config>::iterator it;
 	it = _configs.get().begin();
@@ -296,7 +294,6 @@ void Server::setup(void)
 	for (; it != _configs.get().end(); it++)
 	{
 		Config & config = (*it);
-		// _domain_name = config.host.get();
 
 		try
 		{

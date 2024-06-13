@@ -21,6 +21,7 @@ SRC 		=	main.cpp \
 				ErrorPages.cpp \
 				signal_stop.cpp \
 				Memory.cpp \
+				CustomData.cpp \
 
 VPATH		=	./src \
 				./src/utils \

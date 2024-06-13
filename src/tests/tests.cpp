@@ -90,6 +90,7 @@ static void execute_tests(void)
 }
 
 #include "../utils/Memory.hpp"
+#include "../utils/CustomData.hpp"
 static void execute_tests2(void)
 {
     char *buff = new char[100];
@@ -104,8 +105,8 @@ static void execute_tests2(void)
     Memory::clear();
 
     epoll_event *event = new epoll_event;
-    ft::CustomData *data = new ft::CustomData;
-    data->request = NULL;
+    CustomData *data = new CustomData;
+    data->request = new Request2;
     event->data.ptr = data;
 
     Memory::add(event);

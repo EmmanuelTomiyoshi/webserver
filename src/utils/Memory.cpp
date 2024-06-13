@@ -1,5 +1,6 @@
 #include "Memory.hpp"
 #include "Request2.hpp"
+#include "CustomData.hpp"
 
 std::list<epoll_event *> Memory::_m_events;
 std::list<char *> Memory::_m_buffers;
@@ -49,14 +50,11 @@ void Memory::remove(char *addr)
 
 void Memory::clear_events(void)
 {
-    ft::CustomData *data;
     std::list<epoll_event *>::iterator it;
     it = _m_events.begin();
     for (; it !=  _m_events.end(); it++)
     {
-        data = (ft::CustomData *) (*it)->data.ptr;
-        if (data->request != NULL)
-            delete data->request;
+        CustomData *data = (CustomData *) (*it)->data.ptr;
         delete data;
         delete (*it);
     }

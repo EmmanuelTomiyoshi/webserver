@@ -12,6 +12,8 @@ class Configs {
 		std::vector<std::string> _ports;
 		void validate_ports(void);
 
+		void setup_server_names(void);
+
 	public:
 		Configs(std::string config_file);
 		~Configs(void);

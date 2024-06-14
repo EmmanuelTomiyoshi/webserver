@@ -89,6 +89,13 @@ namespace ft {
         close(fd);
     }
 
+    void debug_file(std::string filename, const char *buff, size_t size)
+    {
+        int fd = open(filename.c_str(), O_TRUNC | O_CREAT | O_RDWR, 00666);
+        write(fd, buff, size);
+        close(fd);
+    }
+
     void print_char_array(const char *arr, size_t size)
     {
         for (size_t i = 0; i < size; i++)

@@ -63,6 +63,7 @@ namespace ft {
     char *get_body_position(char *response, size_t response_size);
 
     void debug_file(std::string filename, char *buff, size_t size);
+    void debug_file(std::string filename, const char *buff, size_t size);
 
     void print_char_array(const char *arr, size_t size);
     void print_char_array(const char *arr);

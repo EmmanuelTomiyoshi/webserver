@@ -27,8 +27,19 @@ void Configs::init(void)
 		config.error_pages.add(HTTP_SERVICE_UNAVAILABLE, conf._single_value[HTTP_SERVICE_UNAVAILABLE]);
 		config.routes.set(conf._routes);
 		this->_configs.push_back(config);
+		_ports.push_back(conf._single_value["port"]);
 	}
 	this->_it = this->_configs.begin();
+	validate_ports();
+}
+
+void Configs::validate_ports(void)
+{
+	std::sort(_ports.begin(), _ports.end());
+	std::vector<std::string>::iterator it;
+	it = std::adjacent_find(_ports.begin(), _ports.end());
+	if (it != _ports.end())
+		throw std::runtime_error("duplicated ports found in config file");
 }
 
 Config & Configs::next(void)

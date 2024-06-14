@@ -319,7 +319,6 @@ void Server::start(void)
 void Server::stop(void)
 {
 	std::cout << "\nstopping server..." << std::endl;
-	std::cout << "_epfd: " << _epfd << std::endl;
 	close(_epfd);
 	close_ports();
 }
@@ -329,7 +328,6 @@ void Server::close_ports(void)
 	std::list<int>::iterator it = this->_socket_fds.begin();
 	for (; it != _socket_fds.end(); it++)
 	{
-		std::cout << "closing " << *it << std::endl;
 		close(*it);
 	}
 

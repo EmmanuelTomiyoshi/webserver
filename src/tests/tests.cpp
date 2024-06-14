@@ -112,6 +112,19 @@ static void execute_tests2(void)
     Memory::clear();
 }
 
+#include "../utils/BuffList.hpp"
+void test_buff_list(void)
+{
+    BuffList list;
+    char *buff = new char[5];
+    std::strcpy(buff, "1234");
+    list.add(buff, 5);
+
+    std::cout << "VALUE: " << list.front().buff << std::endl;
+    std::cout << "hello 1" << std::endl;
+    std::cout << "hello 2" << std::endl;
+}
+
 void tests(int argc, char **argv)
 {
     if (argc != 2)
@@ -124,6 +137,8 @@ void tests(int argc, char **argv)
     }
     if (std::string(argv[1]) == "test2")
     {
+        test_buff_list();
+        exit(0);
         execute_tests2();
         exit(0);
     }

@@ -22,6 +22,7 @@ SRC 		=	main.cpp \
 				signal_stop.cpp \
 				Memory.cpp \
 				CustomData.cpp \
+				BuffList.cpp \
 
 VPATH		=	./src \
 				./src/utils \

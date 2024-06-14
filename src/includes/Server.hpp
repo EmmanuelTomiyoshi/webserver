@@ -39,6 +39,8 @@ class Server
 		static addrinfo *try_server_names(Config *config);
 		void setup_config(Config & config);
 
+		void send_data_to_client(CustomData *data);
+
 	public:
 		Server(std::string config_file);
 		~Server(void);

@@ -11,7 +11,20 @@ void Memory::add(epoll_event *addr)
     if (addr == NULL)
         return ;
 
-    _m_events.push_back((CustomData *) addr->data.ptr);
+    CustomData *data = (CustomData *) addr->data.ptr;
+    if (std::find(_m_events.begin(), _m_events.end(), data) != _m_events.end())
+        return ;
+    _m_events.push_back(data);
+}
+
+void Memory::add(CustomData *data)
+{
+    if (data == NULL)
+        return ;
+
+    if (std::find(_m_events.begin(), _m_events.end(), data) != _m_events.end())
+        return ;
+    _m_events.push_back(data);
 }
 
 void Memory::add(char * addr)
@@ -19,6 +32,8 @@ void Memory::add(char * addr)
     if (addr == NULL)
         return ;
 
+    if (std::find(_m_buffers.begin(), _m_buffers.end(), addr) != _m_buffers.end())
+        return ;
     _m_buffers.push_back(addr);
 }
 
@@ -34,10 +49,23 @@ void Memory::del(epoll_event *addr)
         std::cout << "\n+----> addr to delete not found\n" << std::endl;
         return ;
     }
-    Timeout::remove(addr);
     _m_events.remove(data);
     delete data;
     addr->data.ptr = NULL;
+}
+
+void Memory::del(CustomData *data)
+{
+    if (data == NULL)
+        return ;
+
+    if (std::find(_m_events.begin(), _m_events.end(), data) == _m_events.end())
+    {
+        std::cout << "\n+----> addr to delete not found\n" << std::endl;
+        return ;
+    }
+    _m_events.remove(data);
+    delete data;
 }
 
 void Memory::del(char *addr)
@@ -49,6 +77,11 @@ void Memory::del(char *addr)
 void Memory::remove(epoll_event *addr)
 {
     _m_events.remove((CustomData *) addr->data.ptr);
+}
+
+void Memory::remove(CustomData *data)
+{
+    _m_events.remove(data);
 }
 
 void Memory::remove(char *addr)

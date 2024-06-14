@@ -172,6 +172,33 @@ void Server::process_request(epoll_event & event)
 	}
 }
 
+void Server::send_data_to_client(CustomData *data)
+{
+	ssize_t bytes = 0;
+	if (data->w_count < data->buff_size)
+	{
+		bytes = send(
+			data->fd,
+			data->buff + data->w_count, 
+			data->buff_size - data->w_count,
+			MSG_DONTWAIT
+		);
+
+		std::cout << bytes << " sent." << std::endl;
+
+		data->w_count += bytes;
+	}
+	
+	if (bytes <= 0 || data->w_count >= data->buff_size)
+	{
+		epoll_ctl(data->epfd, EPOLL_CTL_DEL, data->fd, NULL);
+		close(data->fd);
+		delete [] data->buff;
+		Memory::remove(data);
+		return ;
+	}
+}
+
 void	Server::run(void)
 {
 	while (1)
@@ -215,6 +242,11 @@ void	Server::run(void)
 			{
 				std::cout << "client body event triggered" << std::endl;
 				recv_client_body(_events[i]);
+			}
+			else if (event_data->type == ft::RESPONSE)
+			{
+				std::cout << "response event triggered" << std::endl;
+				send_data_to_client(event_data);
 			}
 		}
 	}

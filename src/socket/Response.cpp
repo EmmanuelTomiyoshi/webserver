@@ -258,17 +258,10 @@ void Response::GET_normal(void)
     fill_mime(_path);
     fill_body();
     create_response();
-    CustomData *event_data = (CustomData *) _event->data.ptr;
-    send(
-        event_data->fd,
-        _http_response, 
-        _http_response_size,
-        MSG_DONTWAIT
-    );
-    epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
-	close(event_data->fd);
-    Memory::del(_event);
+    create_writing_event(_event, _http_response, _http_response_size);
+    _http_response = NULL;
 }
+
 void Response::GET_cgi(void)
 {
     CGI cgi;
@@ -491,4 +484,6 @@ void Response::create_writing_event(epoll_event *old_event, char *buff, ssize_t 
     event.data.ptr = data;
 
     epoll_ctl(old_data->epfd, EPOLL_CTL_MOD, old_data->fd, &event);
+    Memory::add(data);
+    Memory::del(old_event);
 }

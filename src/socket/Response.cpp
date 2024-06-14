@@ -233,9 +233,18 @@ void Response::create_response(void)
     std::memmove(_http_response + response.size(), _body.data, _body.size);
 }
 
+void Response::fill_mime(std::string file)
+{
+    if (file.find_last_of('.') == std::string::npos)
+        return ;
+    std::string ext = file.substr(file.find_last_of('.') + 1);
+    _mime = mime_types[ext];
+}
+
 void Response::GET_normal(void)
 {
     open_file();
+    fill_mime(_path);
     fill_body();
     create_response();
     CustomData *event_data = (CustomData *) _event->data.ptr;

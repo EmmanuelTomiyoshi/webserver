@@ -92,6 +92,8 @@ namespace ft {
     void debug_file(std::string filename, const char *buff, size_t size)
     {
         int fd = open(filename.c_str(), O_TRUNC | O_CREAT | O_RDWR, 00666);
+        if (fd == -1)
+            return ;
         write(fd, buff, size);
         close(fd);
     }

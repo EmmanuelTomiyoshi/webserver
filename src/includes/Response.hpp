@@ -76,6 +76,7 @@ class Response
         void create_cors_response(void);
         
         void start_mimes(void);
+        void fill_mime(std::string file);
 
     public:
         Response(void);

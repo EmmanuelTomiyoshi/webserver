@@ -12,6 +12,12 @@ addrinfo Server::get_hints(void)
 
 Server::Server(std::string config_file) : _configs(config_file)
 {
+	_event__functions[ft::SOCK] = &Server::create_new_connection;
+    _event__functions[ft::CONN] = &Server::process_request;
+    _event__functions[ft::CGI_R] = &Server::process_cgi_response;
+    _event__functions[ft::CGI_W] = &Server::write_to_cgi;
+	_event__functions[ft::CLIENT_BODY] = &Server::recv_client_body;
+	_event__functions[ft::RESPONSE] = &Server::send_data_to_client;
 }
 
 Server::~Server(void)
@@ -216,6 +222,13 @@ void Server::create_new_connection(epoll_event & event)
 	);
 }
 
+void Server::write_to_cgi(epoll_event & event)
+{
+	std::cout << "cgi write event triggered" << std::endl;
+	CGI cgi;
+	cgi.write_to_cgi(event);
+}
+
 void	Server::run(void)
 {
 	while (1)
@@ -225,36 +238,16 @@ void	Server::run(void)
 		for (int i = 0; i < nfds; i++)
 		{
 			CustomData *event_data = (CustomData *) _events[i].data.ptr;
-			if (event_data->type == ft::SOCK)
+			try
 			{
-				create_new_connection(_events[i]);
+				Server::event_func func = _event__functions.at(event_data->type);
+				(this->*func)(_events[i]);
 			}
-			else if (event_data->type == ft::CONN)
+			catch(const std::exception& e)
 			{
-				std::cout << "connection event triggered" << std::endl;
-				process_request(_events[i]);
+				std::cerr << e.what() << '\n';
 			}
-			else if (event_data->type == ft::CGI_R)
-			{
-				std::cout << "cgi read event triggered" << std::endl;
-				process_cgi_response(_events[i]);
-			}
-			else if (event_data->type == ft::CGI_W)
-			{
-				std::cout << "cgi write event triggered" << std::endl;
-				CGI cgi;
-				cgi.write_to_cgi(_events[i]);
-			}
-			else if (event_data->type == ft::CLIENT_BODY)
-			{
-				std::cout << "client body event triggered" << std::endl;
-				recv_client_body(_events[i]);
-			}
-			else if (event_data->type == ft::RESPONSE)
-			{
-				std::cout << "response event triggered" << std::endl;
-				send_data_to_client(_events[i]);
-			}
+			
 		}
 	}
 }

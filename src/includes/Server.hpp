@@ -8,7 +8,10 @@
 
 class Server
 {
+	public:
+		typedef void (Server::*event_func)(epoll_event&);
 	private:
+        std::map<ft::EventType, event_func> _event__functions;
 		std::list<addrinfo *> _addr_res_list;
 		std::list<int> _socket_fds;
 
@@ -41,6 +44,7 @@ class Server
 
 		void send_data_to_client(epoll_event & event);
 		void create_new_connection(epoll_event & event);
+		void write_to_cgi(epoll_event & event);
 
 	public:
 		Server(std::string config_file);

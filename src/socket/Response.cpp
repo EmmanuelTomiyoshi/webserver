@@ -68,7 +68,7 @@ void Response::open_public_file(void)
         throw std::runtime_error(HTTP_INTERNAL_SERVER_ERROR);
 }
 
-void Response::open_route_file(void)
+void Response::open_route_file_default(void)
 {
     std::list<std::string>::const_iterator it;
     it = _route->try_files.get().begin();
@@ -79,8 +79,26 @@ void Response::open_route_file(void)
         if (_file.good())
             return ;
     }
-    std::cerr << "ERROR: open_route_file" << std::endl;
+    std::cerr << "ERROR: open_route_file_default" << std::endl;
     throw std::runtime_error(HTTP_NOT_FOUND);
+}
+
+void Response::open_route_file_upload(void)
+{
+    _path = _route->save_files_path.get() + '/' + _request->get_file();
+    _file.open(_path.c_str());
+    if (_file.good())
+        return ;
+    std::cerr << "ERROR: open_route_file_upload" << std::endl;
+    throw std::runtime_error(HTTP_NOT_FOUND);
+}
+
+void Response::open_route_file(void)
+{
+    if (_request->get_file().empty())
+        open_route_file_default();
+    else
+        open_route_file_upload();
 }
 
 void Response::set_public_file_info(void)

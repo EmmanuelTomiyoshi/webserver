@@ -23,7 +23,10 @@ class Response
         std::ifstream _file;
         void open_file(void);
         void open_public_file(void);
+
         void open_route_file(void);
+        void open_route_file_default(void);
+        void open_route_file_upload(void);
 
         std::string _ext;
         std::string _mime;

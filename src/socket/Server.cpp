@@ -190,7 +190,7 @@ void	Server::run(void)
 				_configs._fdconfigs[fd_conn] = _configs._fdconfigs[event_data->fd];
 				new_epoll_event(
 					fd_conn,
-					EPOLLIN | EPOLLET,
+					EPOLLIN,
 					ft::CONN,
 					_configs._fdconfigs[event_data->fd]
 				);

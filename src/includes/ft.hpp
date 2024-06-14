@@ -17,25 +17,8 @@ namespace ft {
         TIMEOUT,
         TRASH,
         CLIENT_BODY,
+        RESPONSE,
     };
-
-    typedef struct CustomData
-    {
-        int fd;
-        int cgi_fd;
-        int epfd;
-        Timeout *timeout;
-        time_t start_time;
-        time_t duration;
-        int pid;
-        EventType type;
-        size_t id;
-        char *buff;
-        ssize_t buff_size;
-        ssize_t w_count;
-        Config *config;
-        Request2 *request;
-    } CustomData;
 
     bool number_is_in(int value, int *arr, int size);
 

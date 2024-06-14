@@ -15,7 +15,6 @@ class CustomData
         Config *config;
         Request2 *request;
         char *buff;
-        Timeout *timeout;
         time_t start_time;
         time_t duration;
         int fd;

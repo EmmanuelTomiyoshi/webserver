@@ -81,10 +81,10 @@ class Response
         void start_mimes(void);
         void fill_mime(std::string file);
 
+        static void create_writing_event(epoll_event *old_event, char *buff, ssize_t size);
     public:
         Response(void);
         Response(epoll_event *event);
-        Response(char *buff, size_t size, Config *config);
         ~Response(void);
 
         ssize_t send_response(void);

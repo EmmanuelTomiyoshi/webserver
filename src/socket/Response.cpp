@@ -6,13 +6,6 @@ std::string Response::http_version = "HTTP/1.1";
 
 std::map<std::string, std::string> Response::mime_types;
 
-Response::Response(char *buff, size_t size, Config *config) : 
-_buff(buff), _buff_size(size), _status("200"), _http_response(NULL),
-_config(config)
-{
-    start_mimes();
-}
-
 Response::Response(void) : _request(NULL), _route(NULL),
 _http_response(NULL), _config(NULL), _event(NULL)
 {
@@ -476,4 +469,26 @@ char *Response::get_response(void)
 ssize_t Response::get_response_size(void)
 {
     return _http_response_size;
+}
+
+void Response::create_writing_event(epoll_event *old_event, char *buff, ssize_t size)
+{
+    CustomData *old_data = (CustomData *) old_event->data.ptr;
+
+    CustomData *data = new CustomData;
+    data->fd = old_data->fd;
+    data->buff = buff;
+    data->buff_size = size;
+    data->w_count = 0;
+    data->type = ft::RESPONSE;
+    data->config = old_data->config;
+    data->duration = 5;
+    data->epfd = old_data->epfd;
+    data->start_time = time(NULL);
+
+    epoll_event event;
+    event.events = EPOLLOUT;
+    event.data.ptr = data;
+
+    epoll_ctl(old_data->epfd, EPOLL_CTL_MOD, old_data->fd, &event);
 }

@@ -172,8 +172,9 @@ void Server::process_request(epoll_event & event)
 	}
 }
 
-void Server::send_data_to_client(CustomData *data)
+void Server::send_data_to_client(epoll_event & event)
 {
+	CustomData *data = (CustomData *) event.data.ptr;
 	ssize_t bytes = 0;
 	if (data->w_count < data->buff_size)
 	{
@@ -199,6 +200,22 @@ void Server::send_data_to_client(CustomData *data)
 	}
 }
 
+void Server::create_new_connection(epoll_event & event)
+{
+	CustomData *event_data = (CustomData *) event.data.ptr;
+	std::cout << "new connection" << std::endl;
+	int fd_conn = accept4(event_data->fd, NULL, NULL, SOCK_NONBLOCK);
+	//fd_conn is related to socket_fd that is related to a port that is related to a specific config file
+	//this is why this relationship works and I get the right config file in the line below
+	_configs._fdconfigs[fd_conn] = _configs._fdconfigs[event_data->fd];
+	new_epoll_event(
+		fd_conn,
+		EPOLLIN,
+		ft::CONN,
+		_configs._fdconfigs[event_data->fd]
+	);
+}
+
 void	Server::run(void)
 {
 	while (1)
@@ -210,17 +227,7 @@ void	Server::run(void)
 			CustomData *event_data = (CustomData *) _events[i].data.ptr;
 			if (event_data->type == ft::SOCK)
 			{
-				std::cout << "new connection" << std::endl;
-				int fd_conn = accept4(event_data->fd, NULL, NULL, SOCK_NONBLOCK);
-				//fd_conn is related to socket_fd that is related to a port that is related to a specific config file
-				//this is why this relationship works and I get the right config file in the line below
-				_configs._fdconfigs[fd_conn] = _configs._fdconfigs[event_data->fd];
-				new_epoll_event(
-					fd_conn,
-					EPOLLIN,
-					ft::CONN,
-					_configs._fdconfigs[event_data->fd]
-				);
+				create_new_connection(_events[i]);
 			}
 			else if (event_data->type == ft::CONN)
 			{
@@ -236,7 +243,7 @@ void	Server::run(void)
 			{
 				std::cout << "cgi write event triggered" << std::endl;
 				CGI cgi;
-				cgi.write_to_cgi(&_events[i]);
+				cgi.write_to_cgi(_events[i]);
 			}
 			else if (event_data->type == ft::CLIENT_BODY)
 			{
@@ -246,7 +253,7 @@ void	Server::run(void)
 			else if (event_data->type == ft::RESPONSE)
 			{
 				std::cout << "response event triggered" << std::endl;
-				send_data_to_client(event_data);
+				send_data_to_client(_events[i]);
 			}
 		}
 	}

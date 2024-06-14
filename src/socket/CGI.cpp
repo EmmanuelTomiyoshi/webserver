@@ -176,11 +176,11 @@ void CGI::add_write_event(int fd, char *buff, ssize_t size, int epfd, int cgi_fd
     Timeout::add(&event);
 }
 
-void CGI::write_to_cgi(epoll_event *event)
+void CGI::write_to_cgi(epoll_event & event)
 {
-    CustomData *data = (CustomData *) event->data.ptr;
+    CustomData *data = (CustomData *) event.data.ptr;
 
-    Timeout::reset_time(event);
+    Timeout::reset_time(&event);
     ssize_t bytes = write(
         data->fd,
         data->buff + data->w_count,
@@ -189,10 +189,10 @@ void CGI::write_to_cgi(epoll_event *event)
 
     if (bytes >= data->buff_size || bytes <= 0 || data->w_count + bytes >= data->buff_size)
     {
-        epoll_ctl(data->epfd, EPOLL_CTL_DEL, data->fd, event);
+        epoll_ctl(data->epfd, EPOLL_CTL_DEL, data->fd, &event);
         close(data->fd);
         data->type = ft::TRASH;
-        Memory::del(event);
+        Memory::del(&event);
         return ;
     }
 

@@ -106,7 +106,7 @@ class CGI
         void debug_pfds_b(void);
         ssize_t read_pfds_b(char **buff);
 
-        void write_to_cgi(epoll_event *event);
+        void write_to_cgi(epoll_event & event);
 };
 
 #endif

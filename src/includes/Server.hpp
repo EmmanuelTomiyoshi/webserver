@@ -39,7 +39,8 @@ class Server
 		static addrinfo *try_server_names(Config *config);
 		void setup_config(Config & config);
 
-		void send_data_to_client(CustomData *data);
+		void send_data_to_client(epoll_event & event);
+		void create_new_connection(epoll_event & event);
 
 	public:
 		Server(std::string config_file);

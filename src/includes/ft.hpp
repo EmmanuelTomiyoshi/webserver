@@ -77,6 +77,7 @@ namespace ft {
 
     //receives a relative path and returns a full path
     std::string get_full_path(std::string relative);
+    std::string read_file(std::string filename);
 }
 
 #endif

@@ -197,4 +197,18 @@ namespace ft {
 
         return path + relative.substr(1);
     }
+
+    std::string read_file(std::string filename)
+    {
+        std::ifstream file(filename.c_str());
+        if (!file)
+            throw std::runtime_error("failed to open file");
+
+        std::string line;
+        std::stringstream buffer;
+        while (std::getline(file, line))
+            buffer << line << "\n";
+        file.close();
+        return buffer.str();
+    }
 }

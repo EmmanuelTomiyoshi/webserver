@@ -257,15 +257,17 @@ void Server::setup_config(Config & config)
 			&addr_res
 		);
 		if (status != 0)
+		{
 			continue ;
+		}
 
 		const int listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 
-		bind(
-			listen_sock,
-			addr_res->ai_addr,
-			addr_res->ai_addrlen
-		);
+		if (bind(listen_sock, addr_res->ai_addr, addr_res->ai_addrlen) != 0)
+		{
+			freeaddrinfo(addr_res);
+			continue ;
+		}
 
 		if (listen(listen_sock, 20) != 0)
 		{
@@ -273,13 +275,15 @@ void Server::setup_config(Config & config)
 			continue ;
 		}
 
+		std::cout << "successfuly listening to " << it->c_str() << ":" << config.port.get() << std::endl;
+
 		_addr_res_list.push_back(addr_res);
 		_socket_fds.push_back(listen_sock);
 		_configs._fdconfigs[listen_sock] = &config; //insert the current config address in fdconfigs map
 		new_epoll_event(listen_sock, EPOLLIN, ft::SOCK);
 		return ;
 	}
-	throw new std::exception;
+	throw std::runtime_error("a server wasn't able to be started");
 }
 
 void Server::setup(void)
@@ -290,7 +294,7 @@ void Server::setup(void)
 
 	std::list<Config>::iterator it;
 	it = _configs.get().begin();
-
+	size_t count = 0;
 	for (; it != _configs.get().end(); it++)
 	{
 		Config & config = (*it);
@@ -303,14 +307,17 @@ void Server::setup(void)
 		{
 			std::cout << "Failed to start a server with the following servernames:\n";
 			config.server_names.show();
+			std::cout << std::endl;
+			count++;
 		}
 	}
+	if (_configs.get().size() == count)
+		throw std::runtime_error("no server could be started, make sure to configure it properly");
 }
 
 void Server::start(void)
 {
 	_configs.init();
-	_configs.show();
 	setup();
 	std::cout << "Server started." << std::endl;
 	run();

@@ -131,58 +131,73 @@ void Server::recv_client_body(epoll_event & event)
 	(void) event;
 }
 
-void Server::process_cgi_response(epoll_event & event)
+void Server::process_cgi_response(epoll_event & cgi_event)
 {
-	CustomData *event_data = (CustomData *) event.data.ptr;
+	CustomData *cgi_data = (CustomData *) cgi_event.data.ptr;
 	const ssize_t buff_siz = 20000;
 	char buff[buff_siz];
-	ssize_t bytes = read(event_data->fd, buff, buff_siz);
+	ssize_t bytes = read(cgi_data->fd, buff, buff_siz);
 
-	if (bytes <= 0 && event_data->w_count <= 0)
+	if (bytes <= 0 && cgi_data->w_count <= 0)
 	{
-		epoll_ctl(_epfd, EPOLL_CTL_DEL, event_data->fd, NULL);
-		Memory::del(&event);
-		close(event_data->fd);
+		epoll_ctl(_epfd, EPOLL_CTL_DEL, cgi_data->fd, NULL);
+		Memory::del(&cgi_event);
+		close(cgi_data->fd);
 		//execute_error();
-		close(event_data->cgi_fd);
+		close(cgi_data->cgi_fd);
 		return ;
 	}
 
 	if (bytes > 0)
 	{
-		char *data = new char[event_data->w_count + bytes];
-		if (event_data->buff)
+		char *data = new char[cgi_data->w_count + bytes];
+		if (cgi_data->buff)
 		{
-			std::memmove(data, event_data->buff, event_data->w_count);
-			delete [] event_data->buff;
+			std::memmove(data, cgi_data->buff, cgi_data->w_count);
+			delete [] cgi_data->buff;
 		}
-		std::memmove(data + event_data->w_count, buff, bytes);
-		event_data->w_count += bytes;
-		event_data->buff = data;
-		Timeout::reset_time(&event);
+		std::memmove(data + cgi_data->w_count, buff, bytes);
+		cgi_data->w_count += bytes;
+		cgi_data->buff = data;
+		Timeout::reset_time(&cgi_event);
 		return ;
 	}
 
 	try
 	{
 		CGI cgi;
-		cgi.process_response(event_data->buff, event_data->w_count);
+		cgi.process_response(cgi_data->buff, cgi_data->w_count);
 		char *response = cgi.get_response();
 		ssize_t response_size = cgi.get_response_size();
 
-		send(event_data->cgi_fd, response, response_size, MSG_DONTWAIT);
 
-		close(event_data->cgi_fd);
-		close(event_data->fd);
-		delete [] response;
-		Memory::del(&event);
+		CustomData *client_data = new CustomData;
+		client_data->buff = response;
+		client_data->buff_size = response_size;
+		client_data->w_count = 0;
+		client_data->fd = cgi_data->cgi_fd;
+		client_data->type = ft::RESPONSE;
+		client_data->epfd = _epfd;
+
+		epoll_event client_event;
+		client_event.data.ptr = client_data;
+		client_event.events = EPOLLOUT;
+
+		epoll_ctl(_epfd, EPOLL_CTL_ADD, client_data->fd, &client_event);
+
+		Memory::add(client_data);
+
+
+		epoll_ctl(_epfd, EPOLL_CTL_DEL, cgi_data->fd, NULL);
+		close(cgi_data->fd);
+		Memory::del(cgi_data);
 	}
 	catch (std::exception & e)
 	{
 		Response response;
 		response.process_error(e.what());
 		send(
-			event_data->cgi_fd,
+			cgi_data->cgi_fd,
 			response.get_response(),
 			response.get_response_size(),
 			MSG_DONTWAIT
@@ -226,7 +241,7 @@ void Server::send_data_to_client(epoll_event & event)
 	
 	if (bytes <= 0 || data->w_count >= data->buff_size)
 	{
-		epoll_ctl(data->epfd, EPOLL_CTL_DEL, data->fd, NULL);
+		epoll_ctl(_epfd, EPOLL_CTL_DEL, data->fd, NULL);
 		close(data->fd);
 		Memory::del(data);
 		return ;

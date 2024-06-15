@@ -19,6 +19,11 @@ void Timeout::remove(epoll_event *event)
     _events.remove(event_data);
 }
 
+void Timeout::remove(CustomData *data)
+{
+    _events.remove(data);
+}
+
 void Timeout::reset_time(epoll_event *event)
 {
    CustomData *event_data = (CustomData *) event->data.ptr;

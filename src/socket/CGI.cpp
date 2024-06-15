@@ -240,6 +240,9 @@ void CGI::execute_cgi_post(void)
         close(_pfds_b[W]);
 
         add_write_event(_pfds_a[W], _body, _body_size, old_event_data->epfd, old_event_data->fd);
+
+
+        epoll_ctl(old_event_data->epfd, EPOLL_CTL_DEL, old_event_data->fd, NULL);
         Memory::del(_event);
     }
 

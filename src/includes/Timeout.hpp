@@ -14,6 +14,7 @@ class Timeout {
     public:
         static void add(epoll_event *event);
         static void remove(epoll_event *event);
+        static void remove(CustomData *data);
         static void reset_time(epoll_event *event);
 
         static void verify(void);

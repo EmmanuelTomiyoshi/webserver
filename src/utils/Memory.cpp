@@ -66,6 +66,7 @@ void Memory::del(CustomData *data)
         return ;
     }
     _m_events.remove(data);
+    Timeout::remove(data);
     delete data;
 }
 

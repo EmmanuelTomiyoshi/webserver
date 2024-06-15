@@ -443,7 +443,7 @@ ssize_t Response::send_response(void)
     catch(const std::exception& e)
     {
         std::cout << "executing error: " << e.what() << std::endl;
-        if (_route != NULL && e.what() == std::string(HTTP_NOT_FOUND) && _route->autoindex.get())
+        if (_route != NULL && e.what() == std::string(HTTP_NOT_FOUND) && _route->autoindex.get() && _request->get_method() == "GET")
             autoindex();
         else
             execute_error(e.what());

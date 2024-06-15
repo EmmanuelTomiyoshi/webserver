@@ -167,7 +167,7 @@ void CGI::add_write_event(int fd, char *buff, ssize_t size, int epfd, int cgi_fd
     event_data->w_count = 0;
 
     epoll_event event;
-    event.events = EPOLLOUT | EPOLLET;
+    event.events = EPOLLOUT;
     event.data.ptr = (void *) event_data;
 
     Memory::add(&event);
@@ -222,7 +222,7 @@ void CGI::execute_cgi_post(void)
         event_data->pid = _pid;
 
         epoll_event event;
-        event.events = EPOLLIN | EPOLLET;
+        event.events = EPOLLIN;
         event.data.ptr = (void *) event_data;
 
         Memory::add(&event);
@@ -273,7 +273,7 @@ void CGI::execute_cgi_get(void)
         event_data->pid = _pid;
 
         epoll_event event;
-        event.events = EPOLLIN | EPOLLET;
+        event.events = EPOLLIN;
         event.data.ptr = (void *) event_data;
 
         Memory::add(&event);

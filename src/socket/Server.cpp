@@ -27,22 +27,6 @@ Server::~Server(void)
 	// 	freeaddrinfo(_addr_res);
 }
 
-void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type)
-{
-	CustomData *event_data = new CustomData;
-	event_data->fd = conn_fd;
-	event_data->type = type;
-	event_data->epfd = _epfd;
-
-	epoll_event event;
-	event.events = operation;
-	event.data.ptr = (void *) event_data;
-
-	Memory::add(&event);
-
-	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, &event);
-}
-
 void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type, Config *config)
 {
 	CustomData *event_data = new CustomData;
@@ -78,35 +62,57 @@ void	Server::send_message(void)
 
  */
 
+void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type)
+{
+	CustomData *event_data = new CustomData;
+	event_data->fd = conn_fd;
+	event_data->type = type;
+	event_data->epfd = _epfd;
+	event_data->request = NULL;
+
+	epoll_event event;
+	event.events = operation;
+	event.data.ptr = (void *) event_data;
+
+	Memory::add(&event);
+
+	epoll_ctl(_epfd, EPOLL_CTL_ADD, conn_fd, &event);
+}
+
 void Server::recv_message(epoll_event & event)
 {
 	CustomData *event_data = (CustomData *) event.data.ptr;
 
-	char *buff = NULL;
-	ssize_t buff_size = ft::recv_all(event_data->fd, &buff);
-	std::cout << "data received: " << buff_size << std::endl;
-	save_request(buff, buff_size);
+	const ssize_t buff_size = 40000;
+	char buff[buff_size];
+	ssize_t bytes = recv(event_data->fd, buff, buff_size, MSG_DONTWAIT);
+	std::cout << "data received: " << bytes << std::endl;
 
-	if (buff_size <= 0)
+	if (bytes <= 0)
 	{
 		epoll_ctl(
 			event_data->epfd,
-			EPOLL_CTL_DEL, event_data->fd,
-			&event
+			EPOLL_CTL_DEL,
+			event_data->fd,
+			NULL
 		);
 		close(event_data->fd);
 		Memory::del(&event);
 		return ;
 	}
 
+	char *data = new char[bytes];
+	std::memmove(data, buff, bytes);
+
 	if (event_data->request == NULL)
 	{
 		event_data->request = new Request2;
-		event_data->request->init(buff, buff_size, event_data->config);
+		event_data->request->init(data, bytes, event_data->config);
 	}
 	else if (event_data->request->is_body_complete() == false)
 	{
-		event_data->request->add_more_body(buff, buff_size);
+		event_data->request->add_more_body(data, bytes);
+		delete [] data;
 	}
 
 	event_data->request->debug();
@@ -117,6 +123,7 @@ void Server::recv_message(epoll_event & event)
 		Response response(&event);
 		response.send_response();
 	}
+
 }
 
 void Server::recv_client_body(epoll_event & event)

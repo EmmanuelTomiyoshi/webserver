@@ -112,7 +112,7 @@ static void execute_tests2(void)
     Memory::clear();
 }
 
-#include "../utils/BuffList.hpp"
+#include "BuffList.hpp"
 void test_buff_list(void)
 {
     BuffList list;

@@ -34,4 +34,5 @@ void sig_handler(int num)
 void set_signal_stop(void)
 {
     signal(SIGINT, sig_handler);
+    signal(SIGPIPE, SIG_IGN);
 }

@@ -46,12 +46,7 @@ void File::init(void)
 
 void File::fill_data(void)
 {
-	char buffer[2000];
-	while (!_file.eof())
-	{
-		_file.getline(buffer, 2000, '\0');
-		_data += buffer;
-	}
+	_data = ft::read_file(_file);
 	_file.close();
 }
 

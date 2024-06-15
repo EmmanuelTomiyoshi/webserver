@@ -220,4 +220,16 @@ namespace ft {
         file.close();
         return buffer.str();
     }
+
+    std::string read_file(std::ifstream & file)
+    {
+        if (!file)
+            throw std::runtime_error("failed to open file");
+
+        std::string line;
+        std::stringstream buffer;
+        while (std::getline(file, line))
+            buffer << line << "\n";
+        return buffer.str();
+    }
 }

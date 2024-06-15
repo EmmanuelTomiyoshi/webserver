@@ -302,6 +302,9 @@ void Server::setup_config(Config & config)
 
 		const int listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 
+		int opt = 1;
+		setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
 		if (bind(listen_sock, addr_res->ai_addr, addr_res->ai_addrlen) != 0)
 		{
 			freeaddrinfo(addr_res);

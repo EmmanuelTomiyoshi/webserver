@@ -70,7 +70,7 @@
     </style>
 </head>
 <body>
-    <h1>Otters</h1>
+    <h1>Gallery</h1>
     <div class="gallery">
         <!-- Repeat this block for the number of images you want -->
         <div class="image-block" id="block_1">
@@ -81,21 +81,21 @@
         </div>
         <!-- More image blocks here -->
         <div class="image-block" id="block_2">
-            <img src="" alt="Image 2" id="img_2">
+            <img src="/otters/img_2.png" alt="Image 2" id="img_2">
             <input type="file" id="file_2" accept="image/png, image/jpeg">
             <label for="file_2">Upload</label>
             <button onclick="deleteImage('img_2', 'block_2')">Delete</button>
         </div>
 
         <div class="image-block" id="block_3">
-            <img src="" alt="Image 3" id="img_3">
+            <img src="/otters/img_3.png" alt="Image 3" id="img_3">
             <input type="file" id="file_3" accept="image/png, image/jpeg">
             <label for="file_3">Upload</label>
             <button onclick="deleteImage('img_3', 'block_3')">Delete</button>
         </div>
 
         <div class="image-block" id="block_4">
-            <img src="" alt="Image 4" id="img_4">
+            <img src="/otters/img_4.png" alt="Image 4" id="img_4">
             <input type="file" id="file_4" accept="image/png, image/jpeg">
             <label for="file_4">Upload</label>
             <button onclick="deleteImage('img_4', 'block_4')">Delete</button>
@@ -122,7 +122,7 @@
         function handleFileUpload(file, imgId) {
             const formData = new FormData();
             const newFileName = `${imgId}.${file.name.split('.').pop()}`;
-            formData.append('file', file, newFileName);
+            formData.append('image', file, newFileName);
 
             fetch('http://sellatus:3009/otters', {
                 method: 'POST',
@@ -131,6 +131,7 @@
                 if (response.ok) {
                     console.log(`Image ${newFileName} uploaded successfully.`);
                     // Optionally handle response data or update UI
+                    window.location.reload();
                 } else {
                     console.error('Failed to upload image.');
                 }

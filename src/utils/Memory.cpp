@@ -50,6 +50,7 @@ void Memory::del(epoll_event *addr)
         return ;
     }
     _m_events.remove(data);
+    Timeout::remove(addr);
     delete data;
     addr->data.ptr = NULL;
 }

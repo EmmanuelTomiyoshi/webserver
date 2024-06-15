@@ -17,25 +17,8 @@ namespace ft {
         TIMEOUT,
         TRASH,
         CLIENT_BODY,
+        RESPONSE,
     };
-
-    typedef struct CustomData
-    {
-        int fd;
-        int cgi_fd;
-        int epfd;
-        Timeout *timeout;
-        time_t start_time;
-        time_t duration;
-        int pid;
-        EventType type;
-        size_t id;
-        char *buff;
-        ssize_t buff_size;
-        ssize_t w_count;
-        Config *config;
-        Request2 *request;
-    } CustomData;
 
     bool number_is_in(int value, int *arr, int size);
 
@@ -63,6 +46,7 @@ namespace ft {
     char *get_body_position(char *response, size_t response_size);
 
     void debug_file(std::string filename, char *buff, size_t size);
+    void debug_file(std::string filename, const char *buff, size_t size);
 
     void print_char_array(const char *arr, size_t size);
     void print_char_array(const char *arr);
@@ -77,6 +61,8 @@ namespace ft {
 
     //receives a relative path and returns a full path
     std::string get_full_path(std::string relative);
+    std::string read_file(std::string filename);
+    std::string read_file(std::ifstream & file);
 }
 
 #endif

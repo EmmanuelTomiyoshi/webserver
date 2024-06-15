@@ -3,25 +3,23 @@
 # include "base.hpp"
 # include "ft.hpp"
 
+class CustomData;
+
 class Timeout {
     private:
-        std::list<epoll_event *> _events;
+        static std::list<CustomData *> _events;
 
-        size_t _id;
-
-        void event_timed_out(epoll_event *event);
+        static void event_timed_out(CustomData *event);
 
     public:
-        Timeout(void);
-        ~Timeout(void);
+        static void add(epoll_event *event);
+        static void remove(epoll_event *event);
+        static void remove(CustomData *data);
+        static void reset_time(epoll_event *event);
 
-        void add(epoll_event *event);
-        void remove(epoll_event *event);
+        static void verify(void);
 
-        void verify(void);
-
-        void show_count(void);
-        void show_pointers(void);
+        static void show_count(void);
 };
 
 #endif

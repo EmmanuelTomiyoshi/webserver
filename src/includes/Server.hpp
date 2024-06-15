@@ -8,24 +8,23 @@
 
 class Server
 {
+	public:
+		typedef void (Server::*event_func)(epoll_event&);
 	private:
-		addrinfo	_addr_hints;
-		addrinfo	*_addr_res[5];
+        std::map<ft::EventType, event_func> _event__functions;
+		std::list<addrinfo *> _addr_res_list;
 		std::list<int> _socket_fds;
 
 		std::string _domain_name;
 
 		epoll_event	_events[20];
 		int			_epfd;
-		int			_timeout_ms;
 
 		std::string	_target;
 
 		Configs _configs;
 		
 		Response *_response;
-
-		Timeout _timeout;
 
 		void run(void);
 		void send_message(void);
@@ -40,11 +39,19 @@ class Server
 
 		void close_ports(void);
 
+		static addrinfo *try_server_names(Config *config);
+		void setup_config(Config & config);
+
+		void send_data_to_client(epoll_event & event);
+		void create_new_connection(epoll_event & event);
+		void write_to_cgi(epoll_event & event);
+
 	public:
 		Server(std::string config_file);
 		~Server(void);
 
 		void start(void);
+		void stop(void);
 		void new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type);
 		void new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type, Config *config);
 };

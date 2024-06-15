@@ -9,6 +9,11 @@ class Configs {
 		File _file;
 		std::list<Config> _configs;
 
+		std::vector<std::string> _ports;
+		void validate_ports(void);
+
+		void setup_server_names(void);
+
 	public:
 		Configs(std::string config_file);
 		~Configs(void);

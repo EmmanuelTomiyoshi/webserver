@@ -89,6 +89,15 @@ namespace ft {
         close(fd);
     }
 
+    void debug_file(std::string filename, const char *buff, size_t size)
+    {
+        int fd = open(filename.c_str(), O_TRUNC | O_CREAT | O_RDWR, 00666);
+        if (fd == -1)
+            return ;
+        write(fd, buff, size);
+        close(fd);
+    }
+
     void print_char_array(const char *arr, size_t size)
     {
         for (size_t i = 0; i < size; i++)
@@ -119,8 +128,12 @@ namespace ft {
             if (bytes <= 0)
                 break;
             total_size += bytes;
-            data = (char *)realloc(data, total_size);
+            char *aux = data;
+            data = new char[total_size];
+            std::memmove(data, aux, total_size - bytes);
             std::memmove(data + total_size - bytes, tmp, bytes);
+            if (aux)
+                delete [] aux;
         }
         *buff = data;
         return total_size;
@@ -192,5 +205,31 @@ namespace ft {
         free(cwd);
 
         return path + relative.substr(1);
+    }
+
+    std::string read_file(std::string filename)
+    {
+        std::ifstream file(filename.c_str());
+        if (!file)
+            throw std::runtime_error("failed to open file");
+
+        std::string line;
+        std::stringstream buffer;
+        while (std::getline(file, line))
+            buffer << line << "\n";
+        file.close();
+        return buffer.str();
+    }
+
+    std::string read_file(std::ifstream & file)
+    {
+        if (!file)
+            throw std::runtime_error("failed to open file");
+
+        std::string line;
+        std::stringstream buffer;
+        while (std::getline(file, line))
+            buffer << line << "\n";
+        return buffer.str();
     }
 }

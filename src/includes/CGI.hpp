@@ -62,7 +62,6 @@ class CGI
         void dup_pfds(void);
 
         void write_body(void);
-        void read_response(void);
 
         int _pfds_a[2];
         int _pfds_b[2];
@@ -81,8 +80,6 @@ class CGI
 
         ResponseData _response_data;
 
-        Timeout *_timeout;
-
         void enter_dir(std::string dir);
 
     public:
@@ -96,7 +93,6 @@ class CGI
         void set_body(char *value);
         void set_body_size(size_t value);
         void set_event(struct epoll_event *event);
-        void set_timeout(Timeout *timeout);
         void set_route(Route *route);
 
         void execute(void);
@@ -106,10 +102,7 @@ class CGI
         char *get_response(void);
         size_t get_response_size(void);
 
-        void debug_pfds_b(void);
-        ssize_t read_pfds_b(char **buff);
-
-        void write_to_cgi(epoll_event *event);
+        void write_to_cgi(epoll_event & event);
 };
 
 #endif

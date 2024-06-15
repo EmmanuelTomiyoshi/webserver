@@ -1,7 +1,6 @@
 #ifndef RESPONSE_HPP
 # define RESPONSE_HPP
 #include  "base.hpp"
-#include "../parsing/Request.hpp"
 #include "Configs.hpp"
 #include "Config.hpp"
 #include "error_codes.hpp"
@@ -12,7 +11,6 @@
 class Response
 {
     private:
-        Request _req;
         Request2 *_request;
         char *_buff;
         size_t _buff_size;
@@ -25,7 +23,10 @@ class Response
         std::ifstream _file;
         void open_file(void);
         void open_public_file(void);
+
         void open_route_file(void);
+        void open_route_file_default(void);
+        void open_route_file_upload(void);
 
         std::string _ext;
         std::string _mime;
@@ -42,6 +43,8 @@ class Response
         void create_response(void);
 
         void build_error(std::string code);
+        void replace_error_path(std::string code);
+        void build_default_error(void);
 
         //the body can hold string or binary
         class Body
@@ -50,7 +53,8 @@ class Response
                 Body(void);
                 ~Body(void);
                 char *data;
-                size_t size;
+                ssize_t size;
+                bool should_free;
         };
 
         Body _body;
@@ -64,7 +68,6 @@ class Response
 
         Config *_config;
         epoll_event *_event;
-        Timeout *_timeout;
 
         static std::string http_version;
 
@@ -76,11 +79,13 @@ class Response
         void create_cors_response(void);
         
         void start_mimes(void);
+        void fill_mime(std::string file);
 
+        static void create_writing_event(epoll_event *old_event, char *buff, ssize_t size);
     public:
         Response(void);
         Response(epoll_event *event);
-        Response(char *buff, size_t size, Config *config, Timeout *timeout);
+        ~Response(void);
 
         ssize_t send_response(void);
 

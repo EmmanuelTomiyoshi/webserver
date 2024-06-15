@@ -5,6 +5,12 @@ Request2::Request2(void) : _buff(NULL), _body(NULL), _is_cgi(false)
 {
 }
 
+Request2::~Request2(void)
+{
+    if (_buff)
+        delete [] _buff;
+}
+
 void Request2::init(char *buff, ssize_t size, Config *config)
 {
     if (size <= 0)
@@ -56,7 +62,17 @@ void Request2::verify_initialization(void) const
 void Request2::separate_info(void)
 {
 	char *body = ft::get_body_position(_buff, _buff_size);
-	size_t size_info = body - _buff;
+
+	size_t size_info;
+    if (body != NULL)
+    {
+        size_info = body - _buff;
+    }
+    else
+    {
+        size_info = _buff_size;
+    }
+        
 	char *info = new char[size_info + 1];
 	std::memmove(info, _buff, size_info);
 	info[size_info] = '\0';
@@ -74,6 +90,11 @@ void Request2::extract_request_line(void)
     ss >> _method;
     ss >> _target;
     ss >> _http_version;
+    
+    std::string aux;
+    ss >> aux;
+    if (aux.empty() == false)
+        throw std::runtime_error(HTTP_BAD_REQUEST);
 
     if (_method.empty() || _target.empty())
         throw std::runtime_error(HTTP_BAD_REQUEST);

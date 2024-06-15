@@ -1,44 +1,38 @@
 #include "Timeout.hpp"
 # include "Response.hpp"
+#include "CustomData.hpp"
+#include "Memory.hpp"
 
-Timeout::Timeout(void) : _id(0)
-{
-    std::cout << "Timeout created" << std::endl;
-}
-
-Timeout::~Timeout(void)
-{
-}
+std::list<CustomData *> Timeout::_events;
 
 void Timeout::add(epoll_event *event)
 {
-    ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
+    CustomData *event_data = (CustomData *) event->data.ptr;
 
-    event_data->id = _id;
-    _id++;
-    _events.push_back(event);
+    _events.push_back(event_data);
 }
 
 void Timeout::remove(epoll_event *event)
 {
-   std::list<epoll_event *>::iterator it = _events.begin();
-   ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
-    for (; it != _events.end(); it++)
-    {
-        ft::CustomData *li = (ft::CustomData *) (*it)->data.ptr;
-        if (li->id == event_data->id)
-        {
-            _events.erase(it);
-            return ;
-        }
-    }
-    std::cerr << "Event not found, failed to remove" << std::endl;
+   CustomData *event_data = (CustomData *) event->data.ptr;
+
+    _events.remove(event_data);
 }
 
-void Timeout::event_timed_out(epoll_event *event)
+void Timeout::remove(CustomData *data)
 {
-    ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
+    _events.remove(data);
+}
 
+void Timeout::reset_time(epoll_event *event)
+{
+   CustomData *event_data = (CustomData *) event->data.ptr;
+
+    event_data->start_time = time(NULL);
+}
+
+void Timeout::event_timed_out(CustomData *event_data)
+{
     close(event_data->fd);
     if (event_data->type == ft::CGI_R)
     {
@@ -53,19 +47,21 @@ void Timeout::event_timed_out(epoll_event *event)
         );
         close(event_data->cgi_fd);
     }
-    remove(event);
-    epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, event);
+    _events.remove(event_data);
+    epoll_event event;
+    event.data.ptr = event_data;
+    epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, &event);
     event_data->type = ft::TIMEOUT;
+    Memory::del(&event);
     std::cout << "Event timed out" << std::endl;
 }
 
 void Timeout::verify(void)
 {
-    std::list<epoll_event *>::iterator it = _events.begin();
+    std::list<CustomData *>::iterator it = _events.begin();
     for (; it != _events.end(); it++)
     {
-        ft::CustomData *event_data = (ft::CustomData *)(*it)->data.ptr;
-        if (event_data->start_time + event_data->duration < time(NULL))
+        if ((*it)->start_time + (*it)->duration < time(NULL))
         {
             event_timed_out(*it);
             return ;
@@ -76,14 +72,4 @@ void Timeout::verify(void)
 void Timeout::show_count(void)
 {
     std::cout << "Events count: " << _events.size() << std::endl;
-}
-
-#include <stdio.h>
-void Timeout::show_pointers(void)
-{
-    std::list<epoll_event *>::iterator it = _events.begin();
-    for (int i = 0; it != _events.end(); it++, i++)
-    {
-        printf("Event %d: %p\n", i, *it);
-    }
 }

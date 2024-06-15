@@ -13,6 +13,13 @@ File::File(std::string file_name) : _file(file_name.c_str())
 		"autoindex",
 		"return",
 		"cgi_route",
+		HTTP_BAD_REQUEST,
+		HTTP_INTERNAL_SERVER_ERROR,
+		HTTP_METHOD_NOT_ALLOWED,
+		HTTP_NOT_FOUND,
+		HTTP_OK,
+		HTTP_PAYLOAD_TOO_LARGE,
+		HTTP_SERVICE_UNAVAILABLE,
 		NULL
 	};
 
@@ -39,12 +46,8 @@ void File::init(void)
 
 void File::fill_data(void)
 {
-	char buffer[2000];
-	while (!_file.eof())
-	{
-		_file.getline(buffer, 2000, '\0');
-		_data += buffer;
-	}
+	_data = ft::read_file(_file);
+	_file.close();
 }
 
 std::string File::read_stream(std::stringstream & ss)
@@ -292,6 +295,4 @@ void File::info(std::list<Conf> & confs) const
 
 File::~File(void)
 {
-	if (_file.good())
-		_file.close();
 }

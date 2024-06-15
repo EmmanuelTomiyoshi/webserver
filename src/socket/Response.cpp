@@ -1,30 +1,31 @@
 #include "Response.hpp"
+#include "CustomData.hpp"
+#include "Memory.hpp"
 
 std::string Response::http_version = "HTTP/1.1";
 
 std::map<std::string, std::string> Response::mime_types;
 
-Response::Response(char *buff, size_t size, Config *config, Timeout *timeout) : 
-_buff(buff), _buff_size(size), _status("200"), _http_response(NULL),
-_config(config), _timeout(timeout)
-{
-    start_mimes();
-}
-
-Response::Response(void)
+Response::Response(void) : _request(NULL), _route(NULL),
+_http_response(NULL), _config(NULL), _event(NULL)
 {
 }
 
 Response::Response(epoll_event *event) : _route(NULL), _status("200"),
 _http_response(NULL), _http_response_size(0)
 {
-	ft::CustomData *event_data = (ft::CustomData *) event->data.ptr;
+	CustomData *event_data = (CustomData *) event->data.ptr;
 
     _event = event;
     _config = event_data->config;
     _request = event_data->request;
-    _timeout = event_data->timeout;
     start_mimes();
+}
+
+Response::~Response(void)
+{
+    if (_http_response != NULL)
+        delete [] _http_response;
 }
 
 void Response::start_mimes(void)
@@ -60,7 +61,7 @@ void Response::open_public_file(void)
         throw std::runtime_error(HTTP_INTERNAL_SERVER_ERROR);
 }
 
-void Response::open_route_file(void)
+void Response::open_route_file_default(void)
 {
     std::list<std::string>::const_iterator it;
     it = _route->try_files.get().begin();
@@ -71,8 +72,26 @@ void Response::open_route_file(void)
         if (_file.good())
             return ;
     }
-    std::cerr << "ERROR: open_route_file" << std::endl;
+    std::cerr << "ERROR: open_route_file_default" << std::endl;
     throw std::runtime_error(HTTP_NOT_FOUND);
+}
+
+void Response::open_route_file_upload(void)
+{
+    _path = _route->save_files_path.get() + '/' + _request->get_file();
+    _file.open(_path.c_str());
+    if (_file.good())
+        return ;
+    std::cerr << "ERROR: open_route_file_upload" << std::endl;
+    throw std::runtime_error(HTTP_NOT_FOUND);
+}
+
+void Response::open_route_file(void)
+{
+    if (_request->get_file().empty())
+        open_route_file_default();
+    else
+        open_route_file_upload();
 }
 
 void Response::set_public_file_info(void)
@@ -129,14 +148,13 @@ void Response::open_file(void)
     }
 }
 
-Response::Body::Body(void)
+Response::Body::Body(void) : data(NULL), should_free(true)
 {
-    this->data = NULL;
 }
 
 Response::Body::~Body(void)
 {
-    if (this->data)
+    if (this->data && this->should_free)
         delete[] this->data;
 }
 
@@ -148,7 +166,13 @@ void Response::read_binary(void)
     std::streamsize size = ft::get_file_size(_file);
     std::streambuf *buff = _file.rdbuf();
     char *data = new char[size];
-    buff->sgetn(data, size);
+    std::streamsize bytes = buff->sgetn(data, size);
+    if (bytes != size)
+    {
+        if (bytes > 0)
+            delete[] data;
+        throw std::runtime_error(HTTP_INTERNAL_SERVER_ERROR);
+    }
     _body.data = data;
     _body.size = size;
 }
@@ -163,15 +187,12 @@ void Response::read_text(void)
 
     _body.size = text.size() + 1;
     _body.data = new char[_body.size];
-    std::memmove(_body.data, text.c_str(), _body.size);
+    std::memmove((void*) _body.data, text.c_str(), _body.size);
 }
 
 void Response::fill_body(void)
 {
-    if (_type == "image")
-        read_binary();
-    else
-        read_text();
+    read_binary();
 }
 
 void Response::build_error(std::string code)
@@ -181,6 +202,25 @@ void Response::build_error(std::string code)
     _mime = this->mime_types[_ext];
     _type = "html";
     _path = "./public/pages/errors/" + code + ".html";
+}
+
+void Response::replace_error_path(std::string code)
+{
+    if (_config->error_pages.get(code).empty() == false)
+        _path = _config->error_pages.get(code);
+    if (_route != NULL && _route->error_pages.get(code).empty() == false)
+        _path = _route->error_pages.get(code);
+}
+
+void Response::build_default_error(void)
+{
+    _status = HTTP_INTERNAL_SERVER_ERROR;
+    _ext = "html";
+    _mime = this->mime_types[_ext];
+    _type = "html";
+    _body.data = (char *) DEFAULT_ERROR_MESSAGE;
+    _body.size = std::strlen(_body.data);
+    _body.should_free = false;
 }
 
 void Response::create_response(void)
@@ -198,29 +238,33 @@ void Response::create_response(void)
         content_length +
         "\r\n";
     
-    size_t size = response.size();
-    size += _body.size;
+    size_t size = response.size() + _body.size;
+    if (size <= 0)
+        throw std::runtime_error(HTTP_NOT_FOUND);
     _http_response = new char[size];
     _http_response_size = size;
     std::memmove(_http_response, response.c_str(), response.size());
     std::memmove(_http_response + response.size(), _body.data, _body.size);
 }
 
+void Response::fill_mime(std::string file)
+{
+    if (file.find_last_of('.') == std::string::npos)
+        return ;
+    std::string ext = file.substr(file.find_last_of('.') + 1);
+    _mime = mime_types[ext];
+}
+
 void Response::GET_normal(void)
 {
     open_file();
+    fill_mime(_path);
     fill_body();
     create_response();
-    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
-    send(
-        event_data->fd,
-        _http_response, 
-        _http_response_size,
-        MSG_DONTWAIT
-    );
-    epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
-	close(event_data->fd);
+    create_writing_event(_event, _http_response, _http_response_size);
+    _http_response = NULL;
 }
+
 void Response::GET_cgi(void)
 {
     CGI cgi;
@@ -228,7 +272,6 @@ void Response::GET_cgi(void)
     cgi.set_body(_request->get_body());
     cgi.set_body_size(_request->get_body_size());
     cgi.set_query_string(_request->get_query());
-    cgi.set_timeout(_timeout);
     cgi.set_route(_route);
     std::string script = _route->get_path();
     script += "/" + _request->get_file();
@@ -270,16 +313,12 @@ void Response::POST(void)
     cgi.set_content_length(_request->get_header("Content-Length"));
     cgi.set_body_size(_request->get_body_size());
     cgi.set_content_type(_request->get_header("Content-Type"));
-    cgi.set_timeout(_timeout);
     cgi.set_script_name("./cgi-bin/upload_debug.pl");
     cgi.set_route(_route);
 
     cgi.set_event(_event);
     cgi.info();
     cgi.execute();
-
-    _http_response = cgi.get_response();
-    _http_response_size = cgi.get_response_size();
 }
 
 void Response::DELETE(void)
@@ -295,7 +334,7 @@ void Response::DELETE(void)
     if (std::remove(file_path.c_str()) != 0)
         throw std::runtime_error(HTTP_INTERNAL_SERVER_ERROR);
     create_cors_response();
-    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+    CustomData *event_data = (CustomData *) _event->data.ptr;
     send(
         event_data->fd,
         _http_response, 
@@ -337,7 +376,7 @@ void Response::execute(void)
     else if (method ==  "OPTIONS")
     {
         create_cors_response();
-        ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+        CustomData *event_data = (CustomData *) _event->data.ptr;
         send(
             event_data->fd,
             _http_response, 
@@ -346,6 +385,7 @@ void Response::execute(void)
         );
         epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
         close(event_data->fd);
+        Memory::del(_event);
     }
     else
         throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
@@ -353,11 +393,19 @@ void Response::execute(void)
 
 void Response::execute_error(std::string code)
 {
-    build_error(code);
-    open_public_file();
-    fill_body();
+    try
+    {
+        build_error(code);
+        replace_error_path(code);
+        open_public_file();
+        fill_body();
+    }
+    catch (std::exception & e)
+    {
+        build_default_error();
+    }
     create_response();
-    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
+    CustomData *event_data = (CustomData *) _event->data.ptr;
     send(
         event_data->fd,
         _http_response, 
@@ -366,6 +414,7 @@ void Response::execute_error(std::string code)
     );
     epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
 	close(event_data->fd);
+    Memory::del(_event);
 }
 
 void Response::autoindex(void)
@@ -375,7 +424,6 @@ void Response::autoindex(void)
     CGI cgi;
     cgi.set_request_method("GET");
     cgi.set_query_string(_request->get_query());
-    cgi.set_timeout(_timeout);
     cgi.set_route(_route);
     cgi.set_script_name("./cgi-bin/autoindex.pl");
     cgi.set_event(_event);
@@ -384,8 +432,6 @@ void Response::autoindex(void)
 
 ssize_t Response::send_response(void)
 {
-    ft::CustomData *event_data = (ft::CustomData *) _event->data.ptr;
-
     try
     {
         if(_request->is_error())
@@ -397,17 +443,10 @@ ssize_t Response::send_response(void)
     catch(const std::exception& e)
     {
         std::cout << "executing error: " << e.what() << std::endl;
-        if (_route != NULL && e.what() == std::string(HTTP_NOT_FOUND) && _route->autoindex.get())
+        if (_route != NULL && e.what() == std::string(HTTP_NOT_FOUND) && _route->autoindex.get() && _request->get_method() == "GET")
             autoindex();
         else
             execute_error(e.what());
-    }
-
-    if (_request->get_method() == "POST" && _request->is_error() == false)
-    {
-        std::cout << "*********JAMALAICACA" << std::endl;
-        epoll_ctl(event_data->epfd, EPOLL_CTL_DEL, event_data->fd, _event);
-        return 1;
     }
     return 1;
 }
@@ -426,4 +465,28 @@ char *Response::get_response(void)
 ssize_t Response::get_response_size(void)
 {
     return _http_response_size;
+}
+
+void Response::create_writing_event(epoll_event *old_event, char *buff, ssize_t size)
+{
+    CustomData *old_data = (CustomData *) old_event->data.ptr;
+
+    CustomData *data = new CustomData;
+    data->fd = old_data->fd;
+    data->buff = buff;
+    data->buff_size = size;
+    data->w_count = 0;
+    data->type = ft::RESPONSE;
+    data->config = old_data->config;
+    data->duration = 5;
+    data->epfd = old_data->epfd;
+    data->start_time = time(NULL);
+
+    epoll_event event;
+    event.events = EPOLLOUT;
+    event.data.ptr = data;
+
+    epoll_ctl(old_data->epfd, EPOLL_CTL_MOD, old_data->fd, &event);
+    Memory::add(data);
+    Memory::del(old_event);
 }

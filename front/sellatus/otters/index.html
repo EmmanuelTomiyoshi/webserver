@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Themed Image Gallery</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .image-block {
+            background-color: #1e1e1e;
+            padding: 10px;
+            border: 2px solid #444;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+        }
+        .image-block img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        .image-block input[type="file"] {
+            display: none; /* Hide by default */
+        }
+        .image-block label {
+            display: block;
+            margin-top: 5px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .image-block label:hover {
+            background-color: #45a049;
+        }
+        .image-block button {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 5px 10px;
+            background-color: #b22222;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .image-block button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gallery</h1>
+    <div class="gallery">
+        <!-- Repeat this block for the number of images you want -->
+        <div class="image-block" id="block_1">
+            <img src="/otters/img_1.png" alt="Image 1" id="img_1">
+            <input type="file" id="file_1" accept="image/png, image/jpeg">
+            <label for="file_1">Upload</label>
+            <button onclick="deleteImage('img_1', 'block_1')">Delete</button>
+        </div>
+        <!-- More image blocks here -->
+        <div class="image-block" id="block_2">
+            <img src="/otters/img_2.png" alt="Image 2" id="img_2">
+            <input type="file" id="file_2" accept="image/png, image/jpeg">
+            <label for="file_2">Upload</label>
+            <button onclick="deleteImage('img_2', 'block_2')">Delete</button>
+        </div>
+
+        <div class="image-block" id="block_3">
+            <img src="/otters/img_3.png" alt="Image 3" id="img_3">
+            <input type="file" id="file_3" accept="image/png, image/jpeg">
+            <label for="file_3">Upload</label>
+            <button onclick="deleteImage('img_3', 'block_3')">Delete</button>
+        </div>
+
+        <div class="image-block" id="block_4">
+            <img src="/otters/img_4.png" alt="Image 4" id="img_4">
+            <input type="file" id="file_4" accept="image/png, image/jpeg">
+            <label for="file_4">Upload</label>
+            <button onclick="deleteImage('img_4', 'block_4')">Delete</button>
+        </div>
+    </div>
+
+    <script>
+        function deleteImage(imgId, blockId) {
+            const imageElement = document.getElementById(imgId);
+            const imageUrl = `http://sellatus:3009/otters/${imgId}.png`;
+
+            fetch(imageUrl, {
+                method: 'DELETE',
+            }).then(response => {
+                if (response.ok) {
+                    imageElement.src = '';
+                } else {
+                    console.error('Failed to delete image');
+                }
+            }).catch(error => console.error('Error deleting image:', error));
+        }
+
+        // Function to handle file upload
+        function handleFileUpload(file, imgId) {
+            const formData = new FormData();
+            const newFileName = `${imgId}.${file.name.split('.').pop()}`;
+            formData.append('image', file, newFileName);
+
+            fetch('http://sellatus:3009/otters', {
+                method: 'POST',
+                body: formData,
+            }).then(response => {
+                if (response.ok) {
+                    console.log(`Image ${newFileName} uploaded successfully.`);
+                    // Optionally handle response data or update UI
+                    window.location.reload();
+                } else {
+                    console.error('Failed to upload image.');
+                }
+            }).catch(error => console.error('Error uploading image:', error));
+        }
+
+        // Event listeners for file input change
+        document.querySelectorAll('.image-block input[type="file"]').forEach(input => {
+            input.addEventListener('change', function() {
+                const file = this.files[0];
+                const imgId = this.id.replace('file_', 'img_');
+
+                if (file) {
+                    handleFileUpload(file, imgId);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

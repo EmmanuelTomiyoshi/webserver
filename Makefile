@@ -2,28 +2,29 @@ NAME 		=	webserv
 
 SRC 		=	main.cpp \
 				IPResolver.cpp \
-				Request.cpp \
 				Server.cpp \
 				Config.cpp \
 				Route.cpp \
 				Methods.cpp \
 				config_test.cpp \
-				Parser.cpp \
 				Configs.cpp \
 				Utils.cpp	\
 				File.cpp \
 				ft.cpp \
 				Response.cpp \
 				CGI.cpp \
-				temp.cpp \
 				Request2.cpp \
 				tests.cpp \
 				Timeout.cpp \
 				save_request.cpp \
 				test_request.cpp \
+				ErrorPages.cpp \
+				signal_stop.cpp \
+				Memory.cpp \
+				CustomData.cpp \
+				BuffList.cpp \
 
 VPATH		=	./src \
-				./src/parsing \
 				./src/utils \
 				./src/socket \
 				./src/config \

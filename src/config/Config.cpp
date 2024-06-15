@@ -17,6 +17,7 @@ void Config::show(void)
 	std::cout << "Port: " << this->port.get() << std::endl;
 	std::cout << "Host: " << this->host.get() << std::endl;
 	std::cout << "Root: " << this->root.get() << std::endl;
+	this->error_pages.show();
 	this->routes.show();
 }
 
@@ -85,6 +86,13 @@ void Config::Routes::set(std::list<File::Conf> & l_routes)
 		dst.set_root(src._single_value["root"]);
 		dst.cgi_route.set(src._single_value["cgi_route"]);
 		dst.cgi_extensions.set(src._multi_values["cgi_extensions"]);
+		dst.error_pages.add(HTTP_BAD_REQUEST, src._single_value[HTTP_BAD_REQUEST]);
+		dst.error_pages.add(HTTP_INTERNAL_SERVER_ERROR, src._single_value[HTTP_INTERNAL_SERVER_ERROR]);
+		dst.error_pages.add(HTTP_METHOD_NOT_ALLOWED, src._single_value[HTTP_METHOD_NOT_ALLOWED]);
+		dst.error_pages.add(HTTP_NOT_FOUND, src._single_value[HTTP_NOT_FOUND]);
+		dst.error_pages.add(HTTP_OK, src._single_value[HTTP_OK]);
+		dst.error_pages.add(HTTP_PAYLOAD_TOO_LARGE, src._single_value[HTTP_PAYLOAD_TOO_LARGE]);
+		dst.error_pages.add(HTTP_SERVICE_UNAVAILABLE, src._single_value[HTTP_SERVICE_UNAVAILABLE]);
 		it++;
 	}
 }
@@ -133,6 +141,7 @@ void Config::ServerNames::set(std::list<std::string> & values)
 		this->_values.push_back(*it);
 		it++;
 	}
+	this->_values.push_back("localhost");
 }
 
 void Config::ServerNames::show(void) const

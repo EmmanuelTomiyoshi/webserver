@@ -148,11 +148,6 @@ void CGI::write_body(void)
     close(_pfds_a[W]);
 }
 
-void CGI::read_response(void)
-{
-    _response_size = ft::read_all(_pfds_b[R], &_response);
-}
-
 void CGI::add_write_event(int fd, char *buff, ssize_t size, int epfd, int cgi_fd)
 {
     CustomData *event_data = new CustomData;
@@ -377,19 +372,6 @@ void CGI::process_response(char *response, ssize_t response_size)
 {
     extract_response_data(response, response_size);
     format_http_response();
-}
-
-void CGI::debug_pfds_b(void)
-{
-    char *buff;
-    ssize_t bytes = ft::read_all(_pfds_b[R], &buff);
-    std::cout << "\n-------- CGI DEBUG_PFDS_B --------" << std::endl;
-    write(1, buff, bytes);
-}
-
-ssize_t CGI::read_pfds_b(char **buff)
-{
-    return ft::read_all(_pfds_b[R], buff);
 }
 
 void CGI::execute(void)

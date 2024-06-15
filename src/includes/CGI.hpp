@@ -62,7 +62,6 @@ class CGI
         void dup_pfds(void);
 
         void write_body(void);
-        void read_response(void);
 
         int _pfds_a[2];
         int _pfds_b[2];
@@ -102,9 +101,6 @@ class CGI
         void process_response(char *response, ssize_t response_size);
         char *get_response(void);
         size_t get_response_size(void);
-
-        void debug_pfds_b(void);
-        ssize_t read_pfds_b(char **buff);
 
         void write_to_cgi(epoll_event & event);
 };

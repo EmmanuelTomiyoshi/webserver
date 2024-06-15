@@ -72,7 +72,6 @@ void Response::open_route_file_default(void)
         if (_file.good())
             return ;
     }
-    std::cerr << "ERROR: open_route_file_default" << std::endl;
     throw std::runtime_error(HTTP_NOT_FOUND);
 }
 
@@ -82,7 +81,6 @@ void Response::open_route_file_upload(void)
     _file.open(_path.c_str());
     if (_file.good())
         return ;
-    std::cerr << "ERROR: open_route_file_upload" << std::endl;
     throw std::runtime_error(HTTP_NOT_FOUND);
 }
 
@@ -99,21 +97,18 @@ void Response::set_public_file_info(void)
     this->_path = '.' + _request->get_target();
     if (_path.empty())
     {
-        std::cerr << "error: no path provided" << std::endl;
         return ;
     }
 
     this->_ext = _path.substr(_path.find_last_of('.') + 1);
     if (_ext.empty())
     {
-        std::cerr << "error: file without extension" << std::endl;
         return ;
     }
 
     this->_mime = mime_types[_ext];
     if (_mime.empty())
     {
-        std::cerr << "error: mime type not allowed" << std::endl;
         return ;
     }
 
@@ -317,7 +312,6 @@ void Response::POST(void)
     cgi.set_route(_route);
 
     cgi.set_event(_event);
-    cgi.info();
     cgi.execute();
 }
 
@@ -328,7 +322,6 @@ void Response::DELETE(void)
 
     std::string file_path = _route->save_files_path.get();
     file_path += "/" + _request->get_file();
-    std::cout << "FILE_PATH: " << file_path << std::endl;
     if (ft::file_exists(file_path) == false)
         throw std::runtime_error(HTTP_NOT_FOUND);
     if (std::remove(file_path.c_str()) != 0)
@@ -366,7 +359,6 @@ void Response::create_cors_response(void)
 void Response::execute(void)
 {
     std::string method = _request->get_method();
-    std::cout << "&*****method: " << method << std::endl;
     if (method == "GET")
         GET();
     else if (method == "POST")
@@ -419,8 +411,6 @@ void Response::execute_error(std::string code)
 
 void Response::autoindex(void)
 {
-    std::cout << "\n-> EXECUTING AUTOINDEX <-\n" << std::endl;
-
     CGI cgi;
     cgi.set_request_method("GET");
     cgi.set_query_string(_request->get_query());
@@ -442,7 +432,6 @@ ssize_t Response::send_response(void)
     }
     catch(const std::exception& e)
     {
-        std::cout << "executing error: " << e.what() << std::endl;
         if (_route != NULL && e.what() == std::string(HTTP_NOT_FOUND) && _route->autoindex.get() && _request->get_method() == "GET")
             autoindex();
         else

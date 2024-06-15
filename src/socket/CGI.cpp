@@ -42,7 +42,6 @@ void CGI::set_request_method(std::string value)
 void CGI::set_content_type(std::string value)
 {
     _content_type = "CONTENT_TYPE=" + value;
-    std::cout << "content type>>" << _content_type << std::endl; 
     add_env(_content_type.c_str());
 }
 

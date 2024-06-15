@@ -86,7 +86,6 @@ void Server::recv_message(epoll_event & event)
 	const ssize_t buff_size = 40000;
 	char buff[buff_size];
 	ssize_t bytes = recv(event_data->fd, buff, buff_size, MSG_DONTWAIT);
-	std::cout << "data received: " << bytes << std::endl;
 
 	if (bytes <= 0)
 	{
@@ -115,11 +114,8 @@ void Server::recv_message(epoll_event & event)
 		delete [] data;
 	}
 
-	event_data->request->debug();
-
 	if (event_data->request->is_body_complete() || event_data->request->is_error())
 	{
-		event_data->request->info();
 		Response response(&event);
 		response.send_response();
 	}
@@ -217,7 +213,6 @@ void Server::process_request(epoll_event & event)
 		epoll_ctl(_epfd, EPOLL_CTL_DEL, event.data.fd, &event);
 		close(event.data.fd);
 		Memory::del(&event);
-		std::cerr << "REQUEST FAILED: " << e.what() << std::endl;
 	}
 }
 
@@ -234,8 +229,6 @@ void Server::send_data_to_client(epoll_event & event)
 			MSG_DONTWAIT
 		);
 
-		std::cout << bytes << " sent." << std::endl;
-
 		data->w_count += bytes;
 	}
 	
@@ -251,7 +244,6 @@ void Server::send_data_to_client(epoll_event & event)
 void Server::create_new_connection(epoll_event & event)
 {
 	CustomData *event_data = (CustomData *) event.data.ptr;
-	std::cout << "new connection" << std::endl;
 	int fd_conn = accept4(event_data->fd, NULL, NULL, SOCK_NONBLOCK);
 	//fd_conn is related to socket_fd that is related to a port that is related to a specific config file
 	//this is why this relationship works and I get the right config file in the line below
@@ -266,7 +258,6 @@ void Server::create_new_connection(epoll_event & event)
 
 void Server::write_to_cgi(epoll_event & event)
 {
-	std::cout << "cgi write event triggered" << std::endl;
 	CGI cgi;
 	cgi.write_to_cgi(event);
 }

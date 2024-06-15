@@ -207,8 +207,7 @@ void Server::send_data_to_client(epoll_event & event)
 	{
 		epoll_ctl(data->epfd, EPOLL_CTL_DEL, data->fd, NULL);
 		close(data->fd);
-		delete [] data->buff;
-		Memory::remove(data);
+		Memory::del(data);
 		return ;
 	}
 }

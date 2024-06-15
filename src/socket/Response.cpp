@@ -313,7 +313,13 @@ void Response::POST(void)
     cgi.set_content_length(_request->get_header("Content-Length"));
     cgi.set_body_size(_request->get_body_size());
     cgi.set_content_type(_request->get_header("Content-Type"));
-    cgi.set_script_name("./cgi-bin/upload_debug.pl");
+    if (_request->get_file().empty())
+        cgi.set_script_name("./cgi-bin/upload_debug.pl");
+    else
+    {
+        std::string script_path = _route->get_path() + "/" + _request->get_file();
+        cgi.set_script_name(script_path);
+    }
     cgi.set_route(_route);
 
     cgi.set_event(_event);
@@ -443,8 +449,12 @@ ssize_t Response::send_response(void)
     catch(const std::exception& e)
     {
         std::cout << "executing error: " << e.what() << std::endl;
-        if (_route != NULL && e.what() == std::string(HTTP_NOT_FOUND) && _route->autoindex.get() && _request->get_method() == "GET")
+        if (_route != NULL && e.what() == std::string(HTTP_NOT_FOUND) 
+        && _route->autoindex.get() && _request->get_method() == "GET"
+        && (_request && _request->get_file().empty()))
+        {
             autoindex();
+        }
         else
             execute_error(e.what());
     }

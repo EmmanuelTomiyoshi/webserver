@@ -220,10 +220,16 @@ void CGI::execute_cgi_post(void)
         event_data->duration = 5;
         event_data->start_time = time(NULL);
         event_data->pid = _pid;
+        event_data->w_count = 0;
+        event_data->buff = NULL;
 
         epoll_event event;
         event.events = EPOLLIN;
         event.data.ptr = (void *) event_data;
+
+        int flags = fcntl(event_data->fd, F_GETFL, 0);
+        flags |= O_NONBLOCK;
+        fcntl(event_data->fd, F_SETFL, flags);
 
         Memory::add(&event);
 

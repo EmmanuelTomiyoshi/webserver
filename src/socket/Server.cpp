@@ -134,15 +134,39 @@ void Server::recv_client_body(epoll_event & event)
 void Server::process_cgi_response(epoll_event & event)
 {
 	CustomData *event_data = (CustomData *) event.data.ptr;
-	char *buff = NULL;
-	Timeout::remove(&event);
-	epoll_ctl(_epfd, EPOLL_CTL_DEL, event_data->fd, &event);
-	int buff_size = ft::read_all(event_data->fd, &buff);
+	const ssize_t buff_siz = 20000;
+	char buff[buff_siz];
+	ssize_t bytes = read(event_data->fd, buff, buff_siz);
+
+	if (bytes <= 0 && event_data->w_count <= 0)
+	{
+		epoll_ctl(_epfd, EPOLL_CTL_DEL, event_data->fd, NULL);
+		Memory::del(&event);
+		close(event_data->fd);
+		//execute_error();
+		close(event_data->cgi_fd);
+		return ;
+	}
+
+	if (bytes > 0)
+	{
+		char *data = new char[event_data->w_count + bytes];
+		if (event_data->buff)
+		{
+			std::memmove(data, event_data->buff, event_data->w_count);
+			delete [] event_data->buff;
+		}
+		std::memmove(data + event_data->w_count, buff, bytes);
+		event_data->w_count += bytes;
+		event_data->buff = data;
+		Timeout::reset_time(&event);
+		return ;
+	}
 
 	try
 	{
 		CGI cgi;
-		cgi.process_response(buff, buff_size);
+		cgi.process_response(event_data->buff, event_data->w_count);
 		char *response = cgi.get_response();
 		ssize_t response_size = cgi.get_response_size();
 
@@ -151,8 +175,6 @@ void Server::process_cgi_response(epoll_event & event)
 		close(event_data->cgi_fd);
 		close(event_data->fd);
 		delete [] response;
-		if (buff)
-			free(buff);
 		Memory::del(&event);
 	}
 	catch (std::exception & e)
@@ -166,7 +188,6 @@ void Server::process_cgi_response(epoll_event & event)
 			MSG_DONTWAIT
 		);
 	}
-
 }
 
 void Server::process_request(epoll_event & event)

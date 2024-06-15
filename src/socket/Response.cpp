@@ -166,7 +166,13 @@ void Response::read_binary(void)
     std::streamsize size = ft::get_file_size(_file);
     std::streambuf *buff = _file.rdbuf();
     char *data = new char[size];
-    buff->sgetn(data, size);
+    std::streamsize bytes = buff->sgetn(data, size);
+    if (bytes != size)
+    {
+        if (bytes > 0)
+            delete[] data;
+        throw std::runtime_error(HTTP_INTERNAL_SERVER_ERROR);
+    }
     _body.data = data;
     _body.size = size;
 }
@@ -186,10 +192,7 @@ void Response::read_text(void)
 
 void Response::fill_body(void)
 {
-    if (_type == "image")
-        read_binary();
-    else
-        read_text();
+    read_binary();
 }
 
 void Response::build_error(std::string code)

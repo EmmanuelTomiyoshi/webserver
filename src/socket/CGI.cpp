@@ -342,12 +342,14 @@ void CGI::format_http_response(void)
     std::string h1 = "Content-Length: " +
         ft::int_to_str(_response_data.body_size) + 
         "\n";
-    std::string h2 = "Content-Type: " + 
+    std::string h2 = "Access-Control-Allow-Origin: *\r\n";
+    std::string h3 = "Access-Control-Allow-Methods: GET, POST, DELETE\r\n";
+    std::string h4 = "Content-Type: " + 
         _response_data.content_type +
         "\n\n";
     
 
-    std::string aux = status_line + h1 + h2;
+    std::string aux = status_line + h1 + h2 + h3 + h4;
 
     size_t size = aux.length() + _response_data.body_size;
     char *http_response = new char[size];

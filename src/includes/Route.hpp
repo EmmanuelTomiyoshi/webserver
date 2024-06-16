@@ -102,6 +102,7 @@ class Route
 		std::string get_root(void) const;
 		std::string get_path(void) const;
 		void show(void);
+		void validate(void);
 };
 
 #endif

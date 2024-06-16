@@ -255,3 +255,9 @@ void Route::show(void)
 	try_files.show();
 	cgi_extensions.show();
 }
+
+void Route::validate(void)
+{
+	if (this->_root.empty() && this->_parent_root.empty())
+		throw std::runtime_error("no root defined for route '" + this->location.get() + "'");
+}

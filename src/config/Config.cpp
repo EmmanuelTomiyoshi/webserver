@@ -68,6 +68,16 @@ Route & Config::Routes::get(std::string location)
 	}
 }
 
+void Config::Routes::validate(void)
+{
+	std::map<std::string, Route>::iterator it = this->_routes.begin();
+	for (; it != this->_routes.end(); it++)
+	{
+		Route & r = it->second;
+		r.validate();
+	}
+}
+
 void Config::Routes::set(std::list<File::Conf> & l_routes)
 {	
 	std::list<File::Conf>::iterator it;

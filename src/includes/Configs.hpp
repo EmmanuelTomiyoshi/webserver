@@ -12,6 +12,7 @@ class Configs {
 		std::vector<std::string> _ports;
 		void validate_ports(void);
 
+		void validate_configs(void);
 		void setup_server_names(void);
 
 	public:

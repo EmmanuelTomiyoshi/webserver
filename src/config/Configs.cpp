@@ -32,6 +32,16 @@ void Configs::init(void)
 	this->_it = this->_configs.begin();
 	validate_ports();
 	setup_server_names();
+	validate_configs();
+}
+
+void Configs::validate_configs(void)
+{
+	std::list<Config>::iterator config = _configs.begin();
+	for (; config != _configs.end(); config++)
+	{
+		config->routes.validate();
+	}
 }
 
 void Configs::validate_ports(void)

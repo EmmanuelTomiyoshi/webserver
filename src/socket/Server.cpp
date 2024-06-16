@@ -22,9 +22,6 @@ Server::Server(std::string config_file) : _configs(config_file)
 
 Server::~Server(void)
 {
-	//TODO: verify what memories to free
-	// if (_addr_res != NULL)
-	// 	freeaddrinfo(_addr_res);
 }
 
 void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type, Config *config)
@@ -52,15 +49,6 @@ void	Server::send_message(void)
 	if (sent <= 0)
 		throw std::runtime_error(HTTP_BAD_REQUEST);
 }
-
-/* 
-	if is first time: initialize request
-
-	else: if is body is incomplete, keep reading
-
-	request.add_more_body();
-
- */
 
 void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type)
 {

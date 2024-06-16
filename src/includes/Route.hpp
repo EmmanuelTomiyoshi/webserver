@@ -68,8 +68,6 @@ class Route
 				void set(std::string value);
 		};
 
-		// cgi_extensions
-
 	public:
 		Route(void);
 		~Route(void);

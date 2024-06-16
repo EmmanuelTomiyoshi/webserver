@@ -8,11 +8,6 @@ use File::Basename;
 # Set the path to store uploaded files
 my $upload_dir = "./";
 
-# print STDERR "STDIN\n\n";
-# while (<STDIN>) {
-#     print STDERR $_;
-# }
-
 print STDERR "\n-----------\nCGI: executing...\n-----------\n";
 # Create a CGI object
 my $cgi = CGI->new;

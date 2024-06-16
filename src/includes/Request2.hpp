@@ -4,12 +4,6 @@
 # include "ft.hpp"
 # include "error_codes.hpp"
 
-/*	 MESSAGE FORMAT 
-
-	 request-line   = method SP request-target SP HTTP-version
-
- */
-
 class Config;
 
 class Request2

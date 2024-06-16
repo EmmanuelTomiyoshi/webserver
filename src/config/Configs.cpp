@@ -41,6 +41,8 @@ void Configs::validate_configs(void)
 	for (; config != _configs.end(); config++)
 	{
 		config->routes.validate();
+		if (config->host.get().empty())
+			throw std::runtime_error("please set a host for your server");
 	}
 }
 
@@ -56,7 +58,6 @@ void Configs::validate_ports(void)
 void Configs::setup_server_names(void)
 {
 	std::string content = ft::read_file("/etc/hosts");
-	std::string loopback = "127.0.0.1";
 
 	std::stringstream buff;
 
@@ -64,24 +65,23 @@ void Configs::setup_server_names(void)
 	it = _configs.begin();
 	for (; it != _configs.end(); it++)
 	{
+		std::string host = it->host.get();
 		if (it->server_names.get().size() <= 1)
 			continue ;
 		std::list<std::string>::const_iterator it2;
 		it2 = it->server_names.get().begin();
 		for (; it2 != --(it->server_names.get().end()); it2++)
 		{
-			std::string host = loopback + " " + (*it2) + "\n";
-			if (content.find(host) != std::string::npos)
+			std::string dns = host + " " + (*it2) + "\n";
+			if (content.find(dns) != std::string::npos)
 			{
-				std::cout << "already exists: " << host;
+				std::cout << "already exists: " << dns << std::endl;
 				continue ;
 			}
-			buff << host;
+			buff << dns;
 		}
 	}
-	std::string host = loopback + " " + "localhost\n";
-	if (content.find(host) == std::string::npos)
-		buff << host;
+
 	std::string result = buff.str() + content;
 	ft::debug_file("/etc/hosts", result.c_str(), result.size());
 }

@@ -290,16 +290,28 @@ void Response::GET_cgi(void)
     cgi.execute();
 }
 
+void Response::GET_redirect(void)
+{
+    create_redirect_response();
+    create_writing_event(_event, _http_response, _http_response_size);
+    _http_response = NULL;
+}
+
 void Response::GET(void)
 {
+    if (_route && _route->redirect.get().empty() == false)
+    {
+        GET_redirect();
+        return ;
+    }
     if (!is_public() && _route->methods.allowed("GET") == false)
         throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
     if (!is_public() && _route->cgi_route.is_true())
     {
         GET_cgi();
+        return ;
     }
-    else
-        GET_normal();
+    GET_normal();    
 }
 
 char *find_str_pos(const char *str, char *src)
@@ -371,6 +383,25 @@ void Response::create_cors_response(void)
 
     std::string response = status_line + 
         h0 + h1 + h2 + h3 + "\r\n";
+        
+
+    size_t size = response.size();
+    _http_response = new char[size];
+    _http_response_size = size;
+    std::memmove(_http_response, response.c_str(), response.size());
+}
+
+void Response::create_redirect_response(void)
+{
+    std::string status_line = http_version + " 302 \r\n";
+    std::string h0 = "Connection: close\r\n";
+    std::string h1 = "Content-Length: 0\r\n";
+    std::string h2 = "Access-Control-Allow-Origin: *\r\n";
+    std::string h3 = "Access-Control-Allow-Methods: GET, POST, DELETE\r\n";
+    std::string h4 = "Location: " + _route->redirect.get() + "\r\n";
+
+    std::string response = status_line + 
+        h0 + h1 + h2 + h3 + h4 + "\r\n";
         
 
     size_t size = response.size();

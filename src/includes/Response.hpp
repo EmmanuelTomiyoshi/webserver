@@ -64,6 +64,7 @@ class Response
 
         void GET(void);
         void GET_normal(void);
+        void GET_redirect(void);
         void autoindex(void);
         void GET_cgi(void);
         void POST(void);
@@ -80,7 +81,8 @@ class Response
         void execute_error(std::string code);
 
         void create_cors_response(void);
-        
+        void create_redirect_response(void);
+
         void start_mimes(void);
         void fill_mime(std::string file);
 

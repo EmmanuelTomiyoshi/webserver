@@ -46,6 +46,8 @@ class Server
 		void create_new_connection(epoll_event & event);
 		void write_to_cgi(epoll_event & event);
 
+		void create_error_event(int fd, std::string code);
+
 	public:
 		Server(std::string config_file);
 		~Server(void);

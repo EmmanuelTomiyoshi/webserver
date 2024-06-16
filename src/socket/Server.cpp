@@ -131,6 +131,27 @@ void Server::recv_client_body(epoll_event & event)
 	(void) event;
 }
 
+void Server::create_error_event(int fd, std::string code)
+{
+	Response response;
+	response.process_error(code);
+
+	CustomData *data = new CustomData;
+	data->fd = fd;
+	data->buff = response.get_response();
+	data->buff_size = response.get_response_size();
+	data->w_count = 0;
+	data->type = ft::RESPONSE;
+	data->epfd = _epfd;
+
+	epoll_event event;
+	event.data.ptr = data;
+	event.events = EPOLLOUT;
+
+	Memory::add(data);
+	epoll_ctl(_epfd, EPOLL_CTL_ADD, data->fd, &event);
+}
+
 void Server::process_cgi_response(epoll_event & cgi_event)
 {
 	CustomData *cgi_data = (CustomData *) cgi_event.data.ptr;
@@ -138,13 +159,14 @@ void Server::process_cgi_response(epoll_event & cgi_event)
 	char buff[buff_siz];
 	ssize_t bytes = read(cgi_data->fd, buff, buff_siz);
 
+
 	if (bytes <= 0 && cgi_data->w_count <= 0)
 	{
+		create_error_event(cgi_data->cgi_fd, HTTP_NOT_FOUND);
+
 		epoll_ctl(_epfd, EPOLL_CTL_DEL, cgi_data->fd, NULL);
-		Memory::del(&cgi_event);
 		close(cgi_data->fd);
-		//execute_error();
-		close(cgi_data->cgi_fd);
+		Memory::del(&cgi_event);
 		return ;
 	}
 
@@ -195,14 +217,7 @@ void Server::process_cgi_response(epoll_event & cgi_event)
 	}
 	catch (std::exception & e)
 	{
-		Response response;
-		response.process_error(e.what());
-		send(
-			cgi_data->cgi_fd,
-			response.get_response(),
-			response.get_response_size(),
-			MSG_DONTWAIT
-		);
+		create_error_event(cgi_data->cgi_fd, e.what());
 	}
 }
 

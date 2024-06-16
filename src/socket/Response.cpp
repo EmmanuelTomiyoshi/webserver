@@ -481,9 +481,12 @@ void Response::process_error(std::string code)
     fill_body();
     create_response();
 }
+
 char *Response::get_response(void)
 {
-    return _http_response;
+    char *aux = _http_response;
+    _http_response = NULL;
+    return aux;
 }
 ssize_t Response::get_response_size(void)
 {

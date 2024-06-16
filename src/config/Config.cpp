@@ -95,7 +95,6 @@ void Config::Routes::set(std::list<File::Conf> & l_routes)
 		dst.set_parent_root(this->_parent->root.get());
 		dst.set_root(src._single_value["root"]);
 		dst.cgi_route.set(src._single_value["cgi_route"]);
-		dst.cgi_extensions.set(src._multi_values["cgi_extensions"]);
 		dst.error_pages.add(HTTP_BAD_REQUEST, src._single_value[HTTP_BAD_REQUEST]);
 		dst.error_pages.add(HTTP_INTERNAL_SERVER_ERROR, src._single_value[HTTP_INTERNAL_SERVER_ERROR]);
 		dst.error_pages.add(HTTP_METHOD_NOT_ALLOWED, src._single_value[HTTP_METHOD_NOT_ALLOWED]);

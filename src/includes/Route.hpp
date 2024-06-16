@@ -30,17 +30,6 @@ class Route
 				void show(void);
 		};
 
-		class CGI_Extensions {
-			private:
-				std::list<std::string> _values;
-			public:
-				CGI_Extensions(void);
-				std::list<std::string> const & get(void) const;
-				bool is_allowed(std::string ext) const;
-				void set(std::list<std::string> const & files);
-				void show(void);
-		};
-
 		class SaveFilesPath {
 			private:
 				std::string _root;
@@ -90,7 +79,6 @@ class Route
 		Return redirect;
 		Location location;
 		TryFiles try_files;
-		CGI_Extensions cgi_extensions;
 		Autoindex autoindex;
 		CGI_Route cgi_route;
 		SaveFilesPath save_files_path;

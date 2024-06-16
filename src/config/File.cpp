@@ -30,7 +30,6 @@ File::File(std::string file_name) : _file(file_name.c_str())
 		"server_name",
 		"try_files",
 		"methods",
-		"cgi_extensions",
 		NULL
 	};
 	for (int i = 0; multiples[i] != NULL; i++)

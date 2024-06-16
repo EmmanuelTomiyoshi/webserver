@@ -223,6 +223,15 @@ void Response::build_default_error(void)
     _body.should_free = false;
 }
 
+void Response::set_redirect(void)
+{
+    if (_route == NULL || _route->redirect.get().empty())
+        return ;
+    
+    _location = "Location: " + _route->redirect.get() + "\r\n";
+    _status = "302";
+}
+
 void Response::create_response(void)
 {
     std::string status_line = http_version + " " + _status + " \r\n";
@@ -234,7 +243,7 @@ void Response::create_response(void)
 
     std::string response = status_line + 
         "Connection: close\r\n" +
-        h1 + h2 + h3 + 
+        h1 + h2 + h3 + _location +
         content_length +
         "\r\n";
     
@@ -260,6 +269,7 @@ void Response::GET_normal(void)
     open_file();
     fill_mime(_path);
     fill_body();
+    set_redirect();
     create_response();
     create_writing_event(_event, _http_response, _http_response_size);
     _http_response = NULL;
@@ -444,6 +454,9 @@ ssize_t Response::send_response(void)
             throw std::runtime_error(_request->get_error());
         if (is_public() == false)
             _route = &_config->routes.get(_request->get_route());
+
+        if (_route)
+            std::cout << "  \n\nREDIRECT: " << _route->redirect.get() << std::endl;
         this->execute();
     }
     catch(const std::exception& e)

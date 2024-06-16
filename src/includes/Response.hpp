@@ -46,6 +46,9 @@ class Response
         void replace_error_path(std::string code);
         void build_default_error(void);
 
+        std::string _location;
+        void set_redirect(void);
+
         //the body can hold string or binary
         class Body
         {

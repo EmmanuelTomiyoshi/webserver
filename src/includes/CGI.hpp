@@ -82,6 +82,10 @@ class CGI
 
         void enter_dir(std::string dir);
 
+        std::string _status;
+        std::string _location;
+        void set_redirect(void);
+
     public:
         CGI(void);
 

@@ -6,7 +6,8 @@
 std::string CGI::_gateway_interface("GATEWAY_INTERFACE=CGI/1.1");
 std::string CGI::_server_protocol("SERVER_PROTOCOL=HTTP/1.1");
 
-CGI::CGI(void) : _body(NULL), _response_size(0)
+CGI::CGI(void) : _route(NULL), _body(NULL), _response(NULL),
+_response_size(0), _event(NULL), _status("200")
 {
     for (int i = 0; i < ENVS_SIZE; i++)
         _envs[i] = NULL;
@@ -217,6 +218,7 @@ void CGI::execute_cgi_post(void)
         event_data->pid = _pid;
         event_data->w_count = 0;
         event_data->buff = NULL;
+        event_data->route = _route;
 
         epoll_event event;
         event.events = EPOLLIN;
@@ -275,6 +277,7 @@ void CGI::execute_cgi_get(void)
         event_data->duration = 5;
         event_data->start_time = time(NULL);
         event_data->pid = _pid;
+        event_data->route = _route;
 
         epoll_event event;
         event.events = EPOLLIN;
@@ -340,9 +343,18 @@ void CGI::extract_response_data(char *response, ssize_t response_size)
     extract_content_type(response, header_size);
 }
 
+void CGI::set_redirect(void)
+{
+    if (_route == NULL || _route->redirect.get().empty())
+        return ;
+
+    _location = "Location: " + _route->redirect.get() + "\r\n";
+    _status = "302";
+}
+
 void CGI::format_http_response(void)
 {
-    std::string status_line = "HTTP/1.1 200 OK\n";
+    std::string status_line = "HTTP/1.1 " + _status + " \r\n";
     std::string h1 = "Content-Length: " +
         ft::int_to_str(_response_data.body_size) + 
         "\n";
@@ -353,7 +365,7 @@ void CGI::format_http_response(void)
         "\n\n";
     
 
-    std::string aux = status_line + h1 + h2 + h3 + h4;
+    std::string aux = status_line + _location + h1 + h2 + h3 + h4;
 
     size_t size = aux.length() + _response_data.body_size;
     char *http_response = new char[size];
@@ -371,6 +383,7 @@ void CGI::format_http_response(void)
 void CGI::process_response(char *response, ssize_t response_size)
 {
     extract_response_data(response, response_size);
+    set_redirect();
     format_http_response();
 }
 

@@ -5,6 +5,7 @@
 class Config;
 class Timeout;
 class Request2;
+class Route;
 
 class CustomData
 {
@@ -24,6 +25,7 @@ class CustomData
         ft::EventType type;
         ssize_t buff_size;
         ssize_t w_count;
+        Route *route;
 };
 
 #endif

@@ -166,6 +166,7 @@ void Server::process_cgi_response(epoll_event & cgi_event)
 	try
 	{
 		CGI cgi;
+		cgi.set_route(cgi_data->route);
 		cgi.process_response(cgi_data->buff, cgi_data->w_count);
 		char *response = cgi.get_response();
 		ssize_t response_size = cgi.get_response_size();

@@ -260,4 +260,8 @@ void Route::validate(void)
 {
 	if (this->_root.empty() && this->_parent_root.empty())
 		throw std::runtime_error("no root defined for route '" + this->location.get() + "'");
+
+	if (!methods.allowed("GET") && !methods.allowed("POST") && !methods.allowed("DELETE"))
+		throw std::runtime_error("no methods defined for route '" + this->location.get() + "'");
+	
 }

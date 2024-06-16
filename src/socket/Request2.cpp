@@ -265,17 +265,13 @@ void Request2::extract_file_normal(void)
 {
     std::string str = _target;
 
-    str = str.substr(str.find_last_of('/') + 1);
 
-    if (str.find_last_of('.') == std::string::npos)
+    if (str.find('?') != std::string::npos)
+        str = str.substr(0, str.find_first_of('?'));
+
+    str = str.substr(str.find_last_of('/') + 1);
+    if (str.find('.') == std::string::npos)
         return ;
-    _is_cgi = true;
-    if (str.find_first_of('?') == std::string::npos)
-    {
-        _file = str;
-        return ;
-    }
-    str = str.substr(0, str.find_first_of('?'));
     _file = str;
 }
 

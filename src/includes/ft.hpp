@@ -56,7 +56,6 @@ namespace ft {
     ssize_t write_all(int fd, char *buff, ssize_t size);
     void close_pipes(int *pfds1, int *pfds2);
 
-    ssize_t read_all(int fd, char **buff);
     bool file_exists(std::string filename);
 
     //receives a relative path and returns a full path

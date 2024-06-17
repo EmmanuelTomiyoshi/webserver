@@ -41,13 +41,10 @@ void start_server(int argc, char **argv)
 		delete server;
 }
 
-void tests(int argc, char **argv);
-
 int main(int argc, char *argv[])
 {
 	try
 	{
-		tests(argc, argv);
 		start_server(argc, argv);
 	}
 	catch (const std::runtime_error& e)

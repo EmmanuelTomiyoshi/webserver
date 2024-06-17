@@ -20,6 +20,7 @@ class Timeout {
         static void verify(void);
 
         static void show_count(void);
+        static Server *server;
 };
 
 #endif

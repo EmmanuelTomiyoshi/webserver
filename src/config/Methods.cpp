@@ -35,8 +35,7 @@ bool Methods::allowed(std::string method) const
 {
 	try
 	{
-		this->_methods.at(method);
-		return true;
+		return this->_methods.at(method);;
 	}
 	catch (std::exception & e)
 	{

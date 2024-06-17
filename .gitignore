@@ -31,7 +31,7 @@
 *.out
 *.app
 
-webserver
+webserv
 
 .vscode
 build
@@ -43,7 +43,7 @@ webserv
 .cache
 *.idx
 example.conf
-.chache
 test_form*
 debug*
+*.json
 front/uploads/*

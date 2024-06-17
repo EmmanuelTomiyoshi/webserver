@@ -18,13 +18,11 @@ Server::Server(std::string config_file) : _configs(config_file)
     _event__functions[ft::CGI_W] = &Server::write_to_cgi;
 	_event__functions[ft::CLIENT_BODY] = &Server::recv_client_body;
 	_event__functions[ft::RESPONSE] = &Server::send_data_to_client;
+	Timeout::server = this;
 }
 
 Server::~Server(void)
 {
-	//TODO: verify what memories to free
-	// if (_addr_res != NULL)
-	// 	freeaddrinfo(_addr_res);
 }
 
 void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type, Config *config)
@@ -53,15 +51,6 @@ void	Server::send_message(void)
 		throw std::runtime_error(HTTP_BAD_REQUEST);
 }
 
-/* 
-	if is first time: initialize request
-
-	else: if is body is incomplete, keep reading
-
-	request.add_more_body();
-
- */
-
 void	Server::new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type)
 {
 	CustomData *event_data = new CustomData;
@@ -86,7 +75,6 @@ void Server::recv_message(epoll_event & event)
 	const ssize_t buff_size = 40000;
 	char buff[buff_size];
 	ssize_t bytes = recv(event_data->fd, buff, buff_size, MSG_DONTWAIT);
-	std::cout << "data received: " << bytes << std::endl;
 
 	if (bytes <= 0)
 	{
@@ -115,11 +103,8 @@ void Server::recv_message(epoll_event & event)
 		delete [] data;
 	}
 
-	event_data->request->debug();
-
 	if (event_data->request->is_body_complete() || event_data->request->is_error())
 	{
-		event_data->request->info();
 		Response response(&event);
 		response.send_response();
 	}
@@ -131,6 +116,27 @@ void Server::recv_client_body(epoll_event & event)
 	(void) event;
 }
 
+void Server::create_error_event(int fd, std::string code)
+{
+	Response response;
+	response.process_error(code);
+
+	CustomData *data = new CustomData;
+	data->fd = fd;
+	data->buff = response.get_response();
+	data->buff_size = response.get_response_size();
+	data->w_count = 0;
+	data->type = ft::RESPONSE;
+	data->epfd = _epfd;
+
+	epoll_event event;
+	event.data.ptr = data;
+	event.events = EPOLLOUT;
+
+	Memory::add(data);
+	epoll_ctl(_epfd, EPOLL_CTL_ADD, data->fd, &event);
+}
+
 void Server::process_cgi_response(epoll_event & cgi_event)
 {
 	CustomData *cgi_data = (CustomData *) cgi_event.data.ptr;
@@ -138,13 +144,14 @@ void Server::process_cgi_response(epoll_event & cgi_event)
 	char buff[buff_siz];
 	ssize_t bytes = read(cgi_data->fd, buff, buff_siz);
 
+
 	if (bytes <= 0 && cgi_data->w_count <= 0)
 	{
+		create_error_event(cgi_data->cgi_fd, HTTP_NOT_FOUND);
+
 		epoll_ctl(_epfd, EPOLL_CTL_DEL, cgi_data->fd, NULL);
-		Memory::del(&cgi_event);
 		close(cgi_data->fd);
-		//execute_error();
-		close(cgi_data->cgi_fd);
+		Memory::del(&cgi_event);
 		return ;
 	}
 
@@ -166,6 +173,7 @@ void Server::process_cgi_response(epoll_event & cgi_event)
 	try
 	{
 		CGI cgi;
+		cgi.set_route(cgi_data->route);
 		cgi.process_response(cgi_data->buff, cgi_data->w_count);
 		char *response = cgi.get_response();
 		ssize_t response_size = cgi.get_response_size();
@@ -194,14 +202,7 @@ void Server::process_cgi_response(epoll_event & cgi_event)
 	}
 	catch (std::exception & e)
 	{
-		Response response;
-		response.process_error(e.what());
-		send(
-			cgi_data->cgi_fd,
-			response.get_response(),
-			response.get_response_size(),
-			MSG_DONTWAIT
-		);
+		create_error_event(cgi_data->cgi_fd, e.what());
 	}
 }
 
@@ -234,8 +235,6 @@ void Server::send_data_to_client(epoll_event & event)
 			MSG_DONTWAIT
 		);
 
-		std::cout << bytes << " sent." << std::endl;
-
 		data->w_count += bytes;
 	}
 	
@@ -250,8 +249,8 @@ void Server::send_data_to_client(epoll_event & event)
 
 void Server::create_new_connection(epoll_event & event)
 {
+	std::cout << "connection " << std::flush;
 	CustomData *event_data = (CustomData *) event.data.ptr;
-	std::cout << "new connection" << std::endl;
 	int fd_conn = accept4(event_data->fd, NULL, NULL, SOCK_NONBLOCK);
 	//fd_conn is related to socket_fd that is related to a port that is related to a specific config file
 	//this is why this relationship works and I get the right config file in the line below
@@ -266,7 +265,6 @@ void Server::create_new_connection(epoll_event & event)
 
 void Server::write_to_cgi(epoll_event & event)
 {
-	std::cout << "cgi write event triggered" << std::endl;
 	CGI cgi;
 	cgi.write_to_cgi(event);
 }

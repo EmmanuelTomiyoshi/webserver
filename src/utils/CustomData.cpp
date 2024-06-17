@@ -5,9 +5,9 @@
 CustomData::CustomData(void) : config(NULL),
 request(NULL), buff(NULL), start_time(0), 
 duration(5), fd(-1), cgi_fd(-1),
-epfd(-1), pid(-1), buff_size(0), w_count(0)
+epfd(-1), pid(-1), buff_size(0), w_count(0),
+route(NULL)
 {
-
 }
 
 CustomData::~CustomData(void)

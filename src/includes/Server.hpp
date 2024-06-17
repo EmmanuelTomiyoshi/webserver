@@ -46,10 +46,12 @@ class Server
 		void create_new_connection(epoll_event & event);
 		void write_to_cgi(epoll_event & event);
 
+
 	public:
 		Server(std::string config_file);
 		~Server(void);
 
+		void create_error_event(int fd, std::string code);
 		void start(void);
 		void stop(void);
 		void new_epoll_event(int conn_fd, uint32_t operation, ft::EventType type);

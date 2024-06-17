@@ -72,7 +72,6 @@ void Response::open_route_file_default(void)
         if (_file.good())
             return ;
     }
-    std::cerr << "ERROR: open_route_file_default" << std::endl;
     throw std::runtime_error(HTTP_NOT_FOUND);
 }
 
@@ -82,7 +81,6 @@ void Response::open_route_file_upload(void)
     _file.open(_path.c_str());
     if (_file.good())
         return ;
-    std::cerr << "ERROR: open_route_file_upload" << std::endl;
     throw std::runtime_error(HTTP_NOT_FOUND);
 }
 
@@ -223,6 +221,15 @@ void Response::build_default_error(void)
     _body.should_free = false;
 }
 
+void Response::set_redirect(void)
+{
+    if (_route == NULL || _route->redirect.get().empty())
+        return ;
+    
+    _location = "Location: " + _route->redirect.get() + "\r\n";
+    _status = "302";
+}
+
 void Response::create_response(void)
 {
     std::string status_line = http_version + " " + _status + " \r\n";
@@ -234,7 +241,7 @@ void Response::create_response(void)
 
     std::string response = status_line + 
         "Connection: close\r\n" +
-        h1 + h2 + h3 + 
+        h1 + h2 + h3 + _location +
         content_length +
         "\r\n";
     
@@ -260,6 +267,7 @@ void Response::GET_normal(void)
     open_file();
     fill_mime(_path);
     fill_body();
+    set_redirect();
     create_response();
     create_writing_event(_event, _http_response, _http_response_size);
     _http_response = NULL;
@@ -280,16 +288,28 @@ void Response::GET_cgi(void)
     cgi.execute();
 }
 
+void Response::GET_redirect(void)
+{
+    create_redirect_response();
+    create_writing_event(_event, _http_response, _http_response_size);
+    _http_response = NULL;
+}
+
 void Response::GET(void)
 {
+    if (_route && _route->redirect.get().empty() == false)
+    {
+        GET_redirect();
+        return ;
+    }
     if (!is_public() && _route->methods.allowed("GET") == false)
         throw std::runtime_error(HTTP_METHOD_NOT_ALLOWED);
     if (!is_public() && _route->cgi_route.is_true())
     {
         GET_cgi();
+        return ;
     }
-    else
-        GET_normal();
+    GET_normal();    
 }
 
 char *find_str_pos(const char *str, char *src)
@@ -313,11 +333,16 @@ void Response::POST(void)
     cgi.set_content_length(_request->get_header("Content-Length"));
     cgi.set_body_size(_request->get_body_size());
     cgi.set_content_type(_request->get_header("Content-Type"));
-    cgi.set_script_name("./cgi-bin/upload_debug.pl");
+    if (_request->get_file().empty())
+        cgi.set_script_name("./cgi-bin/upload_debug.pl");
+    else
+    {
+        std::string script_path = _route->get_path() + "/" + _request->get_file();
+        cgi.set_script_name(script_path);
+    }
     cgi.set_route(_route);
 
     cgi.set_event(_event);
-    cgi.info();
     cgi.execute();
 }
 
@@ -328,7 +353,6 @@ void Response::DELETE(void)
 
     std::string file_path = _route->save_files_path.get();
     file_path += "/" + _request->get_file();
-    std::cout << "FILE_PATH: " << file_path << std::endl;
     if (ft::file_exists(file_path) == false)
         throw std::runtime_error(HTTP_NOT_FOUND);
     if (std::remove(file_path.c_str()) != 0)
@@ -363,10 +387,28 @@ void Response::create_cors_response(void)
     std::memmove(_http_response, response.c_str(), response.size());
 }
 
+void Response::create_redirect_response(void)
+{
+    std::string status_line = http_version + " 302 \r\n";
+    std::string h0 = "Connection: close\r\n";
+    std::string h1 = "Content-Length: 0\r\n";
+    std::string h2 = "Access-Control-Allow-Origin: *\r\n";
+    std::string h3 = "Access-Control-Allow-Methods: GET, POST, DELETE\r\n";
+    std::string h4 = "Location: " + _route->redirect.get() + "\r\n";
+
+    std::string response = status_line + 
+        h0 + h1 + h2 + h3 + h4 + "\r\n";
+        
+
+    size_t size = response.size();
+    _http_response = new char[size];
+    _http_response_size = size;
+    std::memmove(_http_response, response.c_str(), response.size());
+}
+
 void Response::execute(void)
 {
     std::string method = _request->get_method();
-    std::cout << "&*****method: " << method << std::endl;
     if (method == "GET")
         GET();
     else if (method == "POST")
@@ -419,8 +461,6 @@ void Response::execute_error(std::string code)
 
 void Response::autoindex(void)
 {
-    std::cout << "\n-> EXECUTING AUTOINDEX <-\n" << std::endl;
-
     CGI cgi;
     cgi.set_request_method("GET");
     cgi.set_query_string(_request->get_query());
@@ -438,13 +478,17 @@ ssize_t Response::send_response(void)
             throw std::runtime_error(_request->get_error());
         if (is_public() == false)
             _route = &_config->routes.get(_request->get_route());
+
         this->execute();
     }
     catch(const std::exception& e)
     {
-        std::cout << "executing error: " << e.what() << std::endl;
-        if (_route != NULL && e.what() == std::string(HTTP_NOT_FOUND) && _route->autoindex.get() && _request->get_method() == "GET")
+        if (_route != NULL && e.what() == std::string(HTTP_NOT_FOUND) 
+        && _route->autoindex.get() && _request->get_method() == "GET"
+        && (_request && _request->get_file().empty()))
+        {
             autoindex();
+        }
         else
             execute_error(e.what());
     }
@@ -458,9 +502,12 @@ void Response::process_error(std::string code)
     fill_body();
     create_response();
 }
+
 char *Response::get_response(void)
 {
-    return _http_response;
+    char *aux = _http_response;
+    _http_response = NULL;
+    return aux;
 }
 ssize_t Response::get_response_size(void)
 {

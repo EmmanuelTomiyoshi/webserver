@@ -9,7 +9,10 @@ html {
     font-size: 16px;
 }
 
-/* Using rem units */
+a, a:visited {
+    text-decoration: none;
+}
+
 body, html {
     height: 100%;
     margin: 0;
@@ -44,8 +47,6 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
 }
-
-
 
 .Content {
     flex: 1 1 0;
@@ -104,11 +105,14 @@ body {
     gap: 0.75rem;
     display: flex;
 	border-style: none;
+    user-select: none;
+    text-decoration: none;
 }
 
 .ButtonPrimary:hover {
     box-shadow: 0 0 80px #0A7CFF; /* Modified box-shadow on hover */
 	cursor: pointer;
+    text-decoration: none;
 }
 
 .ButtonSecondary:hover {

@@ -46,6 +46,9 @@ class Response
         void replace_error_path(std::string code);
         void build_default_error(void);
 
+        std::string _location;
+        void set_redirect(void);
+
         //the body can hold string or binary
         class Body
         {
@@ -61,6 +64,7 @@ class Response
 
         void GET(void);
         void GET_normal(void);
+        void GET_redirect(void);
         void autoindex(void);
         void GET_cgi(void);
         void POST(void);
@@ -77,11 +81,11 @@ class Response
         void execute_error(std::string code);
 
         void create_cors_response(void);
-        
+        void create_redirect_response(void);
+
         void start_mimes(void);
         void fill_mime(std::string file);
 
-        static void create_writing_event(epoll_event *old_event, char *buff, ssize_t size);
     public:
         Response(void);
         Response(epoll_event *event);
@@ -93,6 +97,7 @@ class Response
 
         void process_error(std::string code);
         char *get_response(void);
+        static void create_writing_event(epoll_event *old_event, char *buff, ssize_t size);
         ssize_t get_response_size(void);
 };
 

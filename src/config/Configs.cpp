@@ -75,7 +75,6 @@ void Configs::setup_server_names(void)
 			std::string dns = host + " " + (*it2) + "\n";
 			if (content.find(dns) != std::string::npos)
 			{
-				std::cout << "already exists: " << dns << std::endl;
 				continue ;
 			}
 			buff << dns;

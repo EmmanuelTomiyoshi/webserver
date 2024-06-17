@@ -86,7 +86,6 @@ class Response
         void start_mimes(void);
         void fill_mime(std::string file);
 
-        static void create_writing_event(epoll_event *old_event, char *buff, ssize_t size);
     public:
         Response(void);
         Response(epoll_event *event);
@@ -98,6 +97,7 @@ class Response
 
         void process_error(std::string code);
         char *get_response(void);
+        static void create_writing_event(epoll_event *old_event, char *buff, ssize_t size);
         ssize_t get_response_size(void);
 };
 

@@ -2,8 +2,11 @@
 # include "Response.hpp"
 #include "CustomData.hpp"
 #include "Memory.hpp"
+#include "Server.hpp"
 
 std::list<CustomData *> Timeout::_events;
+
+Server *Timeout::server = NULL;
 
 void Timeout::add(epoll_event *event)
 {
@@ -37,15 +40,10 @@ void Timeout::event_timed_out(CustomData *event_data)
     if (event_data->type == ft::CGI_R)
     {
         kill(event_data->pid, SIGKILL);
-        Response response;
-        response.process_error(HTTP_INTERNAL_SERVER_ERROR);
-        send(
-            event_data->cgi_fd,
-            response.get_response(),
-            response.get_response_size(),
-            MSG_DONTWAIT
-        );
-        close(event_data->cgi_fd);
+        if (Timeout::server)
+        {
+            Timeout::server->create_error_event(event_data->cgi_fd, HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
     _events.remove(event_data);
     epoll_event event;

@@ -249,7 +249,6 @@ void Server::send_data_to_client(epoll_event & event)
 
 void Server::create_new_connection(epoll_event & event)
 {
-	std::cout << "connection " << std::flush;
 	CustomData *event_data = (CustomData *) event.data.ptr;
 	int fd_conn = accept4(event_data->fd, NULL, NULL, SOCK_NONBLOCK);
 	//fd_conn is related to socket_fd that is related to a port that is related to a specific config file
